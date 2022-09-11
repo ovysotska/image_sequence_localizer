@@ -1,0 +1,36 @@
+syntax = "proto2";
+
+package image_sequence_localizer;
+
+message CostMatrix {
+  optional int32 rows = 20;
+  optional int32 cols = 21;
+  repeated double values = 1;
+}
+
+message MatchingResult {
+  message Match {
+    optional int32 query_id = 1;
+    optional int32 ref_id = 2;
+    // The status of the match: real or hidden.
+    optional bool real = 3;
+  }
+  repeated Match matches = 1;
+}
+
+// Assumes that the feature is represented as a 1D vector.
+// The values are stored in the `values` field.
+message Feature {
+  repeated double values = 1;
+  optional int32 size = 2;
+  optional string type = 3;
+}
+
+message CostMatrixElements {
+  message Element {
+    optional int32 row = 1;
+    optional int32 col = 2;
+    optional int32 similarity_value = 3;
+  }
+  repeated Element elements = 1;
+}
