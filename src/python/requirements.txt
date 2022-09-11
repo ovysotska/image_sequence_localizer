@@ -1,7 +1,5 @@
-scikit-learn
 numpy
 matplotlib
-pickle5
 pandas
 protobuf==3.20.0
 opencv-python
