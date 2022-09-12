@@ -26,7 +26,7 @@ message Feature {
   optional string type = 3;
 }
 
-message CostMatrixElements {
+message Patch {
   message Element {
     optional int32 row = 1;
     optional int32 col = 2;

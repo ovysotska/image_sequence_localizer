@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 import argparse
 from pathlib import Path
-from compute_cost_matrix import load_cost_matrix
+import protos_io
 
 
 def main():
@@ -23,7 +23,7 @@ def main():
     args = parser.parse_args()
 
     cost_matrix_file = args.cost_matrix
-    cost_matrix = load_cost_matrix(cost_matrix_file)
+    cost_matrix = protos_io.read_cost_matrix(cost_matrix_file)
 
     max_value = np.max(np.max(cost_matrix))
     min_value = np.min(np.min(cost_matrix))

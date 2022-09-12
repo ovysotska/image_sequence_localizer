@@ -1,16 +1,7 @@
 import numpy as np
 from pathlib import Path
 import argparse
-import protos.localization_protos_pb2 as loc_protos
-
-
-def loadFeature(filename):
-    f = open(filename, "rb")
-    feature_proto = loc_protos.Feature()
-    feature_proto.ParseFromString(f.read())
-    f.close()
-
-    return np.array(feature_proto.values)
+import protos_io
 
 
 def cosine_similarity(qu, db):
@@ -29,32 +20,6 @@ def compute_cost_matrix(qu_features, db_features):
             cost_matrix[q, d] = cosine_similarity(query_feature, db_feature)
 
     print("Finished.")
-    return cost_matrix
-
-
-def write_cost_matrix(cost_matrix, cost_matrix_file):
-
-    cost_matrix_proto = loc_protos.CostMatrix()
-    cost_matrix_proto.rows = cost_matrix.shape[0]
-    cost_matrix_proto.cols = cost_matrix.shape[1]
-    for row in cost_matrix:
-        cost_matrix_proto.values.extend(row.tolist())
-
-    f = open(cost_matrix_file, "wb")
-    f.write(cost_matrix_proto.SerializeToString())
-    f.close()
-
-
-def load_cost_matrix(cost_matrix_file):
-    f = open(cost_matrix_file, "rb")
-    cost_matrix_proto = loc_protos.CostMatrix()
-    cost_matrix_proto.ParseFromString(f.read())
-    f.close()
-    cost_matrix = np.array(cost_matrix_proto.values)
-    cost_matrix = np.reshape(
-        cost_matrix, (cost_matrix_proto.rows, cost_matrix_proto.cols)
-    )
-    print("Retrieved cost_matrix", cost_matrix)
     return cost_matrix
 
 
@@ -83,17 +48,17 @@ def main():
     db_files.sort()
 
     query_features = []
-    for qu in query_files:
-        query_features.append(loadFeature(qu))
+    for query_file in query_files:
+        query_features.append(protos_io.read_feature(query_file))
 
     db_features = []
-    for db in db_files:
-        db_features.append(loadFeature(db))
+    for db_file in db_files:
+        db_features.append(protos_io.lread_features(db_file))
 
     cost_matrix = compute_cost_matrix(query_features, db_features)
 
     print("Matrix size", cost_matrix.shape)
-    write_cost_matrix(cost_matrix, cost_matrix_file)
+    protos_io.write_cost_matrix(cost_matrix, cost_matrix_file)
     print("The cost matrix was save to", cost_matrix_file)
 
 

@@ -2,33 +2,28 @@ import numpy as np
 import cv2
 import argparse
 from pathlib import Path
-from compute_cost_matrix import load_cost_matrix
-import protos.localization_protos_pb2 as loc_protos
-import matplotlib.pyplot as plt
+import protos_io
 
 
-def load_matching_result(filename):
-    f = open(filename, "rb")
-    result_proto = loc_protos.MatchingResult()
-    result_proto.ParseFromString(f.read())
-    f.close()
-    return result_proto
-
-
-def show_matching_result(matching_result, cost_matrix):
+def show_matching_result(matching_result, cost_matrix, expanded_mask):
 
     rgb_costs = np.zeros((cost_matrix.shape[0], cost_matrix.shape[1], 3))
     rgb_costs[:, :, 0] = cost_matrix
     rgb_costs[:, :, 1] = cost_matrix
     rgb_costs[:, :, 2] = cost_matrix
 
+    # Add expanded nodes
+    for element in expanded_mask:
+        rgb_costs[element.row, element.col] = [0, 1, 0]
+
+    # Add path with color. Red - real nodes, Blue - hidden nodes.
     for match in matching_result.matches:
         if match.real == True:
             rgb_costs[match.query_id, match.ref_id] = [1, 0, 0]
         else:
             rgb_costs[match.query_id, match.ref_id] = [0, 0, 1]
-    plt.imshow(rgb_costs, vmin=0, vmax=1)
-    plt.show()
+
+    return rgb_costs
 
 
 def main():
@@ -46,6 +41,12 @@ def main():
         help="Path to the matching result .MatchingResult.pb file",
     )
     parser.add_argument(
+        "--expanded_patches_dir",
+        required=False,
+        type=Path,
+        help="Path to directory with expanded nodes files of type .Patch.pb",
+    )
+    parser.add_argument(
         "--image_name",
         required=False,
         default=None,
@@ -55,7 +56,7 @@ def main():
     args = parser.parse_args()
 
     cost_matrix_file = args.cost_matrix
-    cost_matrix = load_cost_matrix(cost_matrix_file)
+    cost_matrix = protos_io.read_cost_matrix(cost_matrix_file)
 
     max_value = np.max(np.max(cost_matrix))
     min_value = np.min(np.min(cost_matrix))
@@ -63,21 +64,21 @@ def main():
     print("Max value", max_value)
     print("Min value", min_value)
 
-    matching_result = load_matching_result(args.matching_result)
+    matching_result = protos_io.read_matching_result(args.matching_result)
+    expanded_mask = protos_io.read_expanded_mask(args.expanded_patches_dir)
 
-    show_matching_result(matching_result, cost_matrix)
+    image = show_matching_result(matching_result, cost_matrix, expanded_mask)
 
-    # if args.image_name:
-    #     print(args.image_name)
-    #     img = np.array(cost_matrix, dtype=float) * float(255)
-    #     cv2.imwrite(str(args.image_name), img)
+    if args.image_name:
+        img = np.array(image, dtype=float) * float(255)
+        cv2.imwrite(str(args.image_name), img)
 
-    # window_name = f"cost_matrix {max_value:.4f}:{min_value:.4f}"
+    window_name = f"cost_matrix {max_value:.4f}:{min_value:.4f}"
 
-    # cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
-    # cv2.imshow(window_name, cost_matrix)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
+    cv2.imshow(window_name, image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
