@@ -24,7 +24,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install xmllint
+    - name: Install dependencies
       run: sudo apt-get install -y libopencv-dev libyaml-cpp-dev libprotobuf-dev
 
     - name: Build
