@@ -33,6 +33,7 @@ jobs:
         cd build
         cmake ..
         make -j4
+        cat /home/runner/work/image_sequence_localizer/image_sequence_localizer/build/src/CMakeFiles/protos.dir/build.make
 
     - name: Test
       run: |
