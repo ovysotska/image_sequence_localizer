@@ -1,0 +1,40 @@
+name: CI
+
+on: [pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Check Clang Format
+      uses: DoozyX/clang-format-lint-action@v0.10
+      with:
+        source: '.'
+        exclude: './third_party'
+        extensions: 'h,cpp'
+        clangFormatVersion: 10
+        style: file
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: sudo apt-get install -y libopencv-dev libyaml-cpp-dev libprotobuf-dev libprotoc-dev protobuf-compiler
+
+    - name: Build
+      run: |
+        mkdir build
+        cd build
+        cmake ..
+        make -j4
+
+    - name: Test
+      run: |
+        cd build
+        ctest --output-on-failure

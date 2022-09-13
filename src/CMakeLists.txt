@@ -12,7 +12,10 @@ target_compile_features(cxx_flags INTERFACE cxx_std_17)
 include_directories(${Protobuf_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS localization_protos.proto)
-protobuf_generate_python(PROTO_PY localization_protos.proto PROTOC_OUT_DIR ${CMAKE_SOURCE_DIR}/src/python/protos)
+
+set(PROTOS_FOLDER ${CMAKE_SOURCE_DIR}/src/python/protos)
+file(MAKE_DIRECTORY ${PROTOS_FOLDER})
+protobuf_generate_python(PROTO_PY localization_protos.proto PROTOC_OUT_DIR ${PROTOS_FOLDER})
 
 add_library(protos ${PROTO_SRCS} ${PROTO_HDRS})
 target_link_libraries(protos ${Protobuf_LIBRARIES})
