@@ -25,14 +25,13 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Install dependencies
-      run: sudo apt-get install -y libopencv-dev libyaml-cpp-dev libprotobuf-dev libprotoc-dev
+      run: sudo apt-get install -y libopencv-dev libyaml-cpp-dev libprotobuf-dev libprotoc-dev protobuf-compiler
 
     - name: Build
       run: |
         mkdir build
         cd build
         cmake ..
-        cat /home/runner/work/image_sequence_localizer/image_sequence_localizer/build/src/CMakeFiles/protos.dir/build.make
         make -j4
 
     - name: Test
