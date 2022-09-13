@@ -1,5 +1,3 @@
-find_package(Protobuf REQUIRED)
-
 # TODO: is opencv really required?
 find_package( OpenCV REQUIRED )
 

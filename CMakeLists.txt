@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 
 project(image_sequence_localizer)
 
+find_package(Protobuf REQUIRED)
+
 include(GoogleTest)
 include(cmake/UpdateSubmodules.cmake)
 
