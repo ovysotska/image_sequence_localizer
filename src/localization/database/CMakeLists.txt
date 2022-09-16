@@ -1,5 +1,6 @@
 #  There must be a better way to list a directory. Path?
 add_library(list_dir list_dir.cpp)
+target_link_libraries(list_dir 	cxx_flags)
 
 add_library(online_database online_database.cpp)
 target_link_libraries(online_database

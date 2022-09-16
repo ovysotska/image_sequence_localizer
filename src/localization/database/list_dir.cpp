@@ -1,4 +1,4 @@
-/** vpr_relocalization: a library for visual place recognition in changing 
+/** vpr_relocalization: a library for visual place recognition in changing
 ** environments with efficient relocalization step.
 ** Copyright (c) 2017 O. Vysotska, C. Stachniss, University of Bonn
 **
@@ -21,12 +21,14 @@
 ** SOFTWARE.
 **/
 
-
 #include "list_dir.h"
 
-#include <dirent.h>
+#include "filesystem"
 #include <algorithm>
+#include <dirent.h>
 #include <iostream>
+
+namespace fs = std::filesystem;
 
 std::vector<std::string> listDir(const std::string &dir_name) {
   std::vector<std::string> file_names;
@@ -35,7 +37,7 @@ std::vector<std::string> listDir(const std::string &dir_name) {
     struct dirent *ent;
     /* print all the files and directories within directory */
     while ((ent = readdir(dir)) != NULL) {
-      file_names.push_back( dir_name + ent->d_name);
+      file_names.push_back(dir_name + ent->d_name);
     }
     std::sort(file_names.begin(), file_names.end());
     closedir(dir);
@@ -49,4 +51,25 @@ std::vector<std::string> listDir(const std::string &dir_name) {
     exit(EXIT_FAILURE);
   }
   return file_names;
+}
+
+std::vector<std::string> listProtoDir(const std::string &pathToDir,
+                                      const std::string &protoExtension) {
+  std::vector<std::string> proto_files;
+  for (const auto &entry : fs::directory_iterator(pathToDir)) {
+    if (!entry.is_regular_file()) {
+      // Not a file.
+      continue;
+    }
+    fs::path file = entry.path();
+    if (file.extension() == ".pb") {
+      // It is a proto extension.
+      if (file.stem().extension() == protoExtension) {
+        // It is a proto of the proper type.
+        proto_files.push_back(file.string());
+      }
+    }
+  }
+  std::sort(proto_files.begin(), proto_files.end());
+  return proto_files;
 }

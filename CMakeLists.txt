@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 3.10)
 
 project(image_sequence_localizer)
 
-include(GoogleTest)
+
 include(cmake/UpdateSubmodules.cmake)
+include(GoogleTest)
 
 option(PACKAGE_TESTS "Build the tests" ON)
 if(PACKAGE_TESTS)
