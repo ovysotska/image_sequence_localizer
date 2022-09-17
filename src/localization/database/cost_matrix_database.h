@@ -24,18 +24,15 @@
 #ifndef SRC_DATABASE_COST_MATRIX_DATABASE_H_
 #define SRC_DATABASE_COST_MATRIX_DATABASE_H_
 
-#include <string>
 #include "database/online_database.h"
+#include <string>
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+typedef std::vector<std::vector<double>> Matrix;
 
 /**
  * @brief      Class for cost matrix database. Stores costs as matrix.
  */
-class CostMatrixDatabase : public OnlineDatabase
-{
+class CostMatrixDatabase : public OnlineDatabase {
 public:
   using Ptr = std::shared_ptr<CostMatrixDatabase>;
   using ConstPtr = std::shared_ptr<const CostMatrixDatabase>;
@@ -43,7 +40,7 @@ public:
   CostMatrixDatabase();
   ~CostMatrixDatabase() {}
 
-  int refSize() override;
+  int refSize() override { return cols_; }
   /** gets the original cost and transforms it 1/cost **/
   double getCost(int quId, int refId) override;
 
@@ -65,15 +62,14 @@ public:
 
   void loadFromProto(const std::string &filename);
 
-  void setCosts(const cv::Mat &costs) { costs.copyTo(_costs); }
+  void setCosts(const Matrix &costs, int rows, int cols);
   /** returns original costs. Use for visualization and testing only **/
-  cv::Mat getCosts() const { return _costs; }
+  const Matrix &getCosts() const { return costs_; }
 
 private:
-  /**
-   * Costs are read in format cv::CV_32FC1
-   */
-  cv::Mat _costs;
+  Matrix costs_;
+  int rows_ = 0;
+  int cols_ = 0;
 };
 
 /** can store only those matrix that fit in the RAM **/

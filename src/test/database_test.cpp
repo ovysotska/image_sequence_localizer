@@ -32,9 +32,6 @@
 #include <iostream>
 #include <string>
 
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-
 namespace fs = std::filesystem;
 namespace localizer = image_sequence_localizer;
 
@@ -96,9 +93,20 @@ TEST_F(OnlineDatabaseTest, refSize) {
 // This should test that proper features get pulled by quID, refID rather than
 // actual similarity score TEST_F(OnlineDatabaseTest, getCost) { OnlineDatabase
 // database; double OnlineDatabase::computeMatchCost(int quId, int refId)
+
+TEST(CostMatrixDatabaseTest, refSize) {
+  CostMatrixDatabase database;
+  database.setCosts({{1, 2, 3}, {4, 5, 6}}, 2, 3);
+  EXPECT_EQ(database.refSize(), 3);
 }
 
-// Everything should be done through the cost nmatrxi
-// TEST_F(CostMatrixdatabaseTest, refSize)
+TEST(CostMatrixDatabaseTest, getCost) {
+  CostMatrixDatabase database;
+  database.setCosts({{1, 2, 3}, {4, 5, 6}}, 2, 3);
+  EXPECT_EQ(database.getCost(0, 0), 1);
+  EXPECT_DOUBLE_EQ(database.getCost(0, 2), 1. / 3);
+  EXPECT_DOUBLE_EQ(database.getCost(1, 0), 1. / 4);
+  EXPECT_DOUBLE_EQ(database.getCost(1, 2), 1. / 6);
+}
+
 // TEST_F(CostMatrixdatabaseTest, loadFromProto)
-// TEST_F(CostMatrixdatabaseTest, getCosts)

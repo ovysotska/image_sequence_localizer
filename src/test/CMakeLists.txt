@@ -9,7 +9,6 @@ target_link_libraries(${TESTNAME}
     feature_buffer
     cost_matrix_database
     protos
-    ${OpenCV_LIBS}
     gtest 
     gtest_main
     cxx_flags

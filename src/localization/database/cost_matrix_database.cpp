@@ -31,91 +31,96 @@
 CostMatrixDatabase::CostMatrixDatabase() {}
 
 void CostMatrixDatabase::loadFromTxt(const std::string &filename) {
-    std::ifstream in(filename.c_str());
-    if (!in) {
-        printf("[ERROR][CostMatrixDatabase] The file cannot be opened %s\n",
-               filename.c_str());
-        return;
-    }
-    int rows, cols;
-    in >> rows >> cols;
-    printf("[INFO][CostMatrixDatabase] The matrix has %d rows and %d cols\n",
-           rows, cols);
-    // the only solution that works to reserve space for the Mat. If you know
-    // better working way please let me know.
-    cv::Mat tmp(rows, cols, CV_32FC1);
-    _costs = tmp;
+  std::ifstream in(filename.c_str());
+  if (!in) {
+    printf("[ERROR][CostMatrixDatabase] The file cannot be opened %s\n",
+           filename.c_str());
+    return;
+  }
+  int rows, cols;
+  in >> rows >> cols;
+  printf("[INFO][CostMatrixDatabase] The matrix has %d rows and %d cols\n",
+         rows, cols);
 
-    for (int r = 0; r < rows; ++r) {
-        for (int c = 0; c < cols; ++c) {
-            float value;
-            in >> value;
-            _costs.at<float>(r, c) = value;
-        }
+  for (int r = 0; r < rows; ++r) {
+    std::vector<double> row(cols);
+    for (int c = 0; c < cols; ++c) {
+      float value;
+      in >> value;
+      row[c] = value;
     }
-    printf("[INFO][CostMatrixDatabase] Matrix was read\n");
-    in.close();
+    costs_.push_back(row);
+  }
+  printf("[INFO][CostMatrixDatabase] Matrix was read\n");
+  in.close();
 }
 
 void CostMatrixDatabase::loadFromTxt(const std::string &filename, int rows,
                                      int cols) {
-    std::ifstream in(filename.c_str());
-    if (!in) {
-        printf("[ERROR][CostMatrixDatabase] The file cannot be opened %s\n",
-               filename.c_str());
-        return;
+  std::ifstream in(filename.c_str());
+  if (!in) {
+    printf("[ERROR][CostMatrixDatabase] The file cannot be opened %s\n",
+           filename.c_str());
+    return;
+  }
+  printf("[INFO][CostMatrixDatabase] The matrix has %d rows and %d cols\n",
+         rows, cols);
+  // the only solution that works to reserve space for the Mat. If you know
+  // better working way please let me know.
+  for (int r = 0; r < rows; ++r) {
+    std::vector<double> row(cols);
+    for (int c = 0; c < cols; ++c) {
+      float value;
+      in >> value;
+      row[c] = value;
     }
-    printf("[INFO][CostMatrixDatabase] The matrix has %d rows and %d cols\n",
-           rows, cols);
-    // the only solution that works to reserve space for the Mat. If you know
-    // better working way please let me know.
-    cv::Mat tmp(rows, cols, CV_32FC1);
-    _costs = tmp;
-
-    for (int r = 0; r < rows; ++r) {
-        for (int c = 0; c < cols; ++c) {
-            float value;
-            in >> value;
-            _costs.at<float>(r, c) = value;
-        }
-    }
-    printf("[INFO][CostMatrixDatabase] Matrix was read\n");
-    in.close();
+    costs_.push_back(row);
+  }
+  printf("[INFO][CostMatrixDatabase] Matrix was read\n");
+  in.close();
 }
 
-int CostMatrixDatabase::refSize() { return _costs.cols; }
+void CostMatrixDatabase::setCosts(const Matrix &costs, int rows, int cols) {
+  rows_ = rows;
+  cols_ = cols;
+  costs_ = costs;
+}
+
 double CostMatrixDatabase::getCost(int quId, int refId) {
-    if (quId >= _costs.rows || quId < 0) {
-        printf("[ERROR][CostMatrixDatabase] Invalid query index %d\n", quId);
-        return -1;
-    }
-    if (refId >= _costs.cols || refId < 0) {
-        printf("[ERROR][CostMatrixDatabase] Invalid query index %d\n", refId);
-        return -1;
-    }
-    double value = _costs.at<float>(quId, refId);
-    if (value < 1e-09) {
-        return std::numeric_limits<double>::max();
-    }
-    return 1. / value;
+  if (quId >= rows_ || quId < 0) {
+    printf("[ERROR][CostMatrixDatabase] Invalid query index %d\n", quId);
+    return -1;
+  }
+  if (refId >= cols_ || refId < 0) {
+    printf("[ERROR][CostMatrixDatabase] Invalid query index %d\n", refId);
+    return -1;
+  }
+  double value = costs_[quId][refId];
+  if (value < 1e-09) {
+    return std::numeric_limits<double>::max();
+  }
+  return 1. / value;
 }
 
-// TODO make sure to write a unit test here.
 void CostMatrixDatabase::loadFromProto(const std::string &filename) {
-    GOOGLE_PROTOBUF_VERIFY_VERSION;
-    image_sequence_localizer::CostMatrix cost_matrix_proto;
-    std::fstream input(filename, std::ios::in | std::ios::binary);
-    if (!cost_matrix_proto.ParseFromIstream(&input)) {
-        std::cerr << "Failed to parse cost_matrix file: " << filename << "." << std::endl;
-        return;
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+  image_sequence_localizer::CostMatrix cost_matrix_proto;
+  std::fstream input(filename, std::ios::in | std::ios::binary);
+  if (!cost_matrix_proto.ParseFromIstream(&input)) {
+    std::cerr << "Failed to parse cost_matrix file: " << filename << "."
+              << std::endl;
+    return;
+  }
+  std::vector<double> row;
+  for (int idx = 0; idx < cost_matrix_proto.values_size(); ++idx) {
+    row.push_back(cost_matrix_proto.values(idx));
+    if (row.size() == cost_matrix_proto.cols()) {
+      costs_.push_back(row);
+      row.clear();
     }
-    std::cout << cost_matrix_proto.cols() << " " << cost_matrix_proto.rows() << std::endl;
-    cv::Mat tmp(cost_matrix_proto.rows(), cost_matrix_proto.cols(), CV_32FC1);
-    _costs = tmp;
-
-    for (int idx = 0; idx < cost_matrix_proto.values_size(); ++idx) {
-        int row = idx / cost_matrix_proto.cols();
-        int cols = idx - row * cost_matrix_proto.cols();
-        _costs.at<float>(row, cols) = cost_matrix_proto.values(idx);
-    }
+  }
+  cols_ = cost_matrix_proto.cols();
+  rows_ = cost_matrix_proto.rows();
+  std::cout << "Read cost matrix with " << rows_ << " rows and " << cols_
+            << " cols.\n";
 }
