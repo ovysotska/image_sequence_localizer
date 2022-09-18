@@ -41,7 +41,7 @@ using std::make_shared;
 std::vector<iBinarizableFeature::Ptr>
 loadFeatures(const std::string &path2folder) {
   printf("Loading the features to hash with LSH\n");
-  std::vector<std::string> featureNames = listProtoDir(path2folder, "Feature");
+  std::vector<std::string> featureNames = listProtoDir(path2folder, ".Feature");
   std::vector<iBinarizableFeature::Ptr> featurePtrs;
 
   for (size_t i = 0; i < featureNames.size(); ++i) {

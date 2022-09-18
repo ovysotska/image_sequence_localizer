@@ -63,10 +63,7 @@ protected:
     std::fstream output(filename,
                         std::ios::out | std::ios::trunc | std::ios::binary);
 
-    if (!feature_proto.SerializeToOstream(&output)) {
-      std::cerr << "Failed to write feature proto." << std::endl;
-      return;
-    }
+    ASSERT_TRUE(feature_proto.SerializeToOstream(&output));
   }
   void SetUp() {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -90,9 +87,7 @@ TEST_F(OnlineDatabaseTest, refSize) {
   EXPECT_EQ(4, database.refSize());
 }
 
-// This should test that proper features get pulled by quID, refID rather than
-// actual similarity score TEST_F(OnlineDatabaseTest, getCost) { OnlineDatabase
-// database; double OnlineDatabase::computeMatchCost(int quId, int refId)
+// TODO: Add tests for the online database after refactoring
 
 TEST(CostMatrixDatabaseTest, refSize) {
   CostMatrixDatabase database;
@@ -109,4 +104,27 @@ TEST(CostMatrixDatabaseTest, getCost) {
   EXPECT_DOUBLE_EQ(database.getCost(1, 2), 1. / 6);
 }
 
-// TEST_F(CostMatrixdatabaseTest, loadFromProto)
+TEST(CostMatrixDatabaseTest, loadFromProto) {
+  image_sequence_localizer::CostMatrix cost_matrix;
+  for (double value : {1, 2, 3, 4, 5, 6}) {
+    cost_matrix.add_values(value);
+  }
+  cost_matrix.set_cols(3);
+  cost_matrix.set_rows(2);
+  fs::path tmp_dir = fs::temp_directory_path();
+  fs::create_directories(tmp_dir);
+  std::string cost_matrix_name =
+      (tmp_dir / "debug_cost_matrix.CostMatrix.pb").string();
+
+  std::fstream out(cost_matrix_name,
+                   std::ios::out | std::ios::trunc | std::ios::binary);
+  ASSERT_TRUE(cost_matrix.SerializeToOstream(&out));
+  out.close();
+
+  CostMatrixDatabase database;
+  database.loadFromProto(cost_matrix_name);
+  EXPECT_EQ(database.getCost(0, 0), 1);
+  EXPECT_DOUBLE_EQ(database.getCost(0, 2), 1. / 3);
+  EXPECT_DOUBLE_EQ(database.getCost(1, 0), 1. / 4);
+  EXPECT_DOUBLE_EQ(database.getCost(1, 2), 1. / 6);
+}
