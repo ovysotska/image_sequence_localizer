@@ -55,6 +55,11 @@ std::vector<std::string> listDir(const std::string &dir_name) {
 
 std::vector<std::string> listProtoDir(const std::string &pathToDir,
                                       const std::string &protoExtension) {
+  if (protoExtension.at(0) != '.') {
+    std::cout << "[WARNING] Proto extension should start with <.>\n";
+    std::cout << "[WARNING] Received proto extension: " << protoExtension
+              << std::endl;
+  }
   std::vector<std::string> proto_files;
   for (const auto &entry : fs::directory_iterator(pathToDir)) {
     if (!entry.is_regular_file()) {
