@@ -38,67 +38,67 @@
 
 using std::make_shared;
 
-std::vector<iBinarizableFeature::Ptr> loadFeatures(
-    const std::string &path2folder) {
-    printf("Loading the features to hash with LSH\n");
-    std::vector<std::string> featureNames = listDir(path2folder);
-    std::vector<iBinarizableFeature::Ptr> featurePtrs;
+std::vector<iBinarizableFeature::Ptr>
+loadFeatures(const std::string &path2folder) {
+  printf("Loading the features to hash with LSH\n");
+  std::vector<std::string> featureNames = listProtoDir(path2folder, ".Feature");
+  std::vector<iBinarizableFeature::Ptr> featurePtrs;
 
-    for (size_t i = 0; i < featureNames.size(); ++i) {
-        iBinarizableFeature::Ptr featurePtr =
-            iBinarizableFeature::Ptr(new CnnFeature);
-        featurePtr->loadFromFile(featureNames[i]);
-        featurePtrs.push_back(featurePtr);
-        fprintf(stderr, ".");
-    }
-    fprintf(stderr, "\n");
-    printf("Features were loaded and binarized\n");
-    return featurePtrs;
+  for (size_t i = 0; i < featureNames.size(); ++i) {
+    iBinarizableFeature::Ptr featurePtr =
+        iBinarizableFeature::Ptr(new CnnFeature);
+    featurePtr->loadFromFile(featureNames[i]);
+    featurePtrs.push_back(featurePtr);
+    fprintf(stderr, ".");
+  }
+  fprintf(stderr, "\n");
+  printf("Features were loaded and binarized\n");
+  return featurePtrs;
 }
 
 int main(int argc, char *argv[]) {
-    printf("===== Online place recognition cost matrix based LSH ====\n");
-    if (argc < 2) {
-        printf("[ERROR] Not enough input parameters.\n");
-        printf("Proper usage: ./cost_matrix_based_matching_lsh config_file.yaml\n");
-        exit(0);
-    }
+  printf("===== Online place recognition cost matrix based LSH ====\n");
+  if (argc < 2) {
+    printf("[ERROR] Not enough input parameters.\n");
+    printf("Proper usage: ./cost_matrix_based_matching_lsh config_file.yaml\n");
+    exit(0);
+  }
 
-    std::string config_file = argv[1];
-    ConfigParser parser;
-    parser.parseYaml(config_file);
-    parser.print();
+  std::string config_file = argv[1];
+  ConfigParser parser;
+  parser.parseYaml(config_file);
+  parser.print();
 
-    auto databasePtr = CostMatrixDatabase::Ptr(new CostMatrixDatabase);
-    databasePtr->loadFromProto(parser.costMatrix);
-    // to obtain the features, when needed
-    databasePtr->setQuFeaturesFolder(parser.path2qu);
-    databasePtr->setBufferSize(parser.bufferSize);
-    databasePtr->setFeatureType(FeatureFactory::FeatureType::Cnn_Feature);
+  auto databasePtr = CostMatrixDatabase::Ptr(new CostMatrixDatabase);
+  databasePtr->loadFromProto(parser.costMatrix);
+  // to obtain the features, when needed
+  databasePtr->setQuFeaturesFolder(parser.path2qu);
+  databasePtr->setBufferSize(parser.bufferSize);
+  databasePtr->setFeatureType(FeatureFactory::FeatureType::Cnn_Feature);
 
-    // initialize Relocalizer
-    auto relocalizerPtr = LshCvHashing::Ptr(new LshCvHashing);
-    relocalizerPtr->setParams(1, 12, 2);
-    relocalizerPtr->setDatabase(databasePtr);
-    std::vector<iBinarizableFeature::Ptr> featurePtrs =
-        loadFeatures(parser.path2ref);
-    relocalizerPtr->train(featurePtrs);
+  // initialize Relocalizer
+  auto relocalizerPtr = LshCvHashing::Ptr(new LshCvHashing);
+  relocalizerPtr->setParams(1, 12, 2);
+  relocalizerPtr->setDatabase(databasePtr);
+  std::vector<iBinarizableFeature::Ptr> featurePtrs =
+      loadFeatures(parser.path2ref);
+  relocalizerPtr->train(featurePtrs);
 
-    // initialize SuccessorManager
-    auto successorManagerPtr = SuccessorManager::Ptr(new SuccessorManager);
-    successorManagerPtr->setFanOut(parser.fanOut);
-    successorManagerPtr->setDatabase(databasePtr);
-    successorManagerPtr->setRelocalizer(relocalizerPtr);
+  // initialize SuccessorManager
+  auto successorManagerPtr = SuccessorManager::Ptr(new SuccessorManager);
+  successorManagerPtr->setFanOut(parser.fanOut);
+  successorManagerPtr->setDatabase(databasePtr);
+  successorManagerPtr->setRelocalizer(relocalizerPtr);
 
-    // create localizer and run it
-    OnlineLocalizer localizer;
-    localizer.setQuerySize(parser.querySize);
-    localizer.setSuccessorManager(successorManagerPtr);
-    localizer.setExpansionRate(parser.expansionRate);
-    localizer.setNonMatchingCost(parser.nonMatchCost);
-    localizer.run();
+  // create localizer and run it
+  OnlineLocalizer localizer;
+  localizer.setQuerySize(parser.querySize);
+  localizer.setSuccessorManager(successorManagerPtr);
+  localizer.setExpansionRate(parser.expansionRate);
+  localizer.setNonMatchingCost(parser.nonMatchCost);
+  localizer.run();
 
-    localizer.printPath(parser.matchingResult);
-    printf("Done.\n");
-    return 0;
+  localizer.printPath(parser.matchingResult);
+  printf("Done.\n");
+  return 0;
 }

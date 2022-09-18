@@ -1,4 +1,4 @@
-/** vpr_relocalization: a library for visual place recognition in changing 
+/** vpr_relocalization: a library for visual place recognition in changing
 ** environments with efficient relocalization step.
 ** Copyright (c) 2017 O. Vysotska, C. Stachniss, University of Bonn
 **
@@ -21,14 +21,13 @@
 ** SOFTWARE.
 **/
 
-
 #include "database/online_database.h"
+#include "database/list_dir.h"
+#include "tools/timer/timer.h"
 #include <fstream>
 #include <limits>
 #include <string>
 #include <vector>
-#include "database/list_dir.h"
-#include "tools/timer/timer.h"
 
 using std::string;
 using std::vector;
@@ -81,10 +80,10 @@ double OnlineDatabase::getCost(int quId, int refId) {
 }
 
 void OnlineDatabase::setQuFeaturesFolder(const std::string &path2folder) {
-  _quFeaturesNames = listDir(path2folder);
+  _quFeaturesNames = listProtoDir(path2folder, ".Feature");
 }
 void OnlineDatabase::setRefFeaturesFolder(const std::string &path2folder) {
-  _refFeaturesNames = listDir(path2folder);
+  _refFeaturesNames = listProtoDir(path2folder, ".Feature");
 }
 
 void OnlineDatabase::setBufferSize(int size) {
@@ -119,7 +118,7 @@ double OnlineDatabase::computeMatchCost(int quId, int refId) {
   } else {
     // We cannot directly set const pointers, so set them through a proxy.
     auto tempFeaturePtr = _featureFactory.createFeature();
-    tempFeaturePtr->loadFromFile( _quFeaturesNames[quId]);
+    tempFeaturePtr->loadFromFile(_quFeaturesNames[quId]);
     quFeaturePtr = tempFeaturePtr;
     _quBuff.addFeature(quId, quFeaturePtr);
   }

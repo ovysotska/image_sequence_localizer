@@ -1,6 +1,17 @@
 set(TESTNAME test_${PROJECT_NAME})
 
-add_executable(${TESTNAME} dummy_test.cpp dummy_test_2.cpp)
-target_link_libraries(${TESTNAME} gtest gtest_main)
+add_executable(${TESTNAME} 
+    database_test.cpp
+    feature_buffer_test.cpp
+)
+target_link_libraries(${TESTNAME} 
+    cnn_feature
+    feature_buffer
+    cost_matrix_database
+    protos
+    gtest 
+    gtest_main
+    cxx_flags
+)
 
 gtest_discover_tests(${TESTNAME})

@@ -1,4 +1,4 @@
-/** vpr_relocalization: a library for visual place recognition in changing 
+/** vpr_relocalization: a library for visual place recognition in changing
 ** environments with efficient relocalization step.
 ** Copyright (c) 2017 O. Vysotska, C. Stachniss, University of Bonn
 **
@@ -29,4 +29,7 @@
 
 std::vector<std::string> listDir(const std::string &dir_name);
 
-#endif  // SRC_DATABASE_LIST_DIR_H_
+std::vector<std::string> listProtoDir(const std::string &pathToDir,
+                                      const std::string &protoExtension);
+
+#endif // SRC_DATABASE_LIST_DIR_H_
