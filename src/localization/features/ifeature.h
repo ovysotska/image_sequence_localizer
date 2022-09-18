@@ -1,4 +1,4 @@
-/** vpr_relocalization: a library for visual place recognition in changing 
+/** vpr_relocalization: a library for visual place recognition in changing
 ** environments with efficient relocalization step.
 ** Copyright (c) 2017 O. Vysotska, C. Stachniss, University of Bonn
 **
@@ -21,17 +21,17 @@
 ** SOFTWARE.
 **/
 
-
 #ifndef SRC_FEATURES_IFEATURE_H_
 #define SRC_FEATURES_IFEATURE_H_
-#include <string>
 #include <memory>
+#include <string>
+#include <vector>
 
 /**
  * @brief      Interface class for features.
  */
 class iFeature {
- public:
+public:
   using Ptr = std::shared_ptr<iFeature>;
   using ConstPtr = std::shared_ptr<const iFeature>;
   /**
@@ -42,8 +42,8 @@ class iFeature {
    *
    * @return     One double value as a result of comparison.
    */
-  virtual double computeSimilarityScore(
-      const iFeature::ConstPtr& rhs) const = 0;
+  virtual double
+  computeSimilarityScore(const iFeature::ConstPtr &rhs) const = 0;
   /**
    * @brief      Transforms similarity into the weights/cost for the graph.
 
@@ -53,11 +53,15 @@ class iFeature {
    * std::numeric_limits<double>::max()
    */
   virtual double score2cost(double score) const = 0;
-  virtual void loadFromFile(const std::string &filename) = 0;
-  virtual void disp() const = 0;
-  virtual ~iFeature(){}
-};
+  virtual ~iFeature() {}
+  iFeature() = default;
+  iFeature(const iFeature &) = delete;
+  iFeature(iFeature &&) = delete;
+  iFeature &operator=(const iFeature &) = delete;
+  iFeature &operator=(iFeature &&) = delete;
 
+  std::vector<int> bits;
+};
 /**
   \fn iFeature::score2weight
    * Intuitively, the bigger the similarity between the feature the smaller
@@ -67,4 +71,4 @@ class iFeature {
 
 */
 
-#endif  // SRC_FEATURES_IFEATURE_H_
+#endif // SRC_FEATURES_IFEATURE_H_

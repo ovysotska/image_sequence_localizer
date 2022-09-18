@@ -29,7 +29,7 @@
 #include "database/idatabase.h"
 #include "database/list_dir.h"
 #include "features/cnn_feature.h"
-#include "features/ibinarizable_feature.h"
+#include "features/ifeature.h"
 #include "online_localizer/ilocvisualizer.h"
 #include "online_localizer/online_localizer.h"
 #include "relocalizers/lsh_cv_hashing.h"
@@ -40,16 +40,13 @@
 
 using std::make_shared;
 
-std::vector<iBinarizableFeature::Ptr>
-loadFeatures(const std::string &path2folder) {
+std::vector<iFeature::Ptr> loadFeatures(const std::string &path2folder) {
   printf("Loading the features to hash with LSH\n");
   std::vector<std::string> featureNames = listProtoDir(path2folder, ".Feature");
-  std::vector<iBinarizableFeature::Ptr> featurePtrs;
+  std::vector<iFeature::Ptr> featurePtrs;
 
   for (size_t i = 0; i < featureNames.size(); ++i) {
-    iBinarizableFeature::Ptr featurePtr =
-        iBinarizableFeature::Ptr(new CnnFeature);
-    featurePtr->loadFromFile(featureNames[i]);
+    iFeature::Ptr featurePtr = iFeature::Ptr(new CnnFeature(featureNames[i]));
     featurePtrs.push_back(featurePtr);
     fprintf(stderr, ".");
   }
@@ -78,14 +75,13 @@ int main(int argc, char *argv[]) {
   // to obtain the features, when needed
   databasePtr->setQuFeaturesFolder(parser.path2qu);
   databasePtr->setBufferSize(parser.bufferSize);
-  databasePtr->setFeatureType(FeatureFactory::FeatureType::Cnn_Feature);
+  databasePtr->setFeatureType(FeatureType::Cnn_Feature);
 
   // initialize Relocalizer
   auto relocalizerPtr = LshCvHashing::Ptr(new LshCvHashing);
   relocalizerPtr->setParams(1, 12, 2);
   relocalizerPtr->setDatabase(databasePtr);
-  std::vector<iBinarizableFeature::Ptr> featurePtrs =
-      loadFeatures(parser.path2ref);
+  std::vector<iFeature::Ptr> featurePtrs = loadFeatures(parser.path2ref);
   relocalizerPtr->train(featurePtrs);
 
   // initialize SuccessorManager

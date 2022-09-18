@@ -1,4 +1,4 @@
-/** vpr_relocalization: a library for visual place recognition in changing 
+/** vpr_relocalization: a library for visual place recognition in changing
 ** environments with efficient relocalization step.
 ** Copyright (c) 2017 O. Vysotska, C. Stachniss, University of Bonn
 **
@@ -23,28 +23,21 @@
 
 #ifndef SRC_FEATURES_CNNFEATURE_H_
 #define SRC_FEATURES_CNNFEATURE_H_
+#include "features/ifeature.h"
 #include <string>
 #include <vector>
-#include "features/ibinarizable_feature.h"
 
 /**
  * @brief      Class for cnn feature. By default binarizable with Mid
  * binarization
  */
-class CnnFeature : public iBinarizableFeature {
- public:
+class CnnFeature : public iFeature {
+public:
   using Ptr = std::shared_ptr<CnnFeature>;
   using ConstPtr = std::shared_ptr<const CnnFeature>;
 
-  /**
-   * @brief      Loads a from file. Expects feature to be stored in predefined
-   * format.
-   * If you would like other format. Consider writing your own class, derived
-   * from ifeature.h
-   *
-   * @param[in]  filename  The filename
-   */
-  void loadFromFile(const std::string &filename) override;
+  CnnFeature(const std::string &filename);
+
   /**
    * @brief      computes the cosine distance between two vectors
    *
@@ -52,7 +45,7 @@ class CnnFeature : public iBinarizableFeature {
    *
    * @return     The similarity score.
    */
-  double computeSimilarityScore(const iFeature::ConstPtr& rhs) const override;
+  double computeSimilarityScore(const iFeature::ConstPtr &rhs) const override;
   /**
    * @brief      weight/cost is an inverse of a score.
    *
@@ -62,13 +55,12 @@ class CnnFeature : public iBinarizableFeature {
    * std::numeric_limits<double>::max()
    */
   double score2cost(double score) const override;
-  void disp() const override;
 
   std::vector<double> dim;
-  using iBinarizableFeature::bits;
+  using iFeature::bits;
 
- private:
+protected:
   void binarize();
 };
 
-#endif  // SRC_FEATURES_CNNFEATURE_H_
+#endif // SRC_FEATURES_CNNFEATURE_H_

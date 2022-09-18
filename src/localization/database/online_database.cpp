@@ -91,9 +91,7 @@ void OnlineDatabase::setBufferSize(int size) {
   _quBuff.setBufferSize(size);
 }
 
-void OnlineDatabase::setFeatureType(FeatureFactory::FeatureType type) {
-  _featureFactory.setFeatureType(type);
-}
+void OnlineDatabase::setFeatureType(FeatureType type) { featureType_ = type; }
 
 // use for tests / visualization only
 const MatchMap &OnlineDatabase::getMatchMap() const { return _matchMap; }
@@ -117,8 +115,8 @@ double OnlineDatabase::computeMatchCost(int quId, int refId) {
     quFeaturePtr = _quBuff.getFeature(quId);
   } else {
     // We cannot directly set const pointers, so set them through a proxy.
-    auto tempFeaturePtr = _featureFactory.createFeature();
-    tempFeaturePtr->loadFromFile(_quFeaturesNames[quId]);
+    // TODO(olga) Som madness is happening here.
+    auto tempFeaturePtr = createFeature(featureType_, _quFeaturesNames[quId]);
     quFeaturePtr = tempFeaturePtr;
     _quBuff.addFeature(quId, quFeaturePtr);
   }
@@ -127,8 +125,7 @@ double OnlineDatabase::computeMatchCost(int quId, int refId) {
     refFeaturePtr = _refBuff.getFeature(refId);
   } else {
     // We cannot directly set const pointers, so set them through a proxy.
-    auto tempFeaturePtr = _featureFactory.createFeature();
-    tempFeaturePtr->loadFromFile(_refFeaturesNames[refId]);
+    auto tempFeaturePtr = createFeature(featureType_, _refFeaturesNames[refId]);
     refFeaturePtr = tempFeaturePtr;
     _refBuff.addFeature(refId, refFeaturePtr);
   }
@@ -159,8 +156,7 @@ iFeature::ConstPtr OnlineDatabase::getQueryFeature(int quId) {
     quFeaturePtr = _quBuff.getFeature(quId);
   } else {
     // We cannot directly set const pointers, so set them through a proxy.
-    auto tempFeaturePtr = _featureFactory.createFeature();
-    tempFeaturePtr->loadFromFile(_quFeaturesNames[quId]);
+    auto tempFeaturePtr = createFeature(featureType_, _quFeaturesNames[quId]);
     quFeaturePtr = tempFeaturePtr;
     _quBuff.addFeature(quId, quFeaturePtr);
   }
