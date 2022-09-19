@@ -13,8 +13,6 @@ if(PACKAGE_TESTS)
 endif()
 
 # Options for glog
-# set (WITH_GTEST OFF CACHE INTERNAL)
-# set (WITH_GFLAGS OFF CACHE INTERNAL)
 option(WITH_GFLAGS "Use gflags" OFF)
 option(WITH_GTEST "Use Google Test" OFF)
 option(BUILD_TESTING "Use Build testing" OFF)

@@ -2,7 +2,7 @@ find_package(OpenCV REQUIRED)
 
 add_executable(cost_matrix_based_matching_lsh cost_matrix_based_matching_lsh.cpp)
 target_link_libraries( cost_matrix_based_matching_lsh
-glog::glog
+    glog::glog
     online_localizer
     cost_matrix_database
     successor_manager
