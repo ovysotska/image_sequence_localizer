@@ -36,6 +36,8 @@
 #include "successor_manager/successor_manager.h"
 #include "tools/config_parser/config_parser.h"
 
+#include <glog/logging.h>
+
 using std::make_shared;
 
 std::vector<iBinarizableFeature::Ptr>
@@ -57,7 +59,9 @@ loadFeatures(const std::string &path2folder) {
 }
 
 int main(int argc, char *argv[]) {
-  printf("===== Online place recognition cost matrix based LSH ====\n");
+  google::InitGoogleLogging(argv[0]);
+  FLAGS_logtostderr = 1;
+  LOG(INFO) << "===== Online place recognition cost matrix based LSH ====\n";
   if (argc < 2) {
     printf("[ERROR] Not enough input parameters.\n");
     printf("Proper usage: ./cost_matrix_based_matching_lsh config_file.yaml\n");
