@@ -1,4 +1,4 @@
-/** vpr_relocalization: a library for visual place recognition in changing 
+/** vpr_relocalization: a library for visual place recognition in changing
 ** environments with efficient relocalization step.
 ** Copyright (c) 2017 O. Vysotska, C. Stachniss, University of Bonn
 **
@@ -21,27 +21,25 @@
 ** SOFTWARE.
 **/
 
-
 #ifndef SRC_FEATURES_FEATURE_BUFFER_H_
 #define SRC_FEATURES_FEATURE_BUFFER_H_
 
+#include "ifeature.h"
 #include <memory>
 #include <unordered_map>
 #include <vector>
-#include "ifeature.h"
 
 /**
  * @brief      Class for feature buffer. Stores the features kept in memory
  * during the search
  */
 class FeatureBuffer {
- public:
+public:
+  FeatureBuffer(int size);
   bool inBuffer(int id) const;
-  /**  sets buffer size + reserves the space for map **/
-  void setBufferSize(int size);
   /** returns empty vector if a feature is not in buffer */
   iFeature::ConstPtr getFeature(int id) const;
-  void addFeature(int id, const iFeature::ConstPtr& feature);
+  void addFeature(int id, const iFeature::ConstPtr &feature);
 
   void deleteFeature();
 
@@ -51,4 +49,4 @@ class FeatureBuffer {
   std::unordered_map<int, const iFeature::ConstPtr> featureMap;
 };
 
-#endif  // SRC_FEATURES_FEATURE_BUFFER_H_
+#endif // SRC_FEATURES_FEATURE_BUFFER_H_

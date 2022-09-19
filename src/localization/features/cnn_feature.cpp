@@ -38,7 +38,7 @@ CnnFeature::CnnFeature(const std::string &filename) {
   image_sequence_localizer::Feature feature_proto;
   std::fstream input(filename, std::ios::in | std::ios::binary);
   if (!feature_proto.ParseFromIstream(&input)) {
-    std::cerr << "Failed to parse cost_matrix file: " << filename << "."
+    std::cerr << "Failed to parse feature_proto file: " << filename << "."
               << std::endl;
     return;
   }

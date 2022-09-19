@@ -79,7 +79,7 @@ protected:
   FeatureType featureType_;
 
 private:
-  FeatureBuffer _refBuff, _quBuff;
+  std::unique_ptr<FeatureBuffer> refBuffer_, queryBuffer_;
 };
 
 #endif // SRC_DATABASE_ONLINE_DATABASE_H_

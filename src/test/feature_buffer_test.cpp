@@ -23,60 +23,76 @@
 
 #include "features/cnn_feature.h"
 #include "features/feature_buffer.h"
+#include "features/ifeature.h"
 #include "gtest/gtest.h"
 #include <iostream>
 #include <string>
 #include <vector>
 
-// TODO: add proper testing for the feature buffer
 TEST(featureBuffer, testFeatueBufferProperties) { EXPECT_TRUE(true); }
 
-// TEST(featureBuffer, addFeature) {
-//   FeatureBuffer buffer;
-//   buffer.setBufferSize(2);
-//   std::vector<double> v0 = {1, 2, 3};
-//   std::vector<double> v1 = {4, 5, 6};
-//   std::vector<double> v3 = {7, 8, 9};
+class DummyFeature : public iFeature {
+public:
+  DummyFeature(const std::vector<double> &values) { dim = values; }
+  double computeSimilarityScore(const iFeature::ConstPtr &rhs) const override {
+    return 0.0;
+  }
+  double score2cost(double score) const override { return 0.0; }
+  const std::vector<double> &getDim() const { return dim; }
 
-//   CnnFeature f0, f1, f3;
-//   f0.dim = v0;
-//   f1.dim = v1;
-//   f3.dim = v3;
-//   buffer.addFeature(0, std::make_shared<CnnFeature>(f0));
-//   buffer.addFeature(1, std::make_shared<CnnFeature>(f1));
-//   EXPECT_EQ(buffer.featureMap.size(), 2);
-//   EXPECT_EQ(buffer.ids[0], 0);
-//   EXPECT_EQ(buffer.ids[1], 1);
+private:
+  std::vector<double> dim;
+};
 
-//   buffer.addFeature(3, std::make_shared<CnnFeature>(f3));
-//   EXPECT_EQ(buffer.featureMap.size(), 2);
-//   EXPECT_EQ(buffer.ids[0], 1);
-//   EXPECT_EQ(buffer.ids[1], 3);
-// }
+TEST(featureBuffer, addFeature) {
+  FeatureBuffer buffer(2);
 
-// TEST(featureBuffer, inBuffer) {
-//   FeatureBuffer buffer;
-//   buffer.setBufferSize(4);
-//   EXPECT_FALSE(buffer.inBuffer(4));
-//   std::vector<double> v1 = {4, 5, 6};
-//   CnnFeature f1;
-//   f1.dim = v1;
-//   buffer.addFeature(1, std::make_shared<CnnFeature>(f1));
-//   EXPECT_FALSE(buffer.inBuffer(4));
-//   EXPECT_TRUE(buffer.inBuffer(1));
-// }
+  buffer.addFeature(0,
+                    std::make_shared<DummyFeature>(std::vector{1.0, 2.0, 3.0}));
+  buffer.addFeature(1,
+                    std::make_shared<DummyFeature>(std::vector{4.0, 5.0, 6.0}));
+  EXPECT_EQ(buffer.featureMap.size(), 2);
+  EXPECT_EQ(buffer.ids[0], 0);
+  EXPECT_EQ(buffer.ids[1], 1);
 
+  buffer.addFeature(3,
+                    std::make_shared<DummyFeature>(std::vector{7.0, 8.0, 9.0}));
+  EXPECT_EQ(buffer.featureMap.size(), 2);
+  EXPECT_EQ(buffer.ids[0], 1);
+  EXPECT_EQ(buffer.ids[1], 3);
+}
+
+TEST(featureBuffer, inBuffer) {
+  FeatureBuffer buffer(4);
+  EXPECT_FALSE(buffer.inBuffer(4));
+
+  buffer.addFeature(1,
+                    std::make_shared<DummyFeature>(std::vector{4.0, 5.0, 6.0}));
+  EXPECT_FALSE(buffer.inBuffer(4));
+  EXPECT_TRUE(buffer.inBuffer(1));
+}
+
+TEST(featureBuffer, getFeature) {
+  FeatureBuffer buffer(4);
+  buffer.addFeature(1,
+                    std::make_shared<DummyFeature>(std::vector{4.0, 5.0, 6.0}));
+  const auto resPtr =
+      std::static_pointer_cast<const DummyFeature>(buffer.getFeature(1));
+  auto dims = resPtr->getDim();
+  EXPECT_NEAR(dims[0], 4, 1e-09);
+  EXPECT_NEAR(dims[1], 5, 1e-09);
+  EXPECT_NEAR(dims[2], 6, 1e-09);
+}
+
+// TODO: Feature id is not in the buffer.
 // TEST(featureBuffer, getFeature) {
-//   FeatureBuffer buffer;
-//   buffer.setBufferSize(4);
-
-//   std::vector<double> v1 = {4, 5, 6};
-//   CnnFeature f1;
-//   f1.dim = v1;
-//   buffer.addFeature(1, std::make_shared<CnnFeature>(f1));
+//   FeatureBuffer buffer(4);
+//   buffer.addFeature(1,
+//                     std::make_shared<DummyFeature>(std::vector{4.0, 5.0, 6.0}));
 //   const auto resPtr =
-//       std::static_pointer_cast<const CnnFeature>(buffer.getFeature(1));
-//   EXPECT_NEAR(resPtr->dim[0], 4, 1e-09);
-//   EXPECT_NEAR(resPtr->dim[1], 5, 1e-09);
-//   EXPECT_NEAR(resPtr->dim[2], 6, 1e-09);
+//       std::static_pointer_cast<const DummyFeature>(buffer.getFeature(1));
+//   auto dims = resPtr->getDim();
+//   EXPECT_NEAR(dims[0], 4, 1e-09);
+//   EXPECT_NEAR(dims[1], 5, 1e-09);
+//   EXPECT_NEAR(dims[2], 6, 1e-09);
 // }
