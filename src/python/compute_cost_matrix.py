@@ -53,7 +53,7 @@ def main():
 
     db_features = []
     for db_file in db_files:
-        db_features.append(protos_io.lread_features(db_file))
+        db_features.append(protos_io.read_feature(db_file))
 
     cost_matrix = compute_cost_matrix(query_features, db_features)
 
