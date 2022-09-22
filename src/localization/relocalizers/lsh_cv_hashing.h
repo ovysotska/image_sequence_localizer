@@ -1,4 +1,4 @@
-/** vpr_relocalization: a library for visual place recognition in changing 
+/** vpr_relocalization: a library for visual place recognition in changing
 ** environments with efficient relocalization step.
 ** Copyright (c) 2017 O. Vysotska, C. Stachniss, University of Bonn
 **
@@ -24,13 +24,13 @@
 #ifndef SRC_RELOCALIZERS_LSH_CV_HASHING_H_
 #define SRC_RELOCALIZERS_LSH_CV_HASHING_H_
 
+#include "database/online_database.h"
+#include "features/ifeature.h"
+#include "relocalizers/irelocalizer.h"
 #include <string>
 #include <unordered_map>
-#include <vector>
 #include <unordered_set>
-#include "database/online_database.h"
-#include "features/ibinarizable_feature.h"
-#include "relocalizers/irelocalizer.h"
+#include <vector>
 
 #include "opencv2/features2d/features2d.hpp"
 
@@ -39,7 +39,7 @@
  * measures.
  */
 class LshCvHashing : public iRelocalizer {
- public:
+public:
   using Ptr = std::shared_ptr<LshCvHashing>;
   using ConstPtr = std::shared_ptr<const LshCvHashing>;
 
@@ -47,17 +47,17 @@ class LshCvHashing : public iRelocalizer {
 
   void setDatabase(OnlineDatabase::Ptr database);
 
-  void train(std::vector<iBinarizableFeature::Ptr> features);
+  void train(std::vector<iFeature::Ptr> features);
   /**
    * @brief      Not working for now, for unknown reason
    */
   void saveHashes();
   void setParams(int tableNum, int keySize, int multi_probe_level);
 
-  std::vector<int> hashFeature(const iBinarizableFeature::ConstPtr& fPtr);
+  std::vector<int> hashFeature(const iFeature::ConstPtr &fPtr);
 
- private:
-  int _tableNum = 25;  // number of hash tables
+private:
+  int _tableNum = 25; // number of hash tables
   // number of bits in the hash key
   int _keySize = 15;
   // number of bits to shift to het neighbouring buckets
@@ -68,11 +68,9 @@ class LshCvHashing : public iRelocalizer {
   OnlineDatabase::Ptr _database = nullptr;
 };
 
-
 // table_number the number of hash tables to use (between 10 and 30 usually).
 // key_size the size of the hash key in bits (between 10 and 20 usually).
-// multi_probe_level the number of bits to shift to check for neighboring buckets (0 is regular LSH, 2 is recommended).
+// multi_probe_level the number of bits to shift to check for neighboring
+// buckets (0 is regular LSH, 2 is recommended).
 
-
-
-#endif  // SRC_RELOCALIZERS_LSH_CV_HASHING_H_
+#endif // SRC_RELOCALIZERS_LSH_CV_HASHING_H_

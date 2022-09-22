@@ -4,7 +4,7 @@
 * Make sure tests run
 [Done] No Qt visualization for now
 [Done] Visualization through the Python scripts for now
-* Add visualization of the expanded nodes.
+[Done] Add visualization of the expanded nodes.
 * A better logging library
 
 

@@ -1,4 +1,4 @@
-/** vpr_relocalization: a library for visual place recognition in changing 
+/** vpr_relocalization: a library for visual place recognition in changing
 ** environments with efficient relocalization step.
 ** Copyright (c) 2017 O. Vysotska, C. Stachniss, University of Bonn
 **
@@ -21,10 +21,18 @@
 ** SOFTWARE.
 **/
 
-
 #include "feature_buffer.h"
 
+#include <iostream>
 #include <limits>
+
+FeatureBuffer::FeatureBuffer(int size) {
+  if (size < 0) {
+    std::cerr << "[WARNING] invalid featureBuffer size\n";
+  }
+  bufferSize = size;
+  featureMap.reserve(size);
+}
 
 bool FeatureBuffer::inBuffer(int id) const {
   auto feature = featureMap.find(id);
@@ -40,13 +48,13 @@ iFeature::ConstPtr FeatureBuffer::getFeature(int id) const {
   return found->second;
 }
 
-/** internal function. deletes the latest added feature from the buffer **/
+/** internal function. deletes the first added feature from the buffer **/
 void FeatureBuffer::deleteFeature() {
   featureMap.erase(ids[0]);
   ids.erase(ids.begin());
 }
 
-void FeatureBuffer::addFeature(int id, const iFeature::ConstPtr& feature) {
+void FeatureBuffer::addFeature(int id, const iFeature::ConstPtr &feature) {
   if (ids.size() > static_cast<size_t>(std::numeric_limits<int>::max())) {
     fprintf(stderr,
             "[ERROR] ids vector size does not fit in integer type. Cannot add "
@@ -63,10 +71,4 @@ void FeatureBuffer::addFeature(int id, const iFeature::ConstPtr& feature) {
   }
   // Map stores const pointers, so we cannot use operator[] here.
   featureMap.emplace(id, feature);
-}
-
-/**  sets buffer size + reserves the space for map **/
-void FeatureBuffer::setBufferSize(int size) {
-  bufferSize = size;
-  featureMap.reserve(size);
 }

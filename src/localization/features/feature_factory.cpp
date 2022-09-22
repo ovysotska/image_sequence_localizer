@@ -22,26 +22,20 @@
 **/
 
 #include "feature_factory.h"
-
 #include "cnn_feature.h"
 
-/**
- * @brief      Creates a feature, based on the specified type.
- *
- * @return     shared pointer to a feature
- */
-// TODO(me): should return a unique_pointer!
-iFeature::Ptr FeatureFactory::createFeature() const {
-    iFeature::Ptr featurePtr = nullptr;
-    switch (_type) {
-        case Cnn_Feature: {
-            featurePtr = CnnFeature::Ptr(new CnnFeature);
-            break;
-        }
-        default: {
-            printf("[ERROR][FeatureFactory] Unknown feature type\n");
-            exit(EXIT_FAILURE);
-        }
-    }
-    return featurePtr;
+iFeature::Ptr createFeature(FeatureType type,
+                            const std::string &featureFilename) {
+  iFeature::Ptr featurePtr = nullptr;
+  switch (type) {
+  case Cnn_Feature: {
+    featurePtr = CnnFeature::Ptr(new CnnFeature(featureFilename));
+    break;
+  }
+  default: {
+    printf("[ERROR][FeatureFactory] Unknown feature type\n");
+    exit(EXIT_FAILURE);
+  }
+  }
+  return featurePtr;
 }

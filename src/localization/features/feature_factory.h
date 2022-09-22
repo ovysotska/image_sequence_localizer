@@ -30,17 +30,12 @@
  * @brief      creates shared pointers for the specified feature types.
  * Modify this class, when using own features.
  */
-class FeatureFactory {
-   public:
-    enum FeatureType {
-        Cnn_Feature,
-    };
 
-    iFeature::Ptr createFeature() const;
-    void setFeatureType(FeatureType type) { _type = type; }
-
-   private:
-    FeatureType _type = FeatureType::Cnn_Feature;
+enum FeatureType {
+  Cnn_Feature,
 };
 
-#endif  // SRC_FEATURES_FEATURE_FACTORY_H_
+iFeature::Ptr createFeature(FeatureType type,
+                            const std::string &featureFilename);
+
+#endif // SRC_FEATURES_FEATURE_FACTORY_H_

@@ -1,4 +1,4 @@
-/** vpr_relocalization: a library for visual place recognition in changing 
+/** vpr_relocalization: a library for visual place recognition in changing
 ** environments with efficient relocalization step.
 ** Copyright (c) 2017 O. Vysotska, C. Stachniss, University of Bonn
 **
@@ -38,7 +38,7 @@ void LshCvHashing::setDatabase(OnlineDatabase::Ptr database) {
   _database = database;
 }
 
-void LshCvHashing::train(std::vector<iBinarizableFeature::Ptr> features) {
+void LshCvHashing::train(std::vector<iFeature::Ptr> features) {
   if (!_indexParam) {
     setParams(_tableNum, _keySize, _multiProbeLevel);
   }
@@ -60,8 +60,7 @@ void LshCvHashing::train(std::vector<iBinarizableFeature::Ptr> features) {
   // m_matcherPtr->match(*query, knnmatches, 1);
 }
 
-std::vector<int> LshCvHashing::hashFeature(
-    const iBinarizableFeature::ConstPtr& fPtr) {
+std::vector<int> LshCvHashing::hashFeature(const iFeature::ConstPtr &fPtr) {
   std::vector<std::vector<cv::DMatch>> matches;
   cv::Mat feature(1, fPtr->bits.size(), CV_8UC1);
   for (int i = 0; i < fPtr->bits.size(); ++i) {
@@ -77,7 +76,7 @@ std::vector<int> LshCvHashing::hashFeature(
 
   std::vector<int> matchedIds;
   for (int k = 0; k < matches.size(); ++k) {
-    for (const auto& match : matches[k]) {
+    for (const auto &match : matches[k]) {
       matchedIds.push_back(match.trainIdx);
     }
   }
@@ -98,7 +97,7 @@ std::vector<int> LshCvHashing::getCandidates(int quId) {
     exit(EXIT_FAILURE);
   }
   printf("Getting candidates for a query image\n");
-  const auto featurePtr = std::static_pointer_cast<const iBinarizableFeature>(
+  const auto featurePtr = std::static_pointer_cast<const iFeature>(
       _database->getQueryFeature(quId));
   if (!featurePtr) {
     printf("Wrong feature format\n");
