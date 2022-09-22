@@ -29,8 +29,6 @@
 #include <string>
 #include <vector>
 
-TEST(featureBuffer, testFeatueBufferProperties) { EXPECT_TRUE(true); }
-
 class DummyFeature : public iFeature {
 public:
   DummyFeature(const std::vector<double> &values) { dim = values; }
@@ -83,16 +81,3 @@ TEST(featureBuffer, getFeature) {
   EXPECT_NEAR(dims[1], 5, 1e-09);
   EXPECT_NEAR(dims[2], 6, 1e-09);
 }
-
-// TODO: Feature id is not in the buffer.
-// TEST(featureBuffer, getFeature) {
-//   FeatureBuffer buffer(4);
-//   buffer.addFeature(1,
-//                     std::make_shared<DummyFeature>(std::vector{4.0, 5.0, 6.0}));
-//   const auto resPtr =
-//       std::static_pointer_cast<const DummyFeature>(buffer.getFeature(1));
-//   auto dims = resPtr->getDim();
-//   EXPECT_NEAR(dims[0], 4, 1e-09);
-//   EXPECT_NEAR(dims[1], 5, 1e-09);
-//   EXPECT_NEAR(dims[2], 6, 1e-09);
-// }
