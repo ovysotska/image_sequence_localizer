@@ -5,16 +5,17 @@ from pathlib import Path
 import protos_io
 
 
-def show_matching_result(matching_result, cost_matrix, expanded_mask):
+def show_matching_result(matching_result, cost_matrix, expanded_mask=None):
 
     rgb_costs = np.zeros((cost_matrix.shape[0], cost_matrix.shape[1], 3))
     rgb_costs[:, :, 0] = cost_matrix
     rgb_costs[:, :, 1] = cost_matrix
     rgb_costs[:, :, 2] = cost_matrix
 
-    # Add expanded nodes
-    for element in expanded_mask:
-        rgb_costs[element.row, element.col] = [0, 1, 0]
+    # Add expanded nodes.
+    if expanded_mask:
+        for element in expanded_mask:
+            rgb_costs[element.row, element.col] = [0, 1, 0]
 
     # Add path with color. Red - real nodes, Blue - hidden nodes.
     for match in matching_result.matches:
@@ -65,7 +66,11 @@ def main():
     print("Min value", min_value)
 
     matching_result = protos_io.read_matching_result(args.matching_result)
-    expanded_mask = protos_io.read_expanded_mask(args.expanded_patches_dir)
+
+    if args.expanded_patches_dir:
+        expanded_mask = protos_io.read_expanded_mask(args.expanded_patches_dir)
+    else:
+        expanded_mask = None
 
     image = show_matching_result(matching_result, cost_matrix, expanded_mask)
 
