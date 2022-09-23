@@ -52,5 +52,4 @@ python run_matching.py \
     --dataset_name <dataset_name> \
     --output_dir <path_to_folder>
 ```
-For more details about the parameters, please use `python run_matching.py help`
-
+For more details about the parameters, please use `python run_matching.py help`.
