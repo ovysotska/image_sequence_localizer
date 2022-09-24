@@ -43,7 +43,7 @@ python run_matching.py \
     --output_dir <path_to_folder>
 ```
 
-The framework assumes that there is a _query_ image sequence, for every image of which the user wants to find the corresponding image in the _reference_ image sequence. The script takes the query and reference features that are stored in ".Feature.pb" files. The assumption is that for every image there is a corresponding feature vector that is stored in a separate file. The code, for now, works with image features that can be represented as a single vector and for which the cosine similarity metric makes sense, for example, features from [NetVLAD](https://github.com/Relja/netvlad). For details on the features please refer to `localization_protos.proto`.
+The framework assumes that there is a _query_ image sequence, for every image of which the user wants to find the corresponding image in the _reference_ image sequence. The script takes the query and reference features that are stored in [protobuf messages](https://developers.google.com/protocol-buffers) of type ".Feature.pb" defined in this project. The assumption is that for every image there is a corresponding feature vector that is stored in a separate file. The code, for now, works with image features that can be represented as a single vector and for which the cosine similarity metric makes sense, for example, features from [NetVLAD](https://github.com/Relja/netvlad). For details on the features please refer to `localization_protos.proto`.
 
 The `run_matching.py` script stores all the results in the user-provided `output_dir`. The user also needs to specify the name of the dataset, for example, "my_awesome_dataset".
 
