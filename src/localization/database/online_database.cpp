@@ -80,9 +80,8 @@ OnlineDatabase::OnlineDatabase(const std::string &queryFeaturesDir,
   queryBuffer_ = std::make_unique<FeatureBuffer>(bufferSize);
   featureType_ = type;
 
-  LOG_IF(FATAL, quFeaturesNames_.empty()) << " Query features are not set.";
-  LOG_IF(FATAL, refFeaturesNames_.empty())
-      << " Reference features are not set.";
+  LOG_IF(FATAL, quFeaturesNames_.empty()) << "Query features are not set.";
+  LOG_IF(FATAL, refFeaturesNames_.empty()) << "Reference features are not set.";
 }
 
 // use for tests / visualization only

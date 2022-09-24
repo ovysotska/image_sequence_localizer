@@ -58,21 +58,18 @@ void CostMatrixDatabase::loadFromTxt(const std::string &filename, int rows,
   in.close();
 }
 
-void CostMatrixDatabase::setCosts(const Matrix &costs, int rows, int cols) {
+void CostMatrixDatabase::overrideCosts(const Matrix &costs, int rows,
+                                       int cols) {
   rows_ = rows;
   cols_ = cols;
   costs_ = costs;
 }
 
 double CostMatrixDatabase::getCost(int quId, int refId) {
-  if (quId >= rows_ || quId < 0) {
-    printf("[ERROR][CostMatrixDatabase] Invalid query index %d\n", quId);
-    return -1;
-  }
-  if (refId >= cols_ || refId < 0) {
-    printf("[ERROR][CostMatrixDatabase] Invalid query index %d\n", refId);
-    return -1;
-  }
+  LOG_IF(FATAL, quId >= rows_ || quId < 0) << " Invalid query index" << quId;
+  LOG_IF(FATAL, refId >= cols_ || refId < 0)
+      << " Invalid reference index" << quId;
+
   double value = costs_[quId][refId];
   if (value < 1e-09) {
     return std::numeric_limits<double>::max();

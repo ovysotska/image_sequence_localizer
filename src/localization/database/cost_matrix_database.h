@@ -57,7 +57,7 @@ public:
 
   void loadFromProto(const std::string &filename);
 
-  void setCosts(const Matrix &costs, int rows, int cols);
+  void overrideCosts(const Matrix &costs, int rows, int cols);
   /** returns original costs. Use for visualization and testing only **/
   const Matrix &getCosts() const { return costs_; }
 
@@ -67,8 +67,4 @@ private:
   int cols_ = 0;
 };
 
-/** can store only those matrix that fit in the RAM **/
-
 #endif // SRC_DATABASE_COST_MATRIX_DATABASE_H_
-
-// TODO: Why cv::Mat?

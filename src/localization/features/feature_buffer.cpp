@@ -26,10 +26,10 @@
 #include <iostream>
 #include <limits>
 
+#include <glog/logging.h>
+
 FeatureBuffer::FeatureBuffer(int size) {
-  if (size < 0) {
-    std::cerr << "[WARNING] invalid featureBuffer size\n";
-  }
+  LOG_IF(FATAL, size < 0) << "Invalid featureBuffer size.";
   bufferSize = size;
   featureMap.reserve(size);
 }

@@ -63,7 +63,7 @@ std::vector<std::string> listProtoDir(const std::string &pathToDir,
               << std::endl;
   }
   if (!fs::exists(pathToDir)) {
-    LOG(FATAL) << "Query feature directory does not exist.";
+    LOG(FATAL) << "Feature directory does not exist.";
   }
   std::vector<std::string> proto_files;
   for (const auto &entry : fs::directory_iterator(pathToDir)) {

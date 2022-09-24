@@ -67,7 +67,7 @@ protected:
   }
   void SetUp() {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
-    tmp_dir = fs::temp_directory_path();
+    tmp_dir = fs::temp_directory_path() / "features";
     fs::create_directories(tmp_dir);
     createFeatureFile(tmp_dir, "feature_0.Feature.pb",
                       createFeatureProto({0, 1, 2, 3}));
@@ -78,53 +78,76 @@ protected:
     createFeatureFile(tmp_dir, "feature_3.Feature.pb",
                       createFeatureProto({0, 1, 2.5, 3}));
   }
+  void TearDown() { std::filesystem::remove_all(tmp_dir); }
   fs::path tmp_dir = "";
 };
 
 TEST_F(OnlineDatabaseTest, refSize) {
-  OnlineDatabase database;
-  database.setRefFeaturesFolder(tmp_dir);
+  OnlineDatabase database(/*queryFeaturesDir=*/tmp_dir,
+                          /*refFeaturesDir=*/tmp_dir,
+                          /*type=*/FeatureType::Cnn_Feature,
+                          /*bufferSize=*/10);
   EXPECT_EQ(4, database.refSize());
 }
 
-// TODO: Add tests for the online database after refactoring
+TEST_F(OnlineDatabaseTest, InvalidConstructorParams) {
+  ASSERT_DEATH(OnlineDatabase(
+                   /*queryFeaturesDir=*/"",
+                   /*refFeaturesDir=*/"",
+                   /*type=*/FeatureType::Cnn_Feature,
+                   /*bufferSize=*/10),
+               "Feature directory does not exist.");
 
-TEST(CostMatrixDatabaseTest, refSize) {
-  CostMatrixDatabase database;
-  database.setCosts({{1, 2, 3}, {4, 5, 6}}, 2, 3);
-  EXPECT_EQ(database.refSize(), 3);
+  ASSERT_DEATH(OnlineDatabase(tmp_dir, "", FeatureType::Cnn_Feature, 10),
+               "Feature directory does not exist.");
+  ASSERT_DEATH(OnlineDatabase(tmp_dir, tmp_dir, FeatureType::Cnn_Feature, -1),
+               "Invalid featureBuffer size.");
 }
 
-TEST(CostMatrixDatabaseTest, getCost) {
-  CostMatrixDatabase database;
-  database.setCosts({{1, 2, 3}, {4, 5, 6}}, 2, 3);
-  EXPECT_EQ(database.getCost(0, 0), 1);
-  EXPECT_DOUBLE_EQ(database.getCost(0, 2), 1. / 3);
-  EXPECT_DOUBLE_EQ(database.getCost(1, 0), 1. / 4);
-  EXPECT_DOUBLE_EQ(database.getCost(1, 2), 1. / 6);
+TEST(OnlineDatabase, NoFeatureFiles) {
+  fs::path empty_tmp_dir = fs::temp_directory_path();
+  fs::create_directories(empty_tmp_dir);
+  ASSERT_DEATH(OnlineDatabase(empty_tmp_dir, empty_tmp_dir,
+                              FeatureType::Cnn_Feature, 10),
+               "Query features are not set.");
 }
 
-TEST(CostMatrixDatabaseTest, loadFromProto) {
-  image_sequence_localizer::CostMatrix cost_matrix;
-  for (double value : {1, 2, 3, 4, 5, 6}) {
-    cost_matrix.add_values(value);
-  }
-  cost_matrix.set_cols(3);
-  cost_matrix.set_rows(2);
-  fs::path tmp_dir = fs::temp_directory_path();
-  fs::create_directories(tmp_dir);
-  std::string cost_matrix_name =
-      (tmp_dir / "debug_cost_matrix.CostMatrix.pb").string();
+// TEST(CostMatrixDatabaseTest, refSize) {
+//   CostMatrixDatabase database;
+//   database.setCosts({{1, 2, 3}, {4, 5, 6}}, 2, 3);
+//   EXPECT_EQ(database.refSize(), 3);
+// }
 
-  std::fstream out(cost_matrix_name,
-                   std::ios::out | std::ios::trunc | std::ios::binary);
-  ASSERT_TRUE(cost_matrix.SerializeToOstream(&out));
-  out.close();
+// TEST(CostMatrixDatabaseTest, getCost) {
+//   CostMatrixDatabase database;
+//   database.setCosts({{1, 2, 3}, {4, 5, 6}}, 2, 3);
+//   EXPECT_EQ(database.getCost(0, 0), 1);
+//   EXPECT_DOUBLE_EQ(database.getCost(0, 2), 1. / 3);
+//   EXPECT_DOUBLE_EQ(database.getCost(1, 0), 1. / 4);
+//   EXPECT_DOUBLE_EQ(database.getCost(1, 2), 1. / 6);
+// }
 
-  CostMatrixDatabase database;
-  database.loadFromProto(cost_matrix_name);
-  EXPECT_EQ(database.getCost(0, 0), 1);
-  EXPECT_DOUBLE_EQ(database.getCost(0, 2), 1. / 3);
-  EXPECT_DOUBLE_EQ(database.getCost(1, 0), 1. / 4);
-  EXPECT_DOUBLE_EQ(database.getCost(1, 2), 1. / 6);
-}
+// TEST(CostMatrixDatabaseTest, loadFromProto) {
+//   image_sequence_localizer::CostMatrix cost_matrix;
+//   for (double value : {1, 2, 3, 4, 5, 6}) {
+//     cost_matrix.add_values(value);
+//   }
+//   cost_matrix.set_cols(3);
+//   cost_matrix.set_rows(2);
+//   fs::path tmp_dir = fs::temp_directory_path();
+//   fs::create_directories(tmp_dir);
+//   std::string cost_matrix_name =
+//       (tmp_dir / "debug_cost_matrix.CostMatrix.pb").string();
+
+//   std::fstream out(cost_matrix_name,
+//                    std::ios::out | std::ios::trunc | std::ios::binary);
+//   ASSERT_TRUE(cost_matrix.SerializeToOstream(&out));
+//   out.close();
+
+//   CostMatrixDatabase database;
+//   database.loadFromProto(cost_matrix_name);
+//   EXPECT_EQ(database.getCost(0, 0), 1);
+//   EXPECT_DOUBLE_EQ(database.getCost(0, 2), 1. / 3);
+//   EXPECT_DOUBLE_EQ(database.getCost(1, 0), 1. / 4);
+//   EXPECT_DOUBLE_EQ(database.getCost(1, 2), 1. / 6);
+// }
