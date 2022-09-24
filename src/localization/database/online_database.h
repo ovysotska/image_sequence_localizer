@@ -32,6 +32,7 @@
 #include <unordered_map>
 #include <vector>
 
+// TODO(olga): Do not need to be a separate container.
 /**
  * @brief      Container for storing computed feature matches
  */
@@ -54,18 +55,18 @@ public:
   using Ptr = std::shared_ptr<OnlineDatabase>;
   using ConstPtr = std::shared_ptr<const OnlineDatabase>;
 
-  int refSize() override { return _refFeaturesNames.size(); }
-  double getCost(int quId, int refId) override;
+  OnlineDatabase(const std::string &queryFeaturesDir,
+                 const std::string &refFeaturesDir, const FeatureType &type,
+                 int bufferSize);
 
-  void setQuFeaturesFolder(const std::string &path2folder);
-  void setRefFeaturesFolder(const std::string &path2folder);
-  void setBufferSize(int size);
-  void setFeatureType(FeatureType type);
+  int refSize() override { return refFeaturesNames_.size(); }
+  double getCost(int quId, int refId) override;
 
   // use for tests / visualization only
   const MatchMap &getMatchMap() const;
   void setMatchMap(const MatchMap &matchMap) { _matchMap = matchMap; }
   bool isSet() const;
+
   double computeMatchCost(int quId, int refId);
 
   std::string getQuFeatureName(int id) const;
@@ -74,12 +75,13 @@ public:
 
 protected:
   MatchMap _matchMap;
-  std::vector<std::string> _quFeaturesNames, _refFeaturesNames;
+  std::vector<std::string> quFeaturesNames_, refFeaturesNames_;
   // TODO(olga): Maybe temporary here.
   FeatureType featureType_;
 
 private:
   std::unique_ptr<FeatureBuffer> refBuffer_, queryBuffer_;
+  // std::unordered_map<int, std::unordered_map<int, double>> costs_;
 };
 
 #endif // SRC_DATABASE_ONLINE_DATABASE_H_

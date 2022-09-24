@@ -28,6 +28,8 @@
 #include <dirent.h>
 #include <iostream>
 
+#include <glog/logging.h>
+
 namespace fs = std::filesystem;
 
 std::vector<std::string> listDir(const std::string &dir_name) {
@@ -59,6 +61,9 @@ std::vector<std::string> listProtoDir(const std::string &pathToDir,
     std::cout << "[WARNING] Proto extension should start with <.>\n";
     std::cout << "[WARNING] Received proto extension: " << protoExtension
               << std::endl;
+  }
+  if (!fs::exists(pathToDir)) {
+    LOG(FATAL) << "Query feature directory does not exist.";
   }
   std::vector<std::string> proto_files;
   for (const auto &entry : fs::directory_iterator(pathToDir)) {

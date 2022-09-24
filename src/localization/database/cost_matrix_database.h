@@ -37,20 +37,15 @@ public:
   using Ptr = std::shared_ptr<CostMatrixDatabase>;
   using ConstPtr = std::shared_ptr<const CostMatrixDatabase>;
 
-  CostMatrixDatabase();
-  ~CostMatrixDatabase() {}
+  CostMatrixDatabase(const std::string &costMatrixFile,
+                     const std::string &queryFeaturesDir,
+                     const std::string &refFeaturesDir, const FeatureType &type,
+                     int bufferSize);
 
   int refSize() override { return cols_; }
   /** gets the original cost and transforms it 1/cost **/
   double getCost(int quId, int refId) override;
 
-  /**
-   * @brief      Loads a from txt. Expects specific format: First line should
-   * contain number of rows and cols
-   *
-   * @param[in]  filename  The filename
-   */
-  void loadFromTxt(const std::string &filename);
   /**
    * @brief      Loads from txt. Expects specific format: Pure matrix values.
    *

@@ -22,7 +22,7 @@ To build the code:
 mkdir build
 cd build
 cmake ..
-make -j
+make -j4
 ```
 
 To be able to use the `python` part, for example for visualization, I recommend setting up a virtual environment of your choice and installing the provided requirements through:

@@ -70,12 +70,11 @@ int main(int argc, char *argv[]) {
   parser.parseYaml(config_file);
   parser.print();
 
-  auto databasePtr = CostMatrixDatabase::Ptr(new CostMatrixDatabase);
-  databasePtr->loadFromProto(parser.costMatrix);
-  // to obtain the features, when needed
-  databasePtr->setQuFeaturesFolder(parser.path2qu);
-  databasePtr->setBufferSize(parser.bufferSize);
-  databasePtr->setFeatureType(FeatureType::Cnn_Feature);
+  auto databasePtr = CostMatrixDatabase::Ptr(new CostMatrixDatabase(
+      /*costMatrixFile=*/parser.costMatrix,
+      /*queryFeaturesDir=*/parser.path2qu,
+      /*refFeaturesDir=*/parser.path2ref, /*type=*/FeatureType::Cnn_Feature,
+      /*bufferSize=*/parser.bufferSize));
 
   // initialize Relocalizer
   auto relocalizerPtr = LshCvHashing::Ptr(new LshCvHashing);
