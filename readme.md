@@ -50,7 +50,7 @@ The `run_matching.py` script stores all the results in the user-provided `output
 For more details about the parameters, please use `python run_matching.py --help`.
 
 For more details about the underlying method and the interpretation of the results, please have a look at [paper](http://www.ipb.uni-bonn.de/pdfs/vysotska16ral-icra.pdf).
-Here is a sketch of what roughly is happening for those who don't like to read much ![](doc/test.png)
+Here is a sketch of what roughly is happening for those who don't like to read much ![](doc/cost_matrix_view.png)
 
 ## Parent project
 
