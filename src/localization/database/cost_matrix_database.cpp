@@ -43,7 +43,7 @@ CostMatrixDatabase::CostMatrixDatabase(const std::string &costMatrixFile,
 
 void CostMatrixDatabase::loadFromTxt(const std::string &filename, int rows,
                                      int cols) {
-  std::ifstream in(filename.c_str());
+  std::ifstream in(filename);
   LOG_IF(FATAL, !in) << "The file cannot be opened " << filename;
 
   LOG(INFO) << "The matrix has " << rows << " rows and " << cols << "cols";

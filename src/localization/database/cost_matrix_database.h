@@ -27,9 +27,10 @@
 #define SRC_DATABASE_COST_MATRIX_DATABASE_H_
 
 #include "database/online_database.h"
+
 #include <string>
 
-typedef std::vector<std::vector<double>> Matrix;
+using Matrix = std::vector<std::vector<double>>;
 
 /**
  * @brief      Class for cost matrix database. Stores costs as matrix.

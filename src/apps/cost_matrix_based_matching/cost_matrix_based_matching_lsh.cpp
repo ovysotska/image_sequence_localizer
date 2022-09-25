@@ -73,11 +73,11 @@ int main(int argc, char *argv[]) {
   parser.print();
 
   std::unique_ptr<OnlineDatabase> database =
-      std::make_unique<CostMatrixDatabase>(CostMatrixDatabase(
+      std::make_unique<CostMatrixDatabase>(
           /*costMatrixFile=*/parser.costMatrix,
           /*queryFeaturesDir=*/parser.path2qu,
           /*refFeaturesDir=*/parser.path2ref, /*type=*/FeatureType::Cnn_Feature,
-          /*bufferSize=*/parser.bufferSize));
+          /*bufferSize=*/parser.bufferSize);
 
   // initialize Relocalizer
   auto relocalizerPtr = LshCvHashing::Ptr(new LshCvHashing);

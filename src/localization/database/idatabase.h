@@ -24,9 +24,6 @@
 #ifndef SRC_DATABASE_IDATABASE_H_
 #define SRC_DATABASE_IDATABASE_H_
 
-#include <memory>
-#include <vector>
-
 /**
  * @brief      Interface class for a database.
  */
@@ -44,6 +41,11 @@ public:
    */
   virtual double getCost(int quId, int refId) = 0;
 
+  iDatabase() = default;
+  iDatabase(const iDatabase &) = delete;
+  iDatabase(iDatabase &&) = delete;
+  iDatabase &operator=(const iDatabase &) = delete;
+  iDatabase &operator=(iDatabase &&) = delete;
   virtual ~iDatabase() {}
 };
 

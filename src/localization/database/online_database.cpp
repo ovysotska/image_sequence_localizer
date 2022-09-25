@@ -26,58 +26,54 @@
 #include "database/online_database.h"
 #include "database/list_dir.h"
 #include "features/feature_buffer.h"
+#include "features/ifeature.h"
+
+#include <glog/logging.h>
+
 #include <fstream>
 #include <limits>
 #include <memory>
 #include <string>
 
-#include <glog/logging.h>
-
-using std::string;
+namespace {
+iFeature::ConstPtr
+addFeatureIfNeeded(FeatureBuffer &featureBuffer,
+                   const std::vector<std::string> &featureNames,
+                   FeatureType type, int featureId) {
+  if (featureBuffer.inBuffer(featureId)) {
+    return featureBuffer.getFeature(featureId);
+  }
+  const auto feature = createFeature(type, featureNames[featureId]);
+  featureBuffer.addFeature(featureId, feature);
+  return feature;
+}
+} // namespace
 
 OnlineDatabase::OnlineDatabase(const std::string &queryFeaturesDir,
                                const std::string &refFeaturesDir,
-                               const FeatureType &type, int bufferSize) {
-  quFeaturesNames_ = listProtoDir(queryFeaturesDir, ".Feature");
-  refFeaturesNames_ = listProtoDir(refFeaturesDir, ".Feature");
-  refBuffer_ = std::make_unique<FeatureBuffer>(bufferSize);
-  queryBuffer_ = std::make_unique<FeatureBuffer>(bufferSize);
-  featureType_ = type;
-
+                               FeatureType type, int bufferSize)
+    : quFeaturesNames_{listProtoDir(queryFeaturesDir, ".Feature")},
+      refFeaturesNames_{listProtoDir(refFeaturesDir, ".Feature")},
+      featureType_{type}, refBuffer_{std::make_unique<FeatureBuffer>(
+                              bufferSize)},
+      queryBuffer_{std::make_unique<FeatureBuffer>(bufferSize)} {
   LOG_IF(FATAL, quFeaturesNames_.empty()) << "Query features are not set.";
   LOG_IF(FATAL, refFeaturesNames_.empty()) << "Reference features are not set.";
 }
 
 double OnlineDatabase::computeMatchingCost(int quId, int refId) {
-  if (quId < 0 || quId >= (int)quFeaturesNames_.size()) {
-    LOG(FATAL) << "Query feature " << quId << " is out of range";
-  }
-  if (refId < 0 || refId >= (int)refFeaturesNames_.size()) {
-    LOG(FATAL) << "Reference feature " << refId << " is out of range";
-  }
+  CHECK(quId >= 0 && quId < (int)quFeaturesNames_.size())
+      << "Query feature " << quId << " is out of range";
+  CHECK(refId >= 0 && refId < (int)refFeaturesNames_.size())
+      << "Reference feature " << refId << " is out of range";
 
-  iFeature::ConstPtr quFeaturePtr = nullptr;
-  iFeature::ConstPtr refFeaturePtr = nullptr;
-  if (queryBuffer_->inBuffer(quId)) {
-    quFeaturePtr = queryBuffer_->getFeature(quId);
-  } else {
-    // We cannot directly set const pointers, so set them through a proxy.
-    // TODO(olga) Some madness is happening here.
-    auto tempFeaturePtr = createFeature(featureType_, quFeaturesNames_[quId]);
-    quFeaturePtr = tempFeaturePtr;
-    queryBuffer_->addFeature(quId, quFeaturePtr);
-  }
+  const auto quFeaturePtr =
+      addFeatureIfNeeded(*queryBuffer_, quFeaturesNames_, featureType_, quId);
+  const auto refFeaturePtr =
+      addFeatureIfNeeded(*refBuffer_, refFeaturesNames_, featureType_, refId);
 
-  if (refBuffer_->inBuffer(refId)) {
-    refFeaturePtr = refBuffer_->getFeature(refId);
-  } else {
-    auto tempFeaturePtr = createFeature(featureType_, refFeaturesNames_[refId]);
-    refFeaturePtr = tempFeaturePtr;
-    refBuffer_->addFeature(refId, refFeaturePtr);
-  }
-
-  double score = quFeaturePtr->computeSimilarityScore(refFeaturePtr);
-  return quFeaturePtr->score2cost(score);
+  return quFeaturePtr->score2cost(
+      quFeaturePtr->computeSimilarityScore(refFeaturePtr));
 }
 
 double OnlineDatabase::getCost(int quId, int refId) {
@@ -89,36 +85,12 @@ double OnlineDatabase::getCost(int quId, int refId) {
       return elementIter->second;
     }
   }
-  double cost = computeMatchingCost(quId, refId);
+  const double cost = computeMatchingCost(quId, refId);
   costs_[quId][refId] = cost;
   return cost;
 }
 
-std::string OnlineDatabase::getQuFeatureName(int id) const {
-  if (id < 0 || id >= (int)quFeaturesNames_.size()) {
-    LOG(WARNING) << "No query feature with id " << id << " exists.";
-    return "";
-  }
-  return quFeaturesNames_[id];
-}
-
-std::string OnlineDatabase::getRefFeatureName(int id) const {
-  if (id < 0 || id >= (int)refFeaturesNames_.size()) {
-    LOG(WARNING) << "No reference feature with id " << id << " exists.";
-    return "";
-  }
-  return refFeaturesNames_[id];
-}
-
 iFeature::ConstPtr OnlineDatabase::getQueryFeature(int quId) {
-  iFeature::ConstPtr quFeaturePtr = nullptr;
-  if (queryBuffer_->inBuffer(quId)) {
-    quFeaturePtr = queryBuffer_->getFeature(quId);
-  } else {
-    // We cannot directly set const pointers, so set them through a proxy.
-    auto tempFeaturePtr = createFeature(featureType_, quFeaturesNames_[quId]);
-    quFeaturePtr = tempFeaturePtr;
-    queryBuffer_->addFeature(quId, quFeaturePtr);
-  }
-  return quFeaturePtr;
+  return addFeatureIfNeeded(*queryBuffer_, quFeaturesNames_, featureType_,
+                            quId);
 }

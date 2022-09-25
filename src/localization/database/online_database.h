@@ -29,37 +29,38 @@
 #include "database/idatabase.h"
 #include "features/feature_buffer.h"
 #include "features/feature_factory.h"
+
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 /**
- * @brief      Database for loading and matching features. Saves the computed
+ * @brief      Database for loading and matching features. Caches the computed
  * matching costs.
  */
 class OnlineDatabase : public iDatabase {
 public:
   OnlineDatabase(const std::string &queryFeaturesDir,
-                 const std::string &refFeaturesDir, const FeatureType &type,
+                 const std::string &refFeaturesDir, FeatureType type,
                  int bufferSize);
 
-  int refSize() override { return refFeaturesNames_.size(); }
+  inline int refSize() override { return refFeaturesNames_.size(); }
   double getCost(int quId, int refId) override;
 
   double computeMatchingCost(int quId, int refId);
 
-  std::string getQuFeatureName(int id) const;
-  std::string getRefFeatureName(int id) const;
   iFeature::ConstPtr getQueryFeature(int quId);
 
 protected:
-  std::vector<std::string> quFeaturesNames_, refFeaturesNames_;
+  std::vector<std::string> quFeaturesNames_;
+  std::vector<std::string> refFeaturesNames_;
   // TODO(olga): Maybe temporary here.
-  FeatureType featureType_;
+  FeatureType featureType_{};
 
 private:
-  std::unique_ptr<FeatureBuffer> refBuffer_, queryBuffer_;
+  std::unique_ptr<FeatureBuffer> refBuffer_{};
+  std::unique_ptr<FeatureBuffer> queryBuffer_{};
   std::unordered_map<int, std::unordered_map<int, double>> costs_;
 };
 
