@@ -30,7 +30,7 @@ void LshCvHashing::setParams(int tableNum, int keySize, int multi_probe_level) {
       new cv::flann::LshIndexParams(tableNum, keySize, multi_probe_level);
 }
 
-void LshCvHashing::setDatabase(OnlineDatabase::Ptr database) {
+void LshCvHashing::setDatabase(OnlineDatabase *database) {
   if (!database) {
     printf("[ERROR][LshAngleBasedRelocalizer] Database is not set\n");
     exit(EXIT_FAILURE);

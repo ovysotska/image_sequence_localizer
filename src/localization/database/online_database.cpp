@@ -21,55 +21,19 @@
 ** SOFTWARE.
 **/
 
+/* Updated by O. Vysotska in 2022 */
+
 #include "database/online_database.h"
 #include "database/list_dir.h"
 #include "features/feature_buffer.h"
-#include "tools/timer/timer.h"
 #include <fstream>
 #include <limits>
 #include <memory>
 #include <string>
-#include <vector>
 
 #include <glog/logging.h>
 
 using std::string;
-using std::vector;
-
-/**
- * @brief      Gets the match cost.
- *
- * @param[in]  quId   The qu identifier
- * @param[in]  refId  The reference identifier
- *
- * @return     The match cost. return -1 if cost is not found
- */
-double MatchMap::getMatchCost(int quId, int refId) {
-  auto row_iter = _matches.find(quId);
-  if (row_iter != _matches.end()) {
-    // found
-    auto el_iter = row_iter->second.find(refId);
-    if (el_iter != row_iter->second.end()) {
-      return el_iter->second;
-    }
-  }
-  return -1.0;
-}
-
-double OnlineDatabase::getCost(int quId, int refId) {
-  double cost = _matchMap.getMatchCost(quId, refId);
-  if (cost > -1.0) {
-    // cost was found
-    return cost;
-  }
-  // printf(
-  //     "[DEBUG][OnlineDatabase] Matching costs for features %d - %d will be "
-  //     "computed.\n",
-  //     quId, refId);
-  cost = computeMatchCost(quId, refId);
-  _matchMap.addMatchCost(quId, refId, cost);
-  return cost;
-}
 
 OnlineDatabase::OnlineDatabase(const std::string &queryFeaturesDir,
                                const std::string &refFeaturesDir,
@@ -84,10 +48,7 @@ OnlineDatabase::OnlineDatabase(const std::string &queryFeaturesDir,
   LOG_IF(FATAL, refFeaturesNames_.empty()) << "Reference features are not set.";
 }
 
-// use for tests / visualization only
-const MatchMap &OnlineDatabase::getMatchMap() const { return _matchMap; }
-
-double OnlineDatabase::computeMatchCost(int quId, int refId) {
+double OnlineDatabase::computeMatchingCost(int quId, int refId) {
   if (quId < 0 || quId >= (int)quFeaturesNames_.size()) {
     LOG(FATAL) << "Query feature " << quId << " is out of range";
   }
@@ -119,9 +80,23 @@ double OnlineDatabase::computeMatchCost(int quId, int refId) {
   return quFeaturePtr->score2cost(score);
 }
 
+double OnlineDatabase::getCost(int quId, int refId) {
+  // Check if the cost was computed before.
+  auto rowIter = costs_.find(quId);
+  if (rowIter != costs_.end()) {
+    auto elementIter = rowIter->second.find(refId);
+    if (elementIter != rowIter->second.end()) {
+      return elementIter->second;
+    }
+  }
+  double cost = computeMatchingCost(quId, refId);
+  costs_[quId][refId] = cost;
+  return cost;
+}
+
 std::string OnlineDatabase::getQuFeatureName(int id) const {
   if (id < 0 || id >= (int)quFeaturesNames_.size()) {
-    printf("[WARNING][OnlineDatabase] No such feature exists\n");
+    LOG(WARNING) << "No query feature with id " << id << " exists.";
     return "";
   }
   return quFeaturesNames_[id];
@@ -129,7 +104,7 @@ std::string OnlineDatabase::getQuFeatureName(int id) const {
 
 std::string OnlineDatabase::getRefFeatureName(int id) const {
   if (id < 0 || id >= (int)refFeaturesNames_.size()) {
-    printf("[WARNING][OnlineDatabase] No such feature exists\n");
+    LOG(WARNING) << "No reference feature with id " << id << " exists.";
     return "";
   }
   return refFeaturesNames_[id];

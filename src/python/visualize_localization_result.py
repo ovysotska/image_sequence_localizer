@@ -5,7 +5,7 @@ from pathlib import Path
 import protos_io
 
 
-def show_matching_result(matching_result, cost_matrix, expanded_mask=None):
+def create_combined_image(matching_result, cost_matrix, expanded_mask=None):
 
     rgb_costs = np.zeros((cost_matrix.shape[0], cost_matrix.shape[1], 3))
     rgb_costs[:, :, 0] = cost_matrix
@@ -18,11 +18,14 @@ def show_matching_result(matching_result, cost_matrix, expanded_mask=None):
             rgb_costs[element.row, element.col] = [0, 1, 0]
 
     # Add path with color. Red - real nodes, Blue - hidden nodes.
+    # WARNING: setting the path as BGR channels.
     for match in matching_result.matches:
         if match.real == True:
-            rgb_costs[match.query_id, match.ref_id] = [1, 0, 0]
-        else:
+            # RED
             rgb_costs[match.query_id, match.ref_id] = [0, 0, 1]
+        else:
+            # BLUE
+            rgb_costs[match.query_id, match.ref_id] = [1, 0, 0]
 
     return rgb_costs
 
@@ -72,16 +75,16 @@ def main():
     else:
         expanded_mask = None
 
-    image = show_matching_result(matching_result, cost_matrix, expanded_mask)
+    image_bgr = create_combined_image(matching_result, cost_matrix, expanded_mask)
 
     if args.image_name:
-        img = np.array(image, dtype=float) * float(255)
-        cv2.imwrite(str(args.image_name), img)
+        image_bgr_char = np.array(image_bgr, dtype=float) * float(255)
+        cv2.imwrite(str(args.image_name), image_bgr_char)
 
     window_name = f"cost_matrix {max_value:.4f}:{min_value:.4f}"
 
     cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
-    cv2.imshow(window_name, image)
+    cv2.imshow(window_name, image_bgr)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 

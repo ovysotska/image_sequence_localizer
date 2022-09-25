@@ -44,6 +44,13 @@ def main():
     db_files = list(args.db_features.glob("*.Feature.pb"))
     cost_matrix_file = args.cost_matrix_file
 
+    if len(query_files) == 0:
+        print("WARNING: no query features were read")
+        return
+    if len(db_files) == 0:
+        print("WARNING: no reference features were read")
+        return
+
     query_files.sort()
     db_files.sort()
 

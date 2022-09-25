@@ -21,6 +21,8 @@
 ** SOFTWARE.
 **/
 
+/* Updated by O. Vysotska in 2022 */
+
 #ifndef SRC_DATABASE_COST_MATRIX_DATABASE_H_
 #define SRC_DATABASE_COST_MATRIX_DATABASE_H_
 
@@ -34,9 +36,6 @@ typedef std::vector<std::vector<double>> Matrix;
  */
 class CostMatrixDatabase : public OnlineDatabase {
 public:
-  using Ptr = std::shared_ptr<CostMatrixDatabase>;
-  using ConstPtr = std::shared_ptr<const CostMatrixDatabase>;
-
   CostMatrixDatabase(const std::string &costMatrixFile,
                      const std::string &queryFeaturesDir,
                      const std::string &refFeaturesDir, const FeatureType &type,
@@ -58,7 +57,6 @@ public:
   void loadFromProto(const std::string &filename);
 
   void overrideCosts(const Matrix &costs, int rows, int cols);
-  /** returns original costs. Use for visualization and testing only **/
   const Matrix &getCosts() const { return costs_; }
 
 private:

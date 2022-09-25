@@ -57,11 +57,8 @@ std::vector<std::string> listDir(const std::string &dir_name) {
 
 std::vector<std::string> listProtoDir(const std::string &pathToDir,
                                       const std::string &protoExtension) {
-  if (protoExtension.at(0) != '.') {
-    std::cout << "[WARNING] Proto extension should start with <.>\n";
-    std::cout << "[WARNING] Received proto extension: " << protoExtension
-              << std::endl;
-  }
+  LOG_IF(FATAL, protoExtension.at(0) != '.')
+      << "Proto extension should start with <.>. Received " << protoExtension;
   if (!fs::exists(pathToDir)) {
     LOG(FATAL) << "Feature directory does not exist.";
   }

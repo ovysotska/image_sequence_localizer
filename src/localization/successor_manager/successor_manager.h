@@ -1,4 +1,4 @@
-/** vpr_relocalization: a library for visual place recognition in changing 
+/** vpr_relocalization: a library for visual place recognition in changing
 ** environments with efficient relocalization step.
 ** Copyright (c) 2017 O. Vysotska, C. Stachniss, University of Bonn
 **
@@ -35,13 +35,12 @@
 #include "relocalizers/irelocalizer.h"
 #include "successor_manager/node.h"
 
-
 /**
  * @brief      Class that communicates between database and localizer.
  *             Knows how to maintain successor.
- */   
+ */
 class SuccessorManager {
- public:
+public:
   using Ptr = std::shared_ptr<SuccessorManager>;
   using ConstPtr = std::shared_ptr<const SuccessorManager>;
 
@@ -49,17 +48,20 @@ class SuccessorManager {
   ~SuccessorManager() {}
 
   /**
-   * @brief      Sets the fan out. Fan out is responsible to different speeds between sequences
+   * @brief      Sets the fan out. Fan out is responsible to different speeds
+   * between sequences
    *
-   * @param[in]  value  The values start from 1 to size of reference trajectory. Typical values are 5 to 10.
+   * @param[in]  value  The values start from 1 to size of reference trajectory.
+   * Typical values are 5 to 10.
    *
    * @return     checks if input is valid
    */
   bool setFanOut(int value);
-  bool setDatabase(iDatabase::Ptr database);
+  bool setDatabase(iDatabase *database);
   bool setRelocalizer(iRelocalizer::Ptr relocalizer);
   /**
-   * @brief      Introduces the notion of similar places within the reference trajectory. The ids of the similar places should be pre-computed.
+   * @brief      Introduces the notion of similar places within the reference
+   * trajectory. The ids of the similar places should be pre-computed.
    *
    * @param[in]  filename  The filename
    *
@@ -75,18 +77,18 @@ class SuccessorManager {
   void getSuccessorFanOut(int quId, int refId);
   void getSuccessorsSimPlaces(int quId, int refId);
 
- protected:
-  iDatabase::Ptr _database = nullptr;
+protected:
+  iDatabase *_database = nullptr;
   int _fan_out = 0;
 
- private:
+private:
   // current successors
   std::unordered_set<Node> _successors;
   /**
    * for refId gives the vector of refIds, that represent similar places
    */
-  std::unordered_map<int, std::set<int> > _sameRefPlaces;
+  std::unordered_map<int, std::set<int>> _sameRefPlaces;
   iRelocalizer::Ptr _relocalizer = nullptr;
 };
 
-#endif  // SRC_SUCCESSOR_MANAGER_SUCCESSOR_MANAGER_H_
+#endif // SRC_SUCCESSOR_MANAGER_SUCCESSOR_MANAGER_H_

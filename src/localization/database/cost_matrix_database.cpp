@@ -21,6 +21,8 @@
 ** SOFTWARE.
 **/
 
+/* Updated by O. Vysotska in 2022 */
+
 #include "database/cost_matrix_database.h"
 
 #include <fstream>
@@ -66,9 +68,9 @@ void CostMatrixDatabase::overrideCosts(const Matrix &costs, int rows,
 }
 
 double CostMatrixDatabase::getCost(int quId, int refId) {
-  LOG_IF(FATAL, quId >= rows_ || quId < 0) << " Invalid query index" << quId;
+  LOG_IF(FATAL, quId >= rows_ || quId < 0) << " Invalid query index " << quId;
   LOG_IF(FATAL, refId >= cols_ || refId < 0)
-      << " Invalid reference index" << quId;
+      << " Invalid reference index " << refId;
 
   double value = costs_[quId][refId];
   if (value < 1e-09) {

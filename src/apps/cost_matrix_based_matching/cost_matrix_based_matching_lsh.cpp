@@ -28,6 +28,7 @@
 #include "database/cost_matrix_database.h"
 #include "database/idatabase.h"
 #include "database/list_dir.h"
+#include "database/online_database.h"
 #include "features/cnn_feature.h"
 #include "features/ifeature.h"
 #include "online_localizer/ilocvisualizer.h"
@@ -41,7 +42,7 @@
 using std::make_shared;
 
 std::vector<iFeature::Ptr> loadFeatures(const std::string &path2folder) {
-  printf("Loading the features to hash with LSH\n");
+  LOG(INFO) << "Loading the features to hash with LSH.";
   std::vector<std::string> featureNames = listProtoDir(path2folder, ".Feature");
   std::vector<iFeature::Ptr> featurePtrs;
 
@@ -51,7 +52,7 @@ std::vector<iFeature::Ptr> loadFeatures(const std::string &path2folder) {
     fprintf(stderr, ".");
   }
   fprintf(stderr, "\n");
-  printf("Features were loaded and binarized\n");
+  LOG(INFO) << "Features were loaded and binarized";
   return featurePtrs;
 }
 
@@ -59,6 +60,7 @@ int main(int argc, char *argv[]) {
   google::InitGoogleLogging(argv[0]);
   FLAGS_logtostderr = 1;
   LOG(INFO) << "===== Online place recognition cost matrix based LSH ====\n";
+
   if (argc < 2) {
     printf("[ERROR] Not enough input parameters.\n");
     printf("Proper usage: ./cost_matrix_based_matching_lsh config_file.yaml\n");
@@ -70,23 +72,24 @@ int main(int argc, char *argv[]) {
   parser.parseYaml(config_file);
   parser.print();
 
-  auto databasePtr = CostMatrixDatabase::Ptr(new CostMatrixDatabase(
-      /*costMatrixFile=*/parser.costMatrix,
-      /*queryFeaturesDir=*/parser.path2qu,
-      /*refFeaturesDir=*/parser.path2ref, /*type=*/FeatureType::Cnn_Feature,
-      /*bufferSize=*/parser.bufferSize));
+  std::unique_ptr<OnlineDatabase> database =
+      std::make_unique<CostMatrixDatabase>(CostMatrixDatabase(
+          /*costMatrixFile=*/parser.costMatrix,
+          /*queryFeaturesDir=*/parser.path2qu,
+          /*refFeaturesDir=*/parser.path2ref, /*type=*/FeatureType::Cnn_Feature,
+          /*bufferSize=*/parser.bufferSize));
 
   // initialize Relocalizer
   auto relocalizerPtr = LshCvHashing::Ptr(new LshCvHashing);
   relocalizerPtr->setParams(1, 12, 2);
-  relocalizerPtr->setDatabase(databasePtr);
+  relocalizerPtr->setDatabase(database.get());
   std::vector<iFeature::Ptr> featurePtrs = loadFeatures(parser.path2ref);
   relocalizerPtr->train(featurePtrs);
 
   // initialize SuccessorManager
   auto successorManagerPtr = SuccessorManager::Ptr(new SuccessorManager);
   successorManagerPtr->setFanOut(parser.fanOut);
-  successorManagerPtr->setDatabase(databasePtr);
+  successorManagerPtr->setDatabase(database.get());
   successorManagerPtr->setRelocalizer(relocalizerPtr);
 
   // create localizer and run it
