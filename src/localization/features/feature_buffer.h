@@ -38,15 +38,15 @@ public:
   FeatureBuffer(int size);
   bool inBuffer(int id) const;
   /** returns empty vector if a feature is not in buffer */
-  iFeature::ConstPtr getFeature(int id) const;
-  void addFeature(int id, const iFeature::ConstPtr &feature);
+  const iFeature& getFeature(int id) const;
+  void addFeature(int id, std::unique_ptr<iFeature> feature);
 
   void deleteFeature();
 
   // this is needed to remember which feature came first.
   int bufferSize = -1;
   std::vector<int> ids;
-  std::unordered_map<int, const iFeature::ConstPtr> featureMap;
+  std::unordered_map<int, std::unique_ptr<iFeature>> featureMap;
 };
 
 #endif // SRC_FEATURES_FEATURE_BUFFER_H_

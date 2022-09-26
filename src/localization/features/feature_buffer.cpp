@@ -22,6 +22,7 @@
 **/
 
 #include "feature_buffer.h"
+#include "features/ifeature.h"
 
 #include <iostream>
 #include <limits>
@@ -36,8 +37,8 @@ FeatureBuffer::FeatureBuffer(int size) {
 
 bool FeatureBuffer::inBuffer(int id) const { return featureMap.count(id) > 0; }
 
-iFeature::ConstPtr FeatureBuffer::getFeature(int id) const {
-  return featureMap.at(id);
+const iFeature& FeatureBuffer::getFeature(int id) const {
+  return *featureMap.at(id);
 }
 
 /** internal function. deletes the first added feature from the buffer **/
@@ -46,21 +47,12 @@ void FeatureBuffer::deleteFeature() {
   ids.erase(ids.begin());
 }
 
-void FeatureBuffer::addFeature(int id, const iFeature::ConstPtr &feature) {
-  if (ids.size() > static_cast<size_t>(std::numeric_limits<int>::max())) {
-    fprintf(stderr,
-            "[ERROR] ids vector size does not fit in integer type. Cannot add "
-            "feature with id: %d.\n",
-            id);
-    return;
-  }
+void FeatureBuffer::addFeature(int id,  std::unique_ptr<iFeature> feature) {
+
   if (static_cast<int>(ids.size()) == bufferSize) {
     deleteFeature();
   }
   ids.push_back(id);
-  if (featureMap.count(id) > 0) {
-    fprintf(stderr, "[WARNING] feature with id %d exists. Overwriting.\n", id);
-  }
-  // Map stores const pointers, so we cannot use operator[] here.
-  featureMap.emplace(id, feature);
+  LOG_IF(WARNING, featureMap.count(id) > 0) << "Feature with id " << id << " exists. Overwriting..";
+  featureMap.emplace(id, std::move(feature));
 }

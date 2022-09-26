@@ -33,19 +33,11 @@
  */
 class CnnFeature : public iFeature {
 public:
-  using Ptr = std::shared_ptr<CnnFeature>;
-  using ConstPtr = std::shared_ptr<const CnnFeature>;
 
   CnnFeature(const std::string &filename);
 
-  /**
-   * @brief      computes the cosine distance between two vectors
-   *
-   * @param[in]  rhs   The right hand side
-   *
-   * @return     The similarity score.
-   */
-  double computeSimilarityScore(const iFeature::ConstPtr &rhs) const override;
+  // Computes the cosine distance between two vectors.
+  double computeSimilarityScore(const iFeature &rhs) const override;
   /**
    * @brief      weight/cost is an inverse of a score.
    *

@@ -21,6 +21,9 @@
 ** SOFTWARE.
 **/
 
+/* Updated by O. Vysotska in 2022 */
+
+
 #ifndef SRC_FEATURES_IFEATURE_H_
 #define SRC_FEATURES_IFEATURE_H_
 #include <memory>
@@ -32,8 +35,6 @@
  */
 class iFeature {
 public:
-  using Ptr = std::shared_ptr<iFeature>;
-  using ConstPtr = std::shared_ptr<const iFeature>;
   /**
    * @brief     Returns the similarity score between two feature vectors. The
    * higher the score the more similar two features should be.
@@ -43,7 +44,7 @@ public:
    * @return     One double value as a result of comparison.
    */
   virtual double
-  computeSimilarityScore(const iFeature::ConstPtr &rhs) const = 0;
+  computeSimilarityScore(const iFeature &rhs) const = 0;
   /**
    * @brief      Transforms similarity into the weights/cost for the graph.
 

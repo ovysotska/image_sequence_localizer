@@ -27,6 +27,7 @@
 #include "database/online_database.h"
 #include "features/ifeature.h"
 #include "relocalizers/irelocalizer.h"
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -47,14 +48,14 @@ public:
 
   void setDatabase(OnlineDatabase *database);
 
-  void train(std::vector<iFeature::Ptr> features);
+  void train(const std::vector<std::unique_ptr<iFeature>> &features);
   /**
    * @brief      Not working for now, for unknown reason
    */
   void saveHashes();
   void setParams(int tableNum, int keySize, int multi_probe_level);
 
-  std::vector<int> hashFeature(const iFeature::ConstPtr &fPtr);
+  std::vector<int> hashFeature(const iFeature &fPtr);
 
 private:
   const int _tableNum = 25; // number of hash tables

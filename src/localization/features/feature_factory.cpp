@@ -24,18 +24,14 @@
 #include "feature_factory.h"
 #include "cnn_feature.h"
 
-iFeature::Ptr createFeature(FeatureType type,
+#include <glog/logging.h>
+
+std::unique_ptr<iFeature> createFeature(FeatureType type,
                             const std::string &featureFilename) {
-  iFeature::Ptr featurePtr = nullptr;
   switch (type) {
   case Cnn_Feature: {
-    featurePtr = CnnFeature::Ptr(new CnnFeature(featureFilename));
-    break;
-  }
-  default: {
-    printf("[ERROR][FeatureFactory] Unknown feature type\n");
-    exit(EXIT_FAILURE);
+    return std::make_unique<CnnFeature>(featureFilename);
   }
   }
-  return featurePtr;
+  LOG(FATAL) << "Unknown feature type";
 }

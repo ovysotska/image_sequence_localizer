@@ -21,6 +21,9 @@
 ** SOFTWARE.
 **/
 
+/* Updated by O. Vysotska in 2022 */
+
+
 #include "cnn_feature.h"
 
 #include <math.h>
@@ -69,20 +72,15 @@ void CnnFeature::binarize() {
   }
 }
 
-double CnnFeature::computeSimilarityScore(const iFeature::ConstPtr &rhs) const {
-  const auto featurePtr = std::static_pointer_cast<const CnnFeature>(rhs);
-  if (!featurePtr) {
-    printf("[ERROR][Feature] It seems like you are trying to match features of "
-           "different type\n");
-    exit(EXIT_FAILURE);
-  }
+double CnnFeature::computeSimilarityScore(const iFeature &rhs) const {
+  const auto &feature = static_cast<const CnnFeature&>(rhs);
   double norm_qr =
       sqrt(std::inner_product(dim.begin(), dim.end(), dim.begin(), 0.0L));
   double norm_db =
-      sqrt(std::inner_product(featurePtr->dim.begin(), featurePtr->dim.end(),
-                              featurePtr->dim.begin(), 0.0L));
+      sqrt(std::inner_product(feature.dim.begin(), feature.dim.end(),
+                              feature.dim.begin(), 0.0L));
   double prod_qr_db = std::inner_product(
-      featurePtr->dim.begin(), featurePtr->dim.end(), dim.begin(), 0.0L);
+      feature.dim.begin(), feature.dim.end(), dim.begin(), 0.0L);
   double cos_dist = prod_qr_db / (norm_qr * norm_db);
   return cos_dist;
 }
