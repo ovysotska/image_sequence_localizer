@@ -24,7 +24,9 @@
 #include "features/cnn_feature.h"
 #include "features/feature_buffer.h"
 #include "features/ifeature.h"
+
 #include "gtest/gtest.h"
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -77,7 +79,7 @@ TEST(featureBuffer, getFeature) {
   const auto resPtr =
       std::static_pointer_cast<const DummyFeature>(buffer.getFeature(1));
   auto dims = resPtr->getDim();
-  EXPECT_NEAR(dims[0], 4, 1e-09);
-  EXPECT_NEAR(dims[1], 5, 1e-09);
-  EXPECT_NEAR(dims[2], 6, 1e-09);
+  EXPECT_DOUBLE_EQ(dims[0], 4);
+  EXPECT_DOUBLE_EQ(dims[1], 5);
+  EXPECT_DOUBLE_EQ(dims[2], 6);
 }

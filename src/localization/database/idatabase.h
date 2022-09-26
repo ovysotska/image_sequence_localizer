@@ -1,4 +1,4 @@
-/** vpr_relocalization: a library for visual place recognition in changing 
+/** vpr_relocalization: a library for visual place recognition in changing
 ** environments with efficient relocalization step.
 ** Copyright (c) 2017 O. Vysotska, C. Stachniss, University of Bonn
 **
@@ -24,17 +24,11 @@
 #ifndef SRC_DATABASE_IDATABASE_H_
 #define SRC_DATABASE_IDATABASE_H_
 
-#include <memory>
-#include <vector>
-
 /**
  * @brief      Interface class for a database.
  */
 class iDatabase {
- public:
-  using Ptr = std::shared_ptr<iDatabase>;
-  using ConstPtr = std::shared_ptr<const iDatabase>;
-
+public:
   virtual int refSize() = 0;
   /**
    * @brief      Gets the cost. This cost goes directly in the graph structure.
@@ -47,7 +41,12 @@ class iDatabase {
    */
   virtual double getCost(int quId, int refId) = 0;
 
+  iDatabase() = default;
+  iDatabase(const iDatabase &) = delete;
+  iDatabase(iDatabase &&) = delete;
+  iDatabase &operator=(const iDatabase &) = delete;
+  iDatabase &operator=(iDatabase &&) = delete;
   virtual ~iDatabase() {}
 };
 
-#endif  // SRC_DATABASE_IDATABASE_H_
+#endif // SRC_DATABASE_IDATABASE_H_

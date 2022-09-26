@@ -5,3 +5,4 @@ add_library(feature_factory feature_factory.cpp)
 target_link_libraries(feature_factory PUBLIC cnn_feature)
 
 add_library(feature_buffer feature_buffer.cpp)
+target_link_libraries(feature_buffer glog::glog)

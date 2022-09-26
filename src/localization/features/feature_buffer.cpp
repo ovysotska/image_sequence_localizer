@@ -26,26 +26,18 @@
 #include <iostream>
 #include <limits>
 
+#include <glog/logging.h>
+
 FeatureBuffer::FeatureBuffer(int size) {
-  if (size < 0) {
-    std::cerr << "[WARNING] invalid featureBuffer size\n";
-  }
+  LOG_IF(FATAL, size < 0) << "Invalid featureBuffer size.";
   bufferSize = size;
   featureMap.reserve(size);
 }
 
-bool FeatureBuffer::inBuffer(int id) const {
-  auto feature = featureMap.find(id);
-  if (feature == featureMap.end()) {
-    // not found
-    return false;
-  }
-  return true;
-}
+bool FeatureBuffer::inBuffer(int id) const { return featureMap.count(id) > 0; }
 
 iFeature::ConstPtr FeatureBuffer::getFeature(int id) const {
-  auto found = featureMap.find(id);
-  return found->second;
+  return featureMap.at(id);
 }
 
 /** internal function. deletes the first added feature from the buffer **/

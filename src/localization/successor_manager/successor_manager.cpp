@@ -1,4 +1,4 @@
-/** vpr_relocalization: a library for visual place recognition in changing 
+/** vpr_relocalization: a library for visual place recognition in changing
 ** environments with efficient relocalization step.
 ** Copyright (c) 2017 O. Vysotska, C. Stachniss, University of Bonn
 **
@@ -42,7 +42,7 @@ bool SuccessorManager::setFanOut(int value) {
   return true;
 }
 
-bool SuccessorManager::setDatabase(iDatabase::Ptr database) {
+bool SuccessorManager::setDatabase(iDatabase *database) {
   if (!database) {
     printf("[ERROR][SuccessorManager] Invalid database.\n");
     return false;
@@ -178,8 +178,8 @@ void SuccessorManager::getSuccessorsSimPlaces(int quId, int refId) {
  *
  * @return     The successors if lost.
  */
-std::unordered_set<Node> SuccessorManager::getSuccessorsIfLost(
-    const Node &node) {
+std::unordered_set<Node>
+SuccessorManager::getSuccessorsIfLost(const Node &node) {
   _successors.clear();
   if (!_relocalizer) {
     printf("[ERROR][SuccessorManager] Relocalizer is not set\n");

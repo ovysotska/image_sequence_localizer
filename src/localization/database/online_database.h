@@ -21,65 +21,47 @@
 ** SOFTWARE.
 **/
 
+/* Updated by O. Vysotska in 2022 */
+
 #ifndef SRC_DATABASE_ONLINE_DATABASE_H_
 #define SRC_DATABASE_ONLINE_DATABASE_H_
 
 #include "database/idatabase.h"
 #include "features/feature_buffer.h"
 #include "features/feature_factory.h"
+
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 /**
- * @brief      Container for storing computed feature matches
- */
-class MatchMap {
-public:
-  MatchMap() {}
-  double getMatchCost(int quId, int refId);
-  void addMatchCost(int quId, int refId, double cost) {
-    _matches[quId][refId] = cost;
-  }
-  std::unordered_map<int, std::unordered_map<int, double>> _matches;
-};
-
-/**
- * @brief      Database for loading and matching features. Saves the computed
+ * @brief      Database for loading and matching features. Caches the computed
  * matching costs.
  */
 class OnlineDatabase : public iDatabase {
 public:
-  using Ptr = std::shared_ptr<OnlineDatabase>;
-  using ConstPtr = std::shared_ptr<const OnlineDatabase>;
+  OnlineDatabase(const std::string &queryFeaturesDir,
+                 const std::string &refFeaturesDir, FeatureType type,
+                 int bufferSize);
 
-  int refSize() override { return _refFeaturesNames.size(); }
+  inline int refSize() override { return refFeaturesNames_.size(); }
   double getCost(int quId, int refId) override;
 
-  void setQuFeaturesFolder(const std::string &path2folder);
-  void setRefFeaturesFolder(const std::string &path2folder);
-  void setBufferSize(int size);
-  void setFeatureType(FeatureType type);
+  double computeMatchingCost(int quId, int refId);
 
-  // use for tests / visualization only
-  const MatchMap &getMatchMap() const;
-  void setMatchMap(const MatchMap &matchMap) { _matchMap = matchMap; }
-  bool isSet() const;
-  double computeMatchCost(int quId, int refId);
-
-  std::string getQuFeatureName(int id) const;
-  std::string getRefFeatureName(int id) const;
   iFeature::ConstPtr getQueryFeature(int quId);
 
 protected:
-  MatchMap _matchMap;
-  std::vector<std::string> _quFeaturesNames, _refFeaturesNames;
+  std::vector<std::string> quFeaturesNames_;
+  std::vector<std::string> refFeaturesNames_;
   // TODO(olga): Maybe temporary here.
-  FeatureType featureType_;
+  FeatureType featureType_{};
 
 private:
-  std::unique_ptr<FeatureBuffer> refBuffer_, queryBuffer_;
+  std::unique_ptr<FeatureBuffer> refBuffer_{};
+  std::unique_ptr<FeatureBuffer> queryBuffer_{};
+  std::unordered_map<int, std::unordered_map<int, double>> costs_;
 };
 
 #endif // SRC_DATABASE_ONLINE_DATABASE_H_

@@ -45,7 +45,7 @@ public:
 
   std::vector<int> getCandidates(int quId) override;
 
-  void setDatabase(OnlineDatabase::Ptr database);
+  void setDatabase(OnlineDatabase *database);
 
   void train(std::vector<iFeature::Ptr> features);
   /**
@@ -57,15 +57,15 @@ public:
   std::vector<int> hashFeature(const iFeature::ConstPtr &fPtr);
 
 private:
-  int _tableNum = 25; // number of hash tables
+  const int _tableNum = 25; // number of hash tables
   // number of bits in the hash key
-  int _keySize = 15;
+  const int _keySize = 15;
   // number of bits to shift to het neighbouring buckets
-  int _multiProbeLevel = 2;
+  const int _multiProbeLevel = 2;
 
   cv::Ptr<cv::FlannBasedMatcher> _matcherPtr;
   cv::Ptr<cv::flann::IndexParams> _indexParam;
-  OnlineDatabase::Ptr _database = nullptr;
+  OnlineDatabase *_database = nullptr;
 };
 
 // table_number the number of hash tables to use (between 10 and 30 usually).

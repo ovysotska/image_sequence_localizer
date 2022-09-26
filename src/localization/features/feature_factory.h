@@ -26,11 +26,6 @@
 
 #include "features/ifeature.h"
 
-/**
- * @brief      creates shared pointers for the specified feature types.
- * Modify this class, when using own features.
- */
-
 enum FeatureType {
   Cnn_Feature,
 };

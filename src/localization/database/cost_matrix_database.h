@@ -21,36 +21,31 @@
 ** SOFTWARE.
 **/
 
+/* Updated by O. Vysotska in 2022 */
+
 #ifndef SRC_DATABASE_COST_MATRIX_DATABASE_H_
 #define SRC_DATABASE_COST_MATRIX_DATABASE_H_
 
 #include "database/online_database.h"
+
 #include <string>
 
-typedef std::vector<std::vector<double>> Matrix;
+using Matrix = std::vector<std::vector<double>>;
 
 /**
  * @brief      Class for cost matrix database. Stores costs as matrix.
  */
 class CostMatrixDatabase : public OnlineDatabase {
 public:
-  using Ptr = std::shared_ptr<CostMatrixDatabase>;
-  using ConstPtr = std::shared_ptr<const CostMatrixDatabase>;
-
-  CostMatrixDatabase();
-  ~CostMatrixDatabase() {}
+  CostMatrixDatabase(const std::string &costMatrixFile,
+                     const std::string &queryFeaturesDir,
+                     const std::string &refFeaturesDir, const FeatureType &type,
+                     int bufferSize);
 
   int refSize() override { return cols_; }
   /** gets the original cost and transforms it 1/cost **/
   double getCost(int quId, int refId) override;
 
-  /**
-   * @brief      Loads a from txt. Expects specific format: First line should
-   * contain number of rows and cols
-   *
-   * @param[in]  filename  The filename
-   */
-  void loadFromTxt(const std::string &filename);
   /**
    * @brief      Loads from txt. Expects specific format: Pure matrix values.
    *
@@ -62,8 +57,7 @@ public:
 
   void loadFromProto(const std::string &filename);
 
-  void setCosts(const Matrix &costs, int rows, int cols);
-  /** returns original costs. Use for visualization and testing only **/
+  void overrideCosts(const Matrix &costs, int rows, int cols);
   const Matrix &getCosts() const { return costs_; }
 
 private:
@@ -72,8 +66,4 @@ private:
   int cols_ = 0;
 };
 
-/** can store only those matrix that fit in the RAM **/
-
 #endif // SRC_DATABASE_COST_MATRIX_DATABASE_H_
-
-// TODO: Why cv::Mat?
