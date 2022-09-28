@@ -30,7 +30,7 @@ enum FeatureType {
   Cnn_Feature,
 };
 
-iFeature::Ptr createFeature(FeatureType type,
+std::unique_ptr<iFeature> createFeature(FeatureType type,
                             const std::string &featureFilename);
 
 #endif // SRC_FEATURES_FEATURE_FACTORY_H_

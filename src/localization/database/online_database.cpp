@@ -36,16 +36,15 @@
 #include <string>
 
 namespace {
-iFeature::ConstPtr
+const iFeature&
 addFeatureIfNeeded(FeatureBuffer &featureBuffer,
                    const std::vector<std::string> &featureNames,
                    FeatureType type, int featureId) {
   if (featureBuffer.inBuffer(featureId)) {
     return featureBuffer.getFeature(featureId);
   }
-  const auto feature = createFeature(type, featureNames[featureId]);
-  featureBuffer.addFeature(featureId, feature);
-  return feature;
+  featureBuffer.addFeature(featureId, createFeature(type, featureNames[featureId]));
+  return featureBuffer.getFeature(featureId);
 }
 } // namespace
 
@@ -67,13 +66,13 @@ double OnlineDatabase::computeMatchingCost(int quId, int refId) {
   CHECK(refId >= 0 && refId < (int)refFeaturesNames_.size())
       << "Reference feature " << refId << " is out of range";
 
-  const auto quFeaturePtr =
+  const auto &quFeature =
       addFeatureIfNeeded(*queryBuffer_, quFeaturesNames_, featureType_, quId);
-  const auto refFeaturePtr =
+  const auto &refFeature =
       addFeatureIfNeeded(*refBuffer_, refFeaturesNames_, featureType_, refId);
 
-  return quFeaturePtr->score2cost(
-      quFeaturePtr->computeSimilarityScore(refFeaturePtr));
+  return quFeature.score2cost(
+      quFeature.computeSimilarityScore(refFeature));
 }
 
 double OnlineDatabase::getCost(int quId, int refId) {
@@ -90,7 +89,7 @@ double OnlineDatabase::getCost(int quId, int refId) {
   return cost;
 }
 
-iFeature::ConstPtr OnlineDatabase::getQueryFeature(int quId) {
+const iFeature& OnlineDatabase::getQueryFeature(int quId) {
   return addFeatureIfNeeded(*queryBuffer_, quFeaturesNames_, featureType_,
                             quId);
 }

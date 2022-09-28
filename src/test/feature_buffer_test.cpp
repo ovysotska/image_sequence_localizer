@@ -33,30 +33,27 @@
 
 class DummyFeature : public iFeature {
 public:
-  DummyFeature(const std::vector<double> &values) { dim = values; }
-  double computeSimilarityScore(const iFeature::ConstPtr &rhs) const override {
+  DummyFeature(const std::vector<double> &values) { dimensions = values; }
+  double computeSimilarityScore(const iFeature &rhs) const override {
     return 0.0;
   }
   double score2cost(double score) const override { return 0.0; }
-  const std::vector<double> &getDim() const { return dim; }
 
-private:
-  std::vector<double> dim;
 };
 
 TEST(featureBuffer, addFeature) {
   FeatureBuffer buffer(2);
 
   buffer.addFeature(0,
-                    std::make_shared<DummyFeature>(std::vector{1.0, 2.0, 3.0}));
+                    std::make_unique<DummyFeature>(std::vector{1.0, 2.0, 3.0}));
   buffer.addFeature(1,
-                    std::make_shared<DummyFeature>(std::vector{4.0, 5.0, 6.0}));
+                    std::make_unique<DummyFeature>(std::vector{4.0, 5.0, 6.0}));
   EXPECT_EQ(buffer.featureMap.size(), 2);
   EXPECT_EQ(buffer.ids[0], 0);
   EXPECT_EQ(buffer.ids[1], 1);
 
   buffer.addFeature(3,
-                    std::make_shared<DummyFeature>(std::vector{7.0, 8.0, 9.0}));
+                    std::make_unique<DummyFeature>(std::vector{7.0, 8.0, 9.0}));
   EXPECT_EQ(buffer.featureMap.size(), 2);
   EXPECT_EQ(buffer.ids[0], 1);
   EXPECT_EQ(buffer.ids[1], 3);
@@ -67,7 +64,7 @@ TEST(featureBuffer, inBuffer) {
   EXPECT_FALSE(buffer.inBuffer(4));
 
   buffer.addFeature(1,
-                    std::make_shared<DummyFeature>(std::vector{4.0, 5.0, 6.0}));
+                    std::make_unique<DummyFeature>(std::vector{4.0, 5.0, 6.0}));
   EXPECT_FALSE(buffer.inBuffer(4));
   EXPECT_TRUE(buffer.inBuffer(1));
 }
@@ -75,11 +72,9 @@ TEST(featureBuffer, inBuffer) {
 TEST(featureBuffer, getFeature) {
   FeatureBuffer buffer(4);
   buffer.addFeature(1,
-                    std::make_shared<DummyFeature>(std::vector{4.0, 5.0, 6.0}));
-  const auto resPtr =
-      std::static_pointer_cast<const DummyFeature>(buffer.getFeature(1));
-  auto dims = resPtr->getDim();
-  EXPECT_DOUBLE_EQ(dims[0], 4);
-  EXPECT_DOUBLE_EQ(dims[1], 5);
-  EXPECT_DOUBLE_EQ(dims[2], 6);
+                    std::make_unique<DummyFeature>(std::vector{4.0, 5.0, 6.0}));
+  const auto &feature =buffer.getFeature(1);
+  EXPECT_DOUBLE_EQ(feature.dimensions[0], 4);
+  EXPECT_DOUBLE_EQ(feature.dimensions[1], 5);
+  EXPECT_DOUBLE_EQ(feature.dimensions[2], 6);
 }

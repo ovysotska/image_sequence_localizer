@@ -39,21 +39,19 @@
 
 #include <glog/logging.h>
 
-using std::make_shared;
 
-std::vector<iFeature::Ptr> loadFeatures(const std::string &path2folder) {
+std::vector<std::unique_ptr<iFeature>> loadFeatures(const std::string &path2folder) {
   LOG(INFO) << "Loading the features to hash with LSH.";
   std::vector<std::string> featureNames = listProtoDir(path2folder, ".Feature");
-  std::vector<iFeature::Ptr> featurePtrs;
+  std::vector<std::unique_ptr<iFeature>> features;
 
   for (size_t i = 0; i < featureNames.size(); ++i) {
-    iFeature::Ptr featurePtr = iFeature::Ptr(new CnnFeature(featureNames[i]));
-    featurePtrs.push_back(featurePtr);
+    features.emplace_back(std::make_unique<CnnFeature>(featureNames[i]));
     fprintf(stderr, ".");
   }
   fprintf(stderr, "\n");
   LOG(INFO) << "Features were loaded and binarized";
-  return featurePtrs;
+  return features;
 }
 
 int main(int argc, char *argv[]) {
@@ -83,8 +81,7 @@ int main(int argc, char *argv[]) {
   auto relocalizerPtr = LshCvHashing::Ptr(new LshCvHashing);
   relocalizerPtr->setParams(1, 12, 2);
   relocalizerPtr->setDatabase(database.get());
-  std::vector<iFeature::Ptr> featurePtrs = loadFeatures(parser.path2ref);
-  relocalizerPtr->train(featurePtrs);
+  relocalizerPtr->train(loadFeatures(parser.path2ref));
 
   // initialize SuccessorManager
   auto successorManagerPtr = SuccessorManager::Ptr(new SuccessorManager);

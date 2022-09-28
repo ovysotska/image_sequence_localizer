@@ -22,6 +22,7 @@
 **/
 
 #include "lsh_cv_hashing.h"
+
 #include "database/list_dir.h"
 #include "tools/timer/timer.h"
 
@@ -38,7 +39,7 @@ void LshCvHashing::setDatabase(OnlineDatabase *database) {
   _database = database;
 }
 
-void LshCvHashing::train(std::vector<iFeature::Ptr> features) {
+void LshCvHashing::train(const std::vector<std::unique_ptr<iFeature>> &features) {
   if (!_indexParam) {
     setParams(_tableNum, _keySize, _multiProbeLevel);
   }
@@ -60,16 +61,16 @@ void LshCvHashing::train(std::vector<iFeature::Ptr> features) {
   // m_matcherPtr->match(*query, knnmatches, 1);
 }
 
-std::vector<int> LshCvHashing::hashFeature(const iFeature::ConstPtr &fPtr) {
+std::vector<int> LshCvHashing::hashFeature(const iFeature &feature) {
   std::vector<std::vector<cv::DMatch>> matches;
-  cv::Mat feature(1, fPtr->bits.size(), CV_8UC1);
-  for (int i = 0; i < fPtr->bits.size(); ++i) {
-    feature.at<uchar>(0, i) = fPtr->bits[i];
+  cv::Mat featureCV(1, feature.bits.size(), CV_8UC1);
+  for (int i = 0; i < feature.bits.size(); ++i) {
+    featureCV.at<uchar>(0, i) = feature.bits[i];
   }
   // _matcherPtr->match(feature, matches);
   Timer timer;
   timer.start();
-  _matcherPtr->knnMatch(feature, matches, 5);
+  _matcherPtr->knnMatch(featureCV, matches, 5);
   timer.stop();
   fprintf(stderr, "[LSH][CV] time to extract neighbours: ");
   timer.print_elapsed_time(TimeExt::MicroSec);
@@ -97,17 +98,12 @@ std::vector<int> LshCvHashing::getCandidates(int quId) {
     exit(EXIT_FAILURE);
   }
   printf("Getting candidates for a query image\n");
-  const auto featurePtr = std::static_pointer_cast<const iFeature>(
-      _database->getQueryFeature(quId));
-  if (!featurePtr) {
-    printf("Wrong feature format\n");
-  }
-
+  const auto &feature = _database->getQueryFeature(quId);
   Timer timer;
   timer.start();
 
   std::vector<int> candidates;
-  candidates = hashFeature(featurePtr);
+  candidates = hashFeature(feature);
 
   timer.stop();
   fprintf(stderr, "[HASH] time ");

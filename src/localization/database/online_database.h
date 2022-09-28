@@ -50,7 +50,7 @@ public:
 
   double computeMatchingCost(int quId, int refId);
 
-  iFeature::ConstPtr getQueryFeature(int quId);
+  const iFeature& getQueryFeature(int quId);
 
 protected:
   std::vector<std::string> quFeaturesNames_;
