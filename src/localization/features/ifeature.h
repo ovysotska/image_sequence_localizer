@@ -61,7 +61,9 @@ public:
   iFeature &operator=(const iFeature &) = delete;
   iFeature &operator=(iFeature &&) = delete;
 
+  std::string type = "";
   std::vector<int> bits;
+  std::vector<double> dimensions;
 };
 /**
   \fn iFeature::score2weight

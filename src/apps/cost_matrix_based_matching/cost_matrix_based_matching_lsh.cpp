@@ -46,8 +46,7 @@ std::vector<std::unique_ptr<iFeature>> loadFeatures(const std::string &path2fold
   std::vector<std::unique_ptr<iFeature>> features;
 
   for (size_t i = 0; i < featureNames.size(); ++i) {
-    std::unique_ptr<iFeature> feature = std::make_unique<CnnFeature>(featureNames[i]);
-    features.push_back(std::move(feature));
+    features.emplace_back(std::make_unique<CnnFeature>(featureNames[i]));
     fprintf(stderr, ".");
   }
   fprintf(stderr, "\n");

@@ -48,8 +48,8 @@ public:
    */
   double score2cost(double score) const override;
 
-  std::vector<double> dim;
   using iFeature::bits;
+  using iFeature::dimensions;
 
 protected:
   void binarize();

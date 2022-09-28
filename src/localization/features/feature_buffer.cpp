@@ -47,7 +47,7 @@ void FeatureBuffer::deleteFeature() {
   ids.erase(ids.begin());
 }
 
-void FeatureBuffer::addFeature(int id,  std::unique_ptr<iFeature> feature) {
+void FeatureBuffer::addFeature(int id,  std::unique_ptr<iFeature>&& feature) {
 
   if (static_cast<int>(ids.size()) == bufferSize) {
     deleteFeature();

@@ -25,62 +25,62 @@
 
 
 #include "cnn_feature.h"
+#include "features/ifeature.h"
+#include "localization_protos.pb.h"
 
 #include <math.h>
-
 #include <algorithm>
 #include <fstream>
 #include <limits>
 #include <numeric>
 
-#include "features/ifeature.h"
-#include "localization_protos.pb.h"
+#include <glog/logging.h>
+
 
 CnnFeature::CnnFeature(const std::string &filename) {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
   image_sequence_localizer::Feature feature_proto;
   std::fstream input(filename, std::ios::in | std::ios::binary);
   if (!feature_proto.ParseFromIstream(&input)) {
-    std::cerr << "Failed to parse feature_proto file: " << filename << "."
-              << std::endl;
-    return;
+    LOG(FATAL) << "Failed to parse feature_proto file: " << filename;
   }
 
   for (int idx = 0; idx < feature_proto.values_size(); ++idx) {
-    dim.push_back(feature_proto.values(idx));
+    dimensions.push_back(feature_proto.values(idx));
   }
   binarize();
+  type = "CnnFeature";
 }
 
 void CnnFeature::binarize() {
   bits.clear();
   int des_max = 255, des_min = 0; // des_ - desired params
-  auto min_maxEl = std::minmax_element(dim.begin(), dim.end());
+  auto min_maxEl = std::minmax_element(dimensions.begin(), dimensions.end());
 
   double d_min, d_max;
   d_min = *min_maxEl.first;
   d_max = *min_maxEl.second;
   double tmp = (des_max - des_min) / (d_max - d_min);
 
-  bits.resize(dim.size(), 0);
+  bits.resize(dimensions.size(), 0);
 
   int thresh = des_max / 2;
-  for (int f = 0; f < dim.size(); ++f) {
-    int d_int = (dim[f] - d_min) * tmp + des_min;
+  for (int f = 0; f < dimensions.size(); ++f) {
+    int d_int = (dimensions[f] - d_min) * tmp + des_min;
     bool value = d_int < thresh ? 0 : 1;
     bits[f] = value;
   }
 }
 
 double CnnFeature::computeSimilarityScore(const iFeature &rhs) const {
-  const auto &feature = static_cast<const CnnFeature&>(rhs);
+  CHECK(this->type == rhs.type) <<  "Features are not the same type";
   double norm_qr =
-      sqrt(std::inner_product(dim.begin(), dim.end(), dim.begin(), 0.0L));
+      sqrt(std::inner_product(dimensions.begin(), dimensions.end(), dimensions.begin(), 0.0L));
   double norm_db =
-      sqrt(std::inner_product(feature.dim.begin(), feature.dim.end(),
-                              feature.dim.begin(), 0.0L));
+      sqrt(std::inner_product(rhs.dimensions.begin(), rhs.dimensions.end(),
+                              rhs.dimensions.begin(), 0.0L));
   double prod_qr_db = std::inner_product(
-      feature.dim.begin(), feature.dim.end(), dim.begin(), 0.0L);
+      rhs.dimensions.begin(), rhs.dimensions.end(), dimensions.begin(), 0.0L);
   double cos_dist = prod_qr_db / (norm_qr * norm_db);
   return cos_dist;
 }

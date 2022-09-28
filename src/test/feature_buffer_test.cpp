@@ -33,15 +33,12 @@
 
 class DummyFeature : public iFeature {
 public:
-  DummyFeature(const std::vector<double> &values) { dim = values; }
+  DummyFeature(const std::vector<double> &values) { dimensions = values; }
   double computeSimilarityScore(const iFeature &rhs) const override {
     return 0.0;
   }
   double score2cost(double score) const override { return 0.0; }
-  const std::vector<double> &getDim() const { return dim; }
 
-private:
-  std::vector<double> dim;
 };
 
 TEST(featureBuffer, addFeature) {
@@ -76,9 +73,8 @@ TEST(featureBuffer, getFeature) {
   FeatureBuffer buffer(4);
   buffer.addFeature(1,
                     std::make_unique<DummyFeature>(std::vector{4.0, 5.0, 6.0}));
-  const auto &feature =static_cast<const DummyFeature&>(buffer.getFeature(1));
-  auto dims = feature.getDim();
-  EXPECT_DOUBLE_EQ(dims[0], 4);
-  EXPECT_DOUBLE_EQ(dims[1], 5);
-  EXPECT_DOUBLE_EQ(dims[2], 6);
+  const auto &feature =buffer.getFeature(1);
+  EXPECT_DOUBLE_EQ(feature.dimensions[0], 4);
+  EXPECT_DOUBLE_EQ(feature.dimensions[1], 5);
+  EXPECT_DOUBLE_EQ(feature.dimensions[2], 6);
 }

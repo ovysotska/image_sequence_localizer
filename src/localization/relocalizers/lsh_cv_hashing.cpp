@@ -22,6 +22,7 @@
 **/
 
 #include "lsh_cv_hashing.h"
+
 #include "database/list_dir.h"
 #include "tools/timer/timer.h"
 
@@ -97,12 +98,7 @@ std::vector<int> LshCvHashing::getCandidates(int quId) {
     exit(EXIT_FAILURE);
   }
   printf("Getting candidates for a query image\n");
-  const auto &feature = static_cast<const iFeature&>(
-      _database->getQueryFeature(quId));
-  // if (!featurePtr) {
-  //   printf("Wrong feature format\n");
-  // }
-
+  const auto &feature = _database->getQueryFeature(quId);
   Timer timer;
   timer.start();
 

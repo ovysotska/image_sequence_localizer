@@ -39,7 +39,7 @@ public:
   bool inBuffer(int id) const;
   /** returns empty vector if a feature is not in buffer */
   const iFeature& getFeature(int id) const;
-  void addFeature(int id, std::unique_ptr<iFeature> feature);
+  void addFeature(int id, std::unique_ptr<iFeature>&& feature);
 
   void deleteFeature();
 
