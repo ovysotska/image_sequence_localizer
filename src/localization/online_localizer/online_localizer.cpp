@@ -52,12 +52,12 @@ OnlineLocalizer::OnlineLocalizer() {
   _currentBestHyp = source;
 }
 
-bool OnlineLocalizer::setSuccessorManager(SuccessorManager::Ptr succManager) {
-  if (!succManager) {
+bool OnlineLocalizer::setSuccessorManager(SuccessorManager *successorManager) {
+  if (!successorManager) {
     printf("[ERROR][OnlineLocalizer] Successor manager is not set\n");
     return false;
   }
-  _successorManager = succManager;
+  successorManager_ = successorManager;
   return true;
 }
 
@@ -91,7 +91,7 @@ bool OnlineLocalizer::setNonMatchingCost(double non_match) {
 }
 
 bool OnlineLocalizer::isReady() const {
-  if (!_successorManager) {
+  if (!successorManager_) {
     printf("[ERROR][OnlineLocalizer] Successor manager is not set\n");
     return false;
   }
@@ -142,7 +142,7 @@ void OnlineLocalizer::matchImage(int quId) {
     _frontier = std::priority_queue<Node>(); // reseting priority_queue
     printf("[INFO][OnlineLocalizer] RELOCALIZATION\n");
     Node expandedNode = _currentBestHyp;
-    children = _successorManager->getSuccessorsIfLost(expandedNode);
+    children = successorManager_->getSuccessorsIfLost(expandedNode);
     // add only the most promising node to the frontier
     // need to call update search, since it updates the current best
     // hypothesis
@@ -165,7 +165,7 @@ void OnlineLocalizer::matchImage(int quId) {
       }
       // printf("Node %d %d  %d worth expanding\n", expandedNode.quId,
       // expandedNode.refKey.refId, expandedNode.refKey.seqId);
-      children = _successorManager->getSuccessors(expandedNode);
+      children = successorManager_->getSuccessors(expandedNode);
       updateGraph(expandedNode, children);
       updateSearch(children);
       if (expanded_row == quId - 1) {

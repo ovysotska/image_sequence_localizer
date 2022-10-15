@@ -87,15 +87,14 @@ int main(int argc, char *argv[]) {
   relocalizerPtr->train(featurePtrs);
 
   // initialize SuccessorManager
-  auto successorManagerPtr = SuccessorManager::Ptr(new SuccessorManager);
-  successorManagerPtr->setFanOut(parser.fanOut);
-  successorManagerPtr->setDatabase(database.get());
-  successorManagerPtr->setRelocalizer(relocalizerPtr);
+  std::unique_ptr<SuccessorManager> successorManager =
+      std::make_unique<SuccessorManager>(database.get(), relocalizerPtr.get(),
+                                         parser.fanOut);
 
   // create localizer and run it
   OnlineLocalizer localizer;
   localizer.setQuerySize(parser.querySize);
-  localizer.setSuccessorManager(successorManagerPtr);
+  localizer.setSuccessorManager(successorManager.get());
   localizer.setExpansionRate(parser.expansionRate);
   localizer.setNonMatchingCost(parser.nonMatchCost);
   localizer.run();

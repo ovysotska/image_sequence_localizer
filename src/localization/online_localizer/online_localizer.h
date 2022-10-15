@@ -41,68 +41,67 @@
  * @brief      Class for online localization
  */
 class OnlineLocalizer {
-   public:
-    using PredMap = std::unordered_map<int, std::unordered_map<int, Node> >;
-    using AccCostsMap = std::unordered_map<int, std::unordered_map<int, double> >;
+public:
+  using PredMap = std::unordered_map<int, std::unordered_map<int, Node>>;
+  using AccCostsMap = std::unordered_map<int, std::unordered_map<int, double>>;
 
-    OnlineLocalizer();
-    ~OnlineLocalizer() {}
-    void setQuerySize(int size) { _querySize = size; }
-    bool setSuccessorManager(SuccessorManager::Ptr succManager);
-    bool setVisualizer(iLocVisualizer::Ptr vis);
-    bool setExpansionRate(double rate);
-    bool setNonMatchingCost(double non_match);
+  OnlineLocalizer();
+  ~OnlineLocalizer() {}
+  void setQuerySize(int size) { _querySize = size; }
+  bool setSuccessorManager(SuccessorManager *successorManager);
+  bool setVisualizer(iLocVisualizer::Ptr vis);
+  bool setExpansionRate(double rate);
+  bool setNonMatchingCost(double non_match);
 
-    /**
-     * @brief      dumps path to the file. Line format: quId refId status (0-
-     * hidden, 1-real)
-     *
-     * @param[in]  filename  The filename
-     */
-    void printPath(const std::string &filename) const;
+  /**
+   * @brief      dumps path to the file. Line format: quId refId status (0-
+   * hidden, 1-real)
+   *
+   * @param[in]  filename  The filename
+   */
+  void printPath(const std::string &filename) const;
 
-    bool isReady() const;
-    void run();
-    void processImage(int quId);
-    // core working function
-    void matchImage(int quId);
-    std::vector<PathElement> getCurrentPath() const;
-    std::vector<PathElement> getLastNmatches(int N) const;
+  bool isReady() const;
+  void run();
+  void processImage(int quId);
+  // core working function
+  void matchImage(int quId);
+  std::vector<PathElement> getCurrentPath() const;
+  std::vector<PathElement> getLastNmatches(int N) const;
 
-    void writeOutExpanded(const std::string &filename) const;
+  void writeOutExpanded(const std::string &filename) const;
 
-    // TODO: move these into protected
-    // more on private side
-    void updateSearch(const NodeSet &successors);
-    void updateGraph(const Node &parent,
-                     const NodeSet &successors);
-    Node getProminentSuccessor(const NodeSet &successors) const;
-    bool predExists(const Node &node) const;
-    bool nodeWorthExpanding(const Node &node) const;
-    double computeAveragePathCost() const;
+  // TODO: move these into protected
+  // more on private side
+  void updateSearch(const NodeSet &successors);
+  void updateGraph(const Node &parent, const NodeSet &successors);
+  Node getProminentSuccessor(const NodeSet &successors) const;
+  bool predExists(const Node &node) const;
+  bool nodeWorthExpanding(const Node &node) const;
+  double computeAveragePathCost() const;
 
-    bool isLost(int N, double perc) const;
+  bool isLost(int N, double perc) const;
 
-    void visualize() const;
+  void visualize() const;
 
-   private:
-    int _querySize = 0;
-    int _slidingWindowSize = 5;  // frames
-    bool _needReloc = false;
-    double _expansionRate = -1.0;
-    double _nonMatchCost = -1.0;
+private:
+  int _querySize = 0;
+  int _slidingWindowSize = 5; // frames
+  bool _needReloc = false;
+  double _expansionRate = -1.0;
+  double _nonMatchCost = -1.0;
 
-    std::priority_queue<Node> _frontier;
-    // stores parent for each node
-    PredMap _pred;
-    // stores the accumulative  cost for each node
-    AccCostsMap _accCosts;
-    Node _currentBestHyp;
+  std::priority_queue<Node> _frontier;
+  // stores parent for each node
+  PredMap _pred;
+  // stores the accumulative  cost for each node
+  AccCostsMap _accCosts;
+  Node _currentBestHyp;
 
-    SuccessorManager::Ptr _successorManager = nullptr;
-    iLocVisualizer::Ptr _vis = nullptr;
+  SuccessorManager *successorManager_ = nullptr;
+  iLocVisualizer::Ptr _vis = nullptr;
 
-    NodeSet _expandedRecently;
+  NodeSet _expandedRecently;
 };
 
-#endif  // SRC_ONLINE_LOCALIZER_ONLINE_LOCALIZER_H_
+#endif // SRC_ONLINE_LOCALIZER_ONLINE_LOCALIZER_H_

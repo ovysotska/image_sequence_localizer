@@ -14,4 +14,14 @@ target_link_libraries(${TESTNAME}
     cxx_flags
 )
 
+add_executable( ${TESTNAME}_successor_manager
+    successor_manager_test.cpp
+)
+target_link_libraries(${TESTNAME}_successor_manager
+    gtest
+    gtest_main
+    cxx_flags
+)
+
+
 gtest_discover_tests(${TESTNAME})

@@ -41,24 +41,12 @@
  */
 class SuccessorManager {
 public:
-  using Ptr = std::shared_ptr<SuccessorManager>;
-  using ConstPtr = std::shared_ptr<const SuccessorManager>;
+  // using Ptr = std::shared_ptr<SuccessorManager>;
+  // using ConstPtr = std::shared_ptr<const SuccessorManager>;
 
-  SuccessorManager() {}
+  SuccessorManager(iDatabase *database, iRelocalizer *relocalizer, int fanOut);
   ~SuccessorManager() {}
 
-  /**
-   * @brief      Sets the fan out. Fan out is responsible to different speeds
-   * between sequences
-   *
-   * @param[in]  value  The values start from 1 to size of reference trajectory.
-   * Typical values are 5 to 10.
-   *
-   * @return     checks if input is valid
-   */
-  bool setFanOut(int value);
-  bool setDatabase(iDatabase *database);
-  bool setRelocalizer(iRelocalizer::Ptr relocalizer);
   /**
    * @brief      Introduces the notion of similar places within the reference
    * trajectory. The ids of the similar places should be pre-computed.
@@ -69,8 +57,6 @@ public:
    */
   bool setSimilarPlaces(const std::string &filename);
 
-  bool isReady() const;
-
   std::unordered_set<Node> getSuccessors(const Node &node);
   std::unordered_set<Node> getSuccessorsIfLost(const Node &node);
 
@@ -78,8 +64,8 @@ public:
   void getSuccessorsSimPlaces(int quId, int refId);
 
 protected:
-  iDatabase *_database = nullptr;
-  int _fan_out = 0;
+  iDatabase *database_ = nullptr;
+  int fanOut_ = 0;
 
 private:
   // current successors
@@ -88,7 +74,7 @@ private:
    * for refId gives the vector of refIds, that represent similar places
    */
   std::unordered_map<int, std::set<int>> _sameRefPlaces;
-  iRelocalizer::Ptr _relocalizer = nullptr;
+  iRelocalizer *relocalizer_ = nullptr;
 };
 
 #endif // SRC_SUCCESSOR_MANAGER_SUCCESSOR_MANAGER_H_
