@@ -41,9 +41,6 @@
  */
 class SuccessorManager {
 public:
-  // using Ptr = std::shared_ptr<SuccessorManager>;
-  // using ConstPtr = std::shared_ptr<const SuccessorManager>;
-
   SuccessorManager(iDatabase *database, iRelocalizer *relocalizer, int fanOut);
   ~SuccessorManager() {}
 

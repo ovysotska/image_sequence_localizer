@@ -95,8 +95,6 @@ std::unordered_set<Node> SuccessorManager::getSuccessors(const Node &node) {
   // check for additional successors based on similar places
   if (!_sameRefPlaces.empty()) {
     getSuccessorsSimPlaces(node.quId, node.refId);
-  } else {
-    LOG(INFO) << "Similar Places were not set\n";
   }
   // printf("Successors were computed %d \n", _successors.size());
   return _successors;
@@ -157,7 +155,7 @@ SuccessorManager::getSuccessorsIfLost(const Node &node) {
   std::vector<int> candidates = relocalizer_->getCandidates(succ_qu_id);
 
   if (candidates.empty()) {
-    LOG(INFO) << "No similar images found";
+    LOG(INFO) << "No candidate images found";
     // propagate one node as if moving
     Node succ;
     double succ_cost = database_->getCost(succ_qu_id, node.refId);

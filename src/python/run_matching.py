@@ -97,6 +97,11 @@ def main():
     args = parseParams()
     yaml_config = setDictParam(args)
 
+    if (args.output_dir.exists()):
+        print("WARNING: output_dir exists. Overwritting the results")
+    else:
+        args.output_dir.mkdir()
+
     yaml_config_file = args.output_dir / (args.dataset_name + "_config.yml")
     with open(yaml_config_file, "w") as file:
         yaml.dump(yaml_config, file)
