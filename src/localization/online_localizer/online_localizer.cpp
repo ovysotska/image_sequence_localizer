@@ -181,15 +181,6 @@ void OnlineLocalizer::matchImage(int quId) {
   for (const Node &n : children) {
     _expandedRecently.insert(n);
   }
-
-  // TODO: maybe other way to show expanded nodes.
-
-  // std::ostringstream ss;
-  // ss << std::setw(5) << std::setfill('0') << quId;
-  // std::string filename = "expanded_patch_for_query_" + ss.str() +
-  // ".Patch.pb"; const fs::path result_dir = "debug_results";
-  // fs::create_directory(result_dir);
-  // writeOutExpanded((result_dir / filename).c_str());
 }
 
 void OnlineLocalizer::processImage(int quId) {

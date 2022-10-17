@@ -26,6 +26,7 @@
 #include "database/cost_matrix_database.h"
 #include "database/online_database.h"
 #include "localization_protos.pb.h"
+#include "test_utils.h"
 
 #include "gtest/gtest.h"
 
@@ -35,40 +36,10 @@
 #include <string>
 
 namespace fs = std::filesystem;
-namespace localizer = image_sequence_localizer;
-
-TEST(OnlineDatabase, NoFeatureFiles) {
-  fs::path empty_tmp_dir = fs::temp_directory_path();
-  fs::create_directories(empty_tmp_dir);
-  ASSERT_DEATH(OnlineDatabase(empty_tmp_dir, empty_tmp_dir,
-                              FeatureType::Cnn_Feature, 10),
-               "Query features are not set.");
-}
 
 class OnlineDatabaseTest : public ::testing::Test {
 protected:
-  localizer::Feature createFeatureProto(const std::vector<double> &values) {
-    localizer::Feature feature_proto;
-    feature_proto.set_type("debug");
-    feature_proto.set_size(values.size());
-    for (double value : values) {
-      feature_proto.add_values(value);
-    }
-    return feature_proto;
-  }
-  void createFeatureFile(
-      const fs::path &dir, const std::string &name,
-      const image_sequence_localizer::Feature &feature_proto) const {
-
-    const fs::path filename = dir / name.c_str();
-    std::fstream output(filename,
-                        std::ios::out | std::ios::trunc | std::ios::binary);
-
-    ASSERT_TRUE(feature_proto.SerializeToOstream(&output));
-    output.close();
-  }
-
-  std::string createCostMatrixProto() {
+  std::string createCostMatrixProto(const std::filesystem::path &dir) {
     image_sequence_localizer::CostMatrix cost_matrix;
     for (double value : {1, 2, 3, 4, 5, 6}) {
       cost_matrix.add_values(value);
@@ -77,7 +48,7 @@ protected:
     cost_matrix.set_rows(2);
 
     std::string cost_matrix_name =
-        (tmp_dir / "test_cost_matrix.CostMatrix.pb").string();
+        (dir / "test_cost_matrix.CostMatrix.pb").string();
 
     std::fstream out(cost_matrix_name,
                      std::ios::out | std::ios::trunc | std::ios::binary);
@@ -85,23 +56,21 @@ protected:
     out.close();
     return cost_matrix_name;
   }
-
-  void SetUp() {
-    GOOGLE_PROTOBUF_VERIFY_VERSION;
-    tmp_dir = fs::temp_directory_path() / "features";
-    fs::create_directories(tmp_dir);
-    createFeatureFile(tmp_dir, "feature_0.Feature.pb",
-                      createFeatureProto({0, 1, 2, 3}));
-    createFeatureFile(tmp_dir, "feature_1.Feature.pb",
-                      createFeatureProto({3, 4, 5, 6}));
-    createFeatureFile(tmp_dir, "feature_2.Feature.pb",
-                      createFeatureProto({3, 2, 1, 0}));
-    createFeatureFile(tmp_dir, "feature_3.Feature.pb",
-                      createFeatureProto({0, 1, 2.5, 3}));
+  void SetUp() { tmp_dir = test::createDataForOnlineDatabase(); }
+  void TearDown() {
+    test::clearDataForOnlineDatabase(tmp_dir);
+    tmp_dir = "";
   }
-  void TearDown() { std::filesystem::remove_all(tmp_dir); }
-  fs::path tmp_dir = "";
+  std::filesystem::path tmp_dir = "";
 };
+
+TEST(OnlineDatabase, NoFeatureFiles) {
+  fs::path empty_tmp_dir = fs::temp_directory_path();
+  fs::create_directories(empty_tmp_dir);
+  ASSERT_DEATH(OnlineDatabase(empty_tmp_dir, empty_tmp_dir,
+                              FeatureType::Cnn_Feature, 10),
+               "Query features are not set.");
+}
 
 TEST_F(OnlineDatabaseTest, refSize) {
   OnlineDatabase database(/*queryFeaturesDir=*/tmp_dir,
@@ -133,7 +102,7 @@ TEST_F(OnlineDatabaseTest, NoCostMatrixFile) {
 }
 
 TEST_F(OnlineDatabaseTest, CostMatrixDatabaseConstructor) {
-  std::string cost_matrix_name = createCostMatrixProto();
+  std::string cost_matrix_name = createCostMatrixProto(tmp_dir);
   CostMatrixDatabase database(cost_matrix_name,
                               /*queryFeaturesDir=*/tmp_dir,
                               /*refFeaturesDir=*/tmp_dir,
@@ -146,7 +115,7 @@ TEST_F(OnlineDatabaseTest, CostMatrixDatabaseConstructor) {
 }
 
 TEST_F(OnlineDatabaseTest, CostMatrixDatabaseRefSize) {
-  std::string cost_matrix_name = createCostMatrixProto();
+  std::string cost_matrix_name = createCostMatrixProto(tmp_dir);
   CostMatrixDatabase database(cost_matrix_name,
                               /*queryFeaturesDir=*/tmp_dir,
                               /*refFeaturesDir=*/tmp_dir,
@@ -163,7 +132,7 @@ TEST_F(OnlineDatabaseTest, CostMatrixDatabaseRefSize) {
 }
 
 TEST_F(OnlineDatabaseTest, CostMatrixDatabaseGetCost) {
-  std::string cost_matrix_name = createCostMatrixProto();
+  std::string cost_matrix_name = createCostMatrixProto(tmp_dir);
   CostMatrixDatabase database(cost_matrix_name,
                               /*queryFeaturesDir=*/tmp_dir,
                               /*refFeaturesDir=*/tmp_dir,

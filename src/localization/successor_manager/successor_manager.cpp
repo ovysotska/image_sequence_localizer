@@ -102,7 +102,7 @@ std::unordered_set<Node> SuccessorManager::getSuccessors(const Node &node) {
 
 /**
  * @brief      Gets successors based on fanout for node (quId, refId) from
- * database. Select followers based on _fanOut;
+ * database. Select followers based on fanOut_;
  *
  * @param[in]  quId   query index
  * @param[in]  refId  reference index
