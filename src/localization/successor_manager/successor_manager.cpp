@@ -22,42 +22,23 @@
 **/
 
 #include "successor_manager/successor_manager.h"
+#include "database/idatabase.h"
+#include "relocalizers/irelocalizer.h"
+#include "successor_manager/node.h"
+
+#include <glog/logging.h>
+
 #include <algorithm>
 #include <fstream>
-// #include <unordered_set>
 using std::vector;
 
-bool SuccessorManager::setFanOut(int value) {
-  if (value < 0) {
-    printf("[ERROR][SuccessorManager] Invalid _fanout\n");
-    exit(EXIT_FAILURE);
-  }
-  if (value == 0) {
-    printf(
-        "[WARNING][SuccessorManager] You set 0 fanout. You can only model the "
-        "situation, where the camera is staying in the reference frame.\n");
-    return false;
-  }
-  _fan_out = value;
-  return true;
-}
-
-bool SuccessorManager::setDatabase(iDatabase *database) {
-  if (!database) {
-    printf("[ERROR][SuccessorManager] Invalid database.\n");
-    return false;
-  }
-  _database = database;
-  return true;
-}
-
-bool SuccessorManager::setRelocalizer(iRelocalizer::Ptr relocalizer) {
-  if (!relocalizer) {
-    printf("[ERROR][SuccessorManager] Invalid relocalizer.\n");
-    return false;
-  }
-  _relocalizer = relocalizer;
-  return true;
+SuccessorManager::SuccessorManager(iDatabase *database,
+                                   iRelocalizer *relocalizer, int fanOut)
+    : database_{database}, relocalizer_{relocalizer}, fanOut_{fanOut} {
+  CHECK(database_ != nullptr) << "Database is not set.";
+  CHECK(relocalizer_ != nullptr) << "Relocalizer is not set.";
+  CHECK(fanOut_ > 0) << "Invalid fanOut value: " << fanOut
+                     << ". The value should be > 0.";
 }
 
 /**
@@ -85,14 +66,6 @@ bool SuccessorManager::setSimilarPlaces(const std::string &filename) {
   return true;
 }
 
-bool SuccessorManager::isReady() const {
-  if (!_database) {
-    printf("[ERROR][SuccessorManager] Database is not set. Set it!\n");
-    return false;
-  }
-  return true;
-}
-
 /**
  * @brief      Gets the successors.
  *
@@ -104,47 +77,40 @@ bool SuccessorManager::isReady() const {
 std::unordered_set<Node> SuccessorManager::getSuccessors(const Node &node) {
   _successors.clear();
 
-  if (node == SOURCE_NODE) {
-    printf(
-        "[ERROR][SuccessorManager] Requested to connect source. Robot should "
-        "be lost before first image. Use 'getSuccessorsIfLost' function "
-        "instead\n");
-    exit(EXIT_FAILURE);
-  }
-  if (node.quId < 0 || node.refId < 0) {
-    printf("[ERROR][SuccessorManager] Invalid  image IDs %d %d\n", node.quId,
-           node.refId);
-    exit(EXIT_FAILURE);
-  }
-  // check for regular succcessor
+  LOG_IF(FATAL, node == SOURCE_NODE)
+      << "Requested to connect the source node. Robot should "
+         "be lost before first image. Use 'getSuccessorsIfLost' function "
+         "instead.";
+
+  CHECK(node.quId >= 0 && node.refId >= 0)
+      << "Invalid image ids, query id: " << node.quId
+      << ", ref id: " << node.refId;
+
+  // check for regular successor
   getSuccessorFanOut(node.quId, node.refId);
   // check for additional successors based on similar places
   if (!_sameRefPlaces.empty()) {
     getSuccessorsSimPlaces(node.quId, node.refId);
-  } else {
-    printf("[DEBUG] Similar Places were not set\n");
   }
   // printf("Successors were computed %d \n", _successors.size());
   return _successors;
 }
 
 /**
- * @brief      Gets succesors based on fanout for node (quId, refId) from
- * database. Select followers based on _fanOut;
+ * @brief      Gets successors based on fanout for node (quId, refId) from
+ * database. Select followers based on fanOut_;
  *
  * @param[in]  quId   query index
  * @param[in]  refId  reference index
  *
  */
 void SuccessorManager::getSuccessorFanOut(int quId, int refId) {
-  int left_ref = std::max(refId - _fan_out, 0);
-  int right_ref = std::min(refId + _fan_out, _database->refSize() - 1);
-  // printf("[DEBUG] For parent %d %d children borders are:\n", quId, refId);
-  // printf("[DEBUG] Left: %d, right: %d\n", left_ref, right_ref);
+  int left_ref = std::max(refId - fanOut_, 0);
+  int right_ref = std::min(refId + fanOut_, database_->refSize() - 1);
 
   for (int succ_ref = left_ref; succ_ref <= right_ref; ++succ_ref) {
     Node succ;
-    double succ_cost = _database->getCost(quId + 1, succ_ref);
+    double succ_cost = database_->getCost(quId + 1, succ_ref);
     succ.set(quId + 1, succ_ref, succ_cost);
     _successors.insert(succ);
   }
@@ -181,37 +147,24 @@ void SuccessorManager::getSuccessorsSimPlaces(int quId, int refId) {
 std::unordered_set<Node>
 SuccessorManager::getSuccessorsIfLost(const Node &node) {
   _successors.clear();
-  if (!_relocalizer) {
-    printf("[ERROR][SuccessorManager] Relocalizer is not set\n");
-    exit(EXIT_FAILURE);
-  }
   int succ_qu_id = node.quId + 1;
-  std::vector<int> candidates = _relocalizer->getCandidates(succ_qu_id);
+  std::vector<int> candidates = relocalizer_->getCandidates(succ_qu_id);
 
-  // printf("Relocalizer reported %lu candidates\n", candidates.size());
   if (candidates.empty()) {
-    // no similar places found
-    printf("[DEBUG] No similar images found\n");
+    LOG(INFO) << "No candidate images found";
     // propagate one node as if moving
     Node succ;
-    double succ_cost = _database->getCost(succ_qu_id, node.refId);
+    double succ_cost = database_->getCost(succ_qu_id, node.refId);
     succ.set(succ_qu_id, node.refId, succ_cost);
     _successors.insert(succ);
   } else {
-    // some similar places found
-    // printf("[DEBUG] Similar images found %lu\n", candidates.size());
     for (const auto &candId : candidates) {
       Node succ;
-      double succ_cost = _database->getCost(succ_qu_id, candId);
+      double succ_cost = database_->getCost(succ_qu_id, candId);
       succ.set(succ_qu_id, candId, succ_cost);
       _successors.insert(succ);
       succ.print();
     }
   }
-
-  // for(const auto&n :_successors){
-  //   n.print();
-  // }
-  // printf("Successor manager reported %lu candidates\n", _successors.size());
   return _successors;
 }
