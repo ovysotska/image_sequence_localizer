@@ -35,6 +35,7 @@
 #include <iostream>
 #include <string>
 
+namespace localization {
 namespace fs = std::filesystem;
 
 class OnlineDatabaseTest : public ::testing::Test {
@@ -147,3 +148,4 @@ TEST_F(OnlineDatabaseTest, CostMatrixDatabaseGetCost) {
   ASSERT_DEATH(database.getCost(3, 0), "Invalid query index 3");
   ASSERT_DEATH(database.getCost(0, 4), "Invalid reference index 4");
 }
+} // namespace localization

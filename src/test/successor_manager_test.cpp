@@ -4,6 +4,8 @@
 
 #include "gtest/gtest.h"
 
+namespace localization {
+
 namespace fs = std::filesystem;
 
 class SuccessorManagerTest : public ::testing::Test {
@@ -27,3 +29,4 @@ TEST_F(SuccessorManagerTest, create) {
   ASSERT_DEATH(SuccessorManager(&database, nullptr, /*fanOut=*/0),
                "Relocalizer is not set.");
 }
+} // namespace localization

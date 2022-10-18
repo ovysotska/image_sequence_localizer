@@ -23,7 +23,6 @@
 
 #include "successor_manager/successor_manager.h"
 #include "database/idatabase.h"
-#include "glog/logging.h"
 #include "relocalizers/irelocalizer.h"
 #include "successor_manager/node.h"
 
@@ -34,15 +33,12 @@
 using std::vector;
 
 SuccessorManager::SuccessorManager(iDatabase *database,
-                                   iRelocalizer *relocalizer, int fanOut) {
-  CHECK(database != nullptr) << "Database is not set.";
-  CHECK(relocalizer != nullptr) << "Relocalizer is not set.";
-  CHECK(fanOut > 0) << "Invalid fanOut value: " << fanOut
-                    << ". The value should be > 0.";
-
-  database_ = database;
-  relocalizer_ = relocalizer;
-  fanOut_ = fanOut;
+                                   iRelocalizer *relocalizer, int fanOut)
+    : database_{database}, relocalizer_{relocalizer}, fanOut_{fanOut} {
+  CHECK(database_ != nullptr) << "Database is not set.";
+  CHECK(relocalizer_ != nullptr) << "Relocalizer is not set.";
+  CHECK(fanOut_ > 0) << "Invalid fanOut value: " << fanOut
+                     << ". The value should be > 0.";
 }
 
 /**

@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 
+namespace localization {
 namespace test {
 
 inline image_sequence_localizer::Feature
@@ -29,7 +30,7 @@ inline void
 createFeatureFile(const std::filesystem::path &dir, const std::string &name,
                   const image_sequence_localizer::Feature &feature_proto) {
 
-  const std::filesystem::path filename = dir / name.c_str();
+  const std::filesystem::path filename = dir / name;
   std::fstream output(filename,
                       std::ios::out | std::ios::trunc | std::ios::binary);
 
@@ -56,5 +57,6 @@ inline void clearDataForOnlineDatabase(const std::filesystem::path &path) {
   std::filesystem::remove_all(path);
 }
 } // namespace test
+} // namespace localization
 
 #endif // TEST_TEST_UTILS_H_
