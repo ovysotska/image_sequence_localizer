@@ -11,6 +11,12 @@ def read_feature(feature_filename):
     return np.array(feature_proto.values)
 
 
+def write_feature(filename, proto):
+    f = open(filename, "wb")
+    f.write(proto.SerializeToString())
+    f.close()
+
+
 def write_cost_matrix(cost_matrix, cost_matrix_file):
 
     cost_matrix_proto = loc_protos.CostMatrix()
