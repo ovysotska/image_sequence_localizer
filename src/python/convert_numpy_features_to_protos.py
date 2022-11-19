@@ -20,7 +20,7 @@ def convert_to_protos(features, feature_type):
                                             localization_protos.proto file.
     """
     protos = []
-    assert len(features.shape) == 2
+    assert len(features.shape) == 2, "Expected a NxD dimensional matrix."
     for feature in features:
         feature_proto = loc_protos.Feature()
         feature_proto.size = feature.shape[0]
@@ -37,7 +37,9 @@ def save_protos_to_files(folder, protos, prefix):
         folder.mkdir()
     for idx, proto in enumerate(protos):
         feature_idx = "{0:07d}".format(idx)
-        proto_file = prefix + "_" + feature_idx + "." + proto.type + ".Feature.pb"
+        proto_file = "{prefix}_{feature_idx}.{proto_type}.Feature.pb".format(
+            prefix=prefix, feature_idx=feature_idx, proto_type=proto.type
+        )
         protos_io.write_feature(folder / proto_file, proto)
         print("Feature", idx, "was written to ", folder / proto_file)
     return
