@@ -52,6 +52,16 @@ For more details about the parameters, please use `python run_matching.py --help
 For more details about the underlying method and the interpretation of the results, please have a look at [paper](http://www.ipb.uni-bonn.de/pdfs/vysotska16ral-icra.pdf).
 Here is a sketch of what roughly is happening for those who don't like to read much ![](doc/cost_matrix_view.png)
 
+### Ok.. I don't know how to create protobufs, but I have my features as numpy matrix
+Perfect. Here is a python script that will convert your NxD matrix of features to the needed protobufs.
+``` bash
+python convert_numpy_features_to_protos.py \
+    --filename <your_features>.txt \
+    --feature_type NetVLAD \
+    --output_folder <folder_name> \
+    --output_file_prefix <fancy_feature_name>
+```
+
 ## Parent project
 
 This repository is a continuation of my previous works [vpr_relocalization](https://github.com/PRBonn/vpr_relocalization) and [online_place_recognition](https://github.com/PRBonn/online_place_recognition).
