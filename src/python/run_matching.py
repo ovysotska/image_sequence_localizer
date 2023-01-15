@@ -97,7 +97,7 @@ def main():
     args = parseParams()
     yaml_config = setDictParam(args)
 
-    if (args.output_dir.exists()):
+    if args.output_dir.exists():
         print("WARNING: output_dir exists. Overwritting the results")
     else:
         args.output_dir.mkdir()
@@ -108,6 +108,7 @@ def main():
     computeCostMatrix(yaml_config)
     runMatching(yaml_config_file)
     runResultVisualization(yaml_config)
+    # TODO(olga): Add visualize_matching_results.py
 
 
 if __name__ == "__main__":
