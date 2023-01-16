@@ -187,7 +187,7 @@ def main():
     parser.add_argument(
         "--netvlad_weights_file",
         type=Path,
-        help="NetVlad weights file.",
+        help="NetVlad weights file. Please download them from https://cvg-data.inf.ethz.ch/hloc/netvlad/Pitts30K_struct.mat to netvlad/data/",
         default="data/Pitts30K_struct.mat",
     )
     args = parser.parse_args()
