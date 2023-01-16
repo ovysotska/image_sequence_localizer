@@ -24,8 +24,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Update
+      run: sudo apt update
+
     - name: Install dependencies
-      run: sudo apt-get install -y libopencv-dev libyaml-cpp-dev libprotobuf-dev libprotoc-dev protobuf-compiler
+      run: sudo apt install -y libopencv-dev libyaml-cpp-dev libprotobuf-dev libprotoc-dev protobuf-compiler
 
     - name: Build
       run: |
