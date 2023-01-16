@@ -7,16 +7,16 @@ import yaml
 def parseParams():
     parser = argparse.ArgumentParser(description="Run image matching.")
     parser.add_argument(
-        "--query_features",
+        "--query_images",
         type=Path,
         required=True,
-        help="Path to the directory with features of type .Feature.pb",
+        help="Path to the directory with images in .jpg or .png format",
     )
     parser.add_argument(
-        "--reference_features",
+        "--reference_images",
         type=Path,
         required=True,
-        help="Path to the directory with features of type .Feature.pb",
+        help="Path to the directory with images in .jpg or .png format",
     )
     parser.add_argument(
         "--dataset_name",
@@ -33,27 +33,64 @@ def parseParams():
     return parser.parse_args()
 
 
-def setDictParam(args):
+def setDictParam(args, query_features_dir, reference_features_dir):
     params = dict()
-    params["path2qu"] = args.query_features.as_posix()
-    params["path2ref"] = args.reference_features.as_posix()
-    params["costMatrix"] = (
-        args.output_dir / (args.dataset_name + ".CostMatrix.pb")
-    ).as_posix()
-    params["matchingResult"] = (
+    params["path2qu"] = str(query_features_dir)
+    params["path2ref"] = str(reference_features_dir)
+    params["costMatrix"] = str(args.output_dir / (args.dataset_name + ".CostMatrix.pb"))
+    params["matchingResult"] = str(
         args.output_dir / (args.dataset_name + ".MatchingResult.pb")
-    ).as_posix()
-    params["matchingResultImage"] = (
+    )
+    params["matchingResultImage"] = str(
         args.output_dir / (args.dataset_name + "_result.png")
-    ).as_posix()
+    )
     params["expansionRate"] = 0.3
     params["fanOut"] = 5
     params["nonMatchCost"] = 3.7
     params["bufferSize"] = 100
 
-    queriesNum = len(list(args.query_features.glob("*Feature.pb")))
+    queriesNum = len(list(query_features_dir.glob("*Feature.pb")))
     params["querySize"] = queriesNum
     return params
+
+
+def computeFeatures(image_dir, output_folder, feature_name_prefix):
+    if output_folder.exists():
+        print(
+            "WARNING: Feature folder {folder_name} exists. Skipping feature computation.".format(
+                folder_name=output_folder
+            )
+        )
+        return
+    output_folder.mkdir()
+    # Extract features.
+    netvlad_weights = Path("netvlad/data/Pitts30K_struct.mat")
+    if not netvlad_weights.exists():
+        print(
+            "ERROR: Can't find netvlad weights. Please download to netvlad/data/ from https://cvg-data.inf.ethz.ch/hloc/netvlad/Pitts30K_struct.mat"
+        )
+        exit(1)
+
+    params = "--data_dir {image_dir} ".format(image_dir=image_dir)
+    np_features = output_folder / (feature_name_prefix + "-features.txt")
+    params += "--output_file {output_file} ".format(output_file=np_features)
+    params += "--netvlad_weights_file {weights} ".format(weights=netvlad_weights)
+
+    command = "python netvlad/netvlad_extractor.py  " + params
+    print("Calling:", command)
+    os.system(command)
+
+    # Convert from np to protos.
+    params = "--filename {features_file} ".format(features_file=np_features)
+    params += "--feature_type NetVLAD "
+    params += "--output_folder {output_folder} ".format(output_folder=output_folder)
+    params += "--output_file_prefix {output_file_prefix} ".format(
+        output_file_prefix=feature_name_prefix
+    )
+
+    command = "python convert_numpy_features_to_protos.py " + params
+    print("Calling:", command)
+    os.system(command)
 
 
 def computeCostMatrix(config):
@@ -75,7 +112,7 @@ def runMatching(config_yaml_file):
     binary = (
         "../../build/src/apps/cost_matrix_based_matching/cost_matrix_based_matching_lsh"
     )
-    command = binary + " " + config_yaml_file.as_posix()
+    command = binary + " " + str(config_yaml_file)
     print("Calling:", command)
     os.system(command)
 
@@ -95,13 +132,21 @@ def runResultVisualization(config):
 
 def main():
     args = parseParams()
-    yaml_config = setDictParam(args)
 
     if args.output_dir.exists():
         print("WARNING: output_dir exists. Overwritting the results")
     else:
         args.output_dir.mkdir()
 
+    # Compute query features.
+    query_features_dir = args.output_dir / "query_features"
+    computeFeatures(args.query_images, query_features_dir, args.dataset_name)
+
+    # Compute reference features.
+    reference_features_dir = args.output_dir / "reference_features"
+    computeFeatures(args.reference_images, reference_features_dir, args.dataset_name)
+
+    yaml_config = setDictParam(args, query_features_dir, reference_features_dir)
     yaml_config_file = args.output_dir / (args.dataset_name + "_config.yml")
     with open(yaml_config_file, "w") as file:
         yaml.dump(yaml_config, file)
