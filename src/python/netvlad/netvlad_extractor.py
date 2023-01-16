@@ -1,5 +1,5 @@
 # This file is highly inspired by
-#  https://github.com/cvg/Hierarchical-Localization/blob/master/hloc/extractors/netvlad.py
+# https://github.com/cvg/Hierarchical-Localization/blob/master/hloc/extractors/netvlad.py
 # The weights are downloaded from https://cvg-data.inf.ethz.ch/hloc/netvlad/Pitts30K_struct.mat
 # The parsing of the .mat file is according to aforementioned project.
 
@@ -17,6 +17,8 @@ import numpy as np
 from pathlib import Path
 import argparse
 
+kNetVLADImageSize = 224
+
 
 class ImageDataset(Dataset):
     def __init__(self, img_dir, transform=None):
@@ -31,8 +33,8 @@ class ImageDataset(Dataset):
 
     def __getitem__(self, idx):
         assert idx >= 0 and idx < len(self.img_names)
-        image = Image.open(self.img_names[idx].as_posix())
-        image = image.resize((224, 224))
+        image = Image.open(str(self.img_names[idx]))
+        image = image.resize((kNetVLADImageSize, kNetVLADImageSize))
         if self.transform:
             image = self.transform(image)
         # returns an image in the proper format
@@ -144,7 +146,6 @@ class NetVLAD(nn.Module):
     def forward(self, image):
         assert image.shape[0] == 3
         image = torch.clamp(image * 255, 0.0, 255.0)  # Input should be 0-255.
-        print("Image dimensions", image.size())
 
         mean_tensor = image.new_tensor(self.preprocess["mean"]).view(1, -1, 1, 1)
         std_tensor = image.new_tensor(self.preprocess["std"]).view(1, -1, 1, 1)
@@ -157,7 +158,6 @@ class NetVLAD(nn.Module):
         # Image shape: (1, 3, 244, 244)
         # Returns a (1, 512, 14, 14) feature volume.
         descriptors = self.backbone(image)
-        print("Descriptors", descriptors.shape)
         # Reshape the feature volume -> (1, 512, 14*14)
         batch, channels, width, height = descriptors.size()
         descriptors = descriptors.view(batch, channels, width * height)
@@ -203,9 +203,9 @@ def main():
     for image_idx in range(len(dataset)):
         image = dataset[image_idx]
         prediction = model(image)
-        pred_np = prediction.cpu().detach().numpy()[0]
-        print("Prediction:", pred_np)
+        pred_np = prediction.detach().numpy()[0]
         netVladDescriptors.append(pred_np)
+        print(f"Processed image {image_idx}")
 
     netVladDescriptors = np.array(netVladDescriptors)
     print("Final descriptors size", netVladDescriptors.shape)
@@ -213,5 +213,4 @@ def main():
 
 
 if __name__ == "__main__":
-
     main()

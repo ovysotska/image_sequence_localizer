@@ -35,17 +35,15 @@ def parseParams():
 
 def setDictParam(args, query_features_dir, reference_features_dir):
     params = dict()
-    params["path2qu"] = query_features_dir.as_posix()
-    params["path2ref"] = reference_features_dir.as_posix()
-    params["costMatrix"] = (
-        args.output_dir / (args.dataset_name + ".CostMatrix.pb")
-    ).as_posix()
-    params["matchingResult"] = (
+    params["path2qu"] = str(query_features_dir)
+    params["path2ref"] = str(reference_features_dir)
+    params["costMatrix"] = str(args.output_dir / (args.dataset_name + ".CostMatrix.pb"))
+    params["matchingResult"] = str(
         args.output_dir / (args.dataset_name + ".MatchingResult.pb")
-    ).as_posix()
-    params["matchingResultImage"] = (
+    )
+    params["matchingResultImage"] = str(
         args.output_dir / (args.dataset_name + "_result.png")
-    ).as_posix()
+    )
     params["expansionRate"] = 0.3
     params["fanOut"] = 5
     params["nonMatchCost"] = 3.7
@@ -114,7 +112,7 @@ def runMatching(config_yaml_file):
     binary = (
         "../../build/src/apps/cost_matrix_based_matching/cost_matrix_based_matching_lsh"
     )
-    command = binary + " " + config_yaml_file.as_posix()
+    command = binary + " " + str(config_yaml_file)
     print("Calling:", command)
     os.system(command)
 
