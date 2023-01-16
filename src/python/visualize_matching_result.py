@@ -10,11 +10,11 @@ def createHiddenMatchImage(width, height):
     text_left_corner = (int(width / 3), int(height / 2))
     image = cv2.putText(
         image,
-        "No match found",
+        "No match found",  # text
         text_left_corner,
-        cv2.FONT_HERSHEY_SIMPLEX,
-        1,
-        (255, 255, 255),
+        cv2.FONT_HERSHEY_SIMPLEX,  # fontFace
+        1,  # fontScale
+        (255, 255, 255),  # color
         2,  # thickness
     )
     return image
@@ -51,25 +51,30 @@ def main():
 
     matching_result = protos_io.read_matching_result(args.matching_result)
 
+    if args.output_dir.exists():
+        print(
+            "WARNING: the output directory exists. Potentially rewritting the results."
+        )
+
     args.output_dir.mkdir(exist_ok=True)
 
     query_images = sorted(list(args.query_images.glob("*.jpg" or "*.png")))
     reference_images = sorted(list(args.reference_images.glob("*.jpg" or "*.png")))
 
     for match in matching_result.matches:
-        query_image = cv2.imread(query_images[match.query_id].as_posix())
+        query_image = cv2.imread(str(query_images[match.query_id]))
         if not match.real:
             reference_image = createHiddenMatchImage(
                 query_image.shape[1], query_image.shape[0]
             )
         else:
-            reference_image = cv2.imread(reference_images[match.ref_id].as_posix())
+            reference_image = cv2.imread(str(reference_images[match.ref_id]))
 
         stacked = cv2.hconcat([query_image, reference_image])
         img_name = args.output_dir / "query:{qu_id}_ref:{ref_id}.jpg".format(
             qu_id=match.query_id, ref_id=match.ref_id
         )
-        cv2.imwrite(img_name.as_posix(), stacked)
+        cv2.imwrite(str(img_name), stacked)
         print("Saved image", img_name)
 
 
