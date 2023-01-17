@@ -57,6 +57,12 @@ def main():
         type=Path,
         help="Image name to save the cost matrix to.",
     )
+    parser.add_argument(
+        "--show_image",
+        action="store_true",
+        help="Show in a separate window.",
+    )
+
     args = parser.parse_args()
 
     cost_matrix_file = args.cost_matrix
@@ -80,13 +86,15 @@ def main():
     if args.image_name:
         image_bgr_char = np.array(image_bgr, dtype=float) * float(255)
         cv2.imwrite(str(args.image_name), image_bgr_char)
+        print("Image is written to", args.image_name)
 
-    window_name = f"cost_matrix {max_value:.4f}:{min_value:.4f}"
+    if args.show_image:
+        window_name = f"cost_matrix {max_value:.4f}:{min_value:.4f}"
 
-    cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
-    cv2.imshow(window_name, image_bgr)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+        cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
+        cv2.imshow(window_name, image_bgr)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":

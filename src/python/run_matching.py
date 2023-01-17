@@ -30,11 +30,18 @@ def parseParams():
         required=True,
         help="Path to output directory to store results.",
     )
+    parser.add_argument(
+        "--write_image_matches",
+        action="store_true",
+        help="Creates and writes the pair of matching images.",
+    )
     return parser.parse_args()
 
 
 def setDictParam(args, query_features_dir, reference_features_dir):
     params = dict()
+    params["path2query_images"] = str(args.query_images)
+    params["path2ref_images"] = str(args.reference_images)
     params["path2qu"] = str(query_features_dir)
     params["path2ref"] = str(reference_features_dir)
     params["costMatrix"] = str(args.output_dir / (args.dataset_name + ".CostMatrix.pb"))
@@ -130,6 +137,23 @@ def runResultVisualization(config):
     os.system(command)
 
 
+def runMatchingResultVisualization(config, output_dir):
+    params = "--matching_result {matching_result} ".format(
+        matching_result=config["matchingResult"]
+    )
+    params += "--query_images {query_images} ".format(
+        query_images=config["path2query_images"]
+    )
+    params += "--reference_images {ref_images} ".format(
+        ref_images=config["path2ref_images"]
+    )
+    params += "--output_dir {output_dir}/matched_images ".format(output_dir=output_dir)
+
+    command = "python visualize_matching_result.py " + params
+    print("Calling:", command)
+    os.system(command)
+
+
 def main():
     args = parseParams()
 
@@ -153,7 +177,8 @@ def main():
     computeCostMatrix(yaml_config)
     runMatching(yaml_config_file)
     runResultVisualization(yaml_config)
-    # TODO(olga): Add visualize_matching_results.py
+    if args.write_image_matches:
+        runMatchingResultVisualization(yaml_config, args.output_dir)
 
 
 if __name__ == "__main__":
