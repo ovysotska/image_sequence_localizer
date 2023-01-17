@@ -6,7 +6,7 @@ It can recognize visually similar places in GPS-denied environments.
 Thus, can serve as a candidate search technique in the context of full 6 DoF robot pose estimation.
 
 Visual place recognition, also known as "weak localization", is performed here by matching sequences of images.
-The assumption is then that the input is a sequence of images or image features respectively. The program outputs the ids of image pairs that represent the same place.
+The assumption is then that the input is a sequence of images. The program outputs the ids of image pairs that represent the same place. The matching pairs are also visualized as concatenated images.
 
 
 ## Build
@@ -30,6 +30,8 @@ To be able to use the `python` part, for example for visualization, I recommend 
 pip install -r requirements.txt
 ```
 
+Requires `Python 3.8+`.
+
 ## Usage
 
 The code is under continuous development but at any point in time you should be able to run the matching procedure through:
@@ -37,13 +39,14 @@ The code is under continuous development but at any point in time you should be 
 ``` bash
 cd src/python
 python run_matching.py \
-    --query_features <path_to_features> \
-    --reference_features <path_to_features> \
+    --query_images <path_to_images> \
+    --reference_images <path_to_images> \
     --dataset_name <dataset_name> \
     --output_dir <path_to_folder>
+    --write_image_matches
 ```
 
-The framework assumes that there is a _query_ image sequence, for every image of which the user wants to find the corresponding image in the _reference_ image sequence. The script takes the query and reference features that are stored in [protobuf messages](https://developers.google.com/protocol-buffers) of type ".Feature.pb" defined in this project. The assumption is that for every image there is a corresponding feature vector that is stored in a separate file. The code, for now, works with image features that can be represented as a single vector and for which the cosine similarity metric makes sense, for example, features from [NetVLAD](https://github.com/Relja/netvlad). For details on the features please refer to `localization_protos.proto`.
+The framework assumes that there is a _query_ image sequence, for every image of which the user wants to find the corresponding image in the _reference_ image sequence. 
 
 The `run_matching.py` script stores all the results in the user-provided `output_dir`. The user also needs to specify the name of the dataset, for example, "my_awesome_dataset".
 
@@ -52,15 +55,6 @@ For more details about the parameters, please use `python run_matching.py --help
 For more details about the underlying method and the interpretation of the results, please have a look at [paper](http://www.ipb.uni-bonn.de/pdfs/vysotska16ral-icra.pdf).
 Here is a sketch of what roughly is happening for those who don't like to read much ![](doc/cost_matrix_view.png)
 
-### Ok.. I don't know how to create protobufs, but I have my features as numpy matrix
-Perfect. Here is a python script that will convert your NxD matrix of features to the needed protobufs.
-``` bash
-python convert_numpy_features_to_protos.py \
-    --filename <your_features>.txt \
-    --feature_type NetVLAD \
-    --output_folder <folder_name> \
-    --output_file_prefix <fancy_feature_name>
-```
 
 ## Parent project
 
@@ -70,6 +64,6 @@ The plan is to gradually modernize and improve the code by preserving the essent
 
 **Essential capabilities**:
 
-1. Given two sequences of image features compute the matching image pairs.
+1. Given two sequences of images compute the matching image pairs.
 2. Scripts to visualize the results.
 
