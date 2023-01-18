@@ -33,7 +33,6 @@
 #include "features/ifeature.h"
 #include "online_localizer/ilocvisualizer.h"
 #include "online_localizer/online_localizer.h"
-#include "relocalizers/irelocalizer.h"
 #include "relocalizers/lsh_cv_hashing.h"
 #include "successor_manager/successor_manager.h"
 #include "tools/config_parser/config_parser.h"
@@ -78,15 +77,12 @@ int main(int argc, char *argv[]) {
           /*refFeaturesDir=*/parser.path2ref, /*type=*/FeatureType::Cnn_Feature,
           /*bufferSize=*/parser.bufferSize);
 
-  // initialize Relocalizer
+  // initialize Relocalizer.
   auto relocalizer = std::make_unique<LshCvHashing>(
       /*onlineDatabase=*/database.get(),
       /*tableNum=*/1,
       /*keySize=*/12,
       /*multiProbeLevel=*/2);
-  // auto relocalizerPtr = LshCvHashing::Ptr(new LshCvHashing);
-  // relocalizerPtr->setParams(1, 12, 2);
-  // relocalizerPtr->setDatabase(database.get());
   relocalizer->train(loadFeatures(parser.path2ref));
 
   // initialize SuccessorManager
