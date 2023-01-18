@@ -41,32 +41,26 @@
  */
 class LshCvHashing : public iRelocalizer {
 public:
-  using Ptr = std::shared_ptr<LshCvHashing>;
-  using ConstPtr = std::shared_ptr<const LshCvHashing>;
+  /* tableNum - number of hash tables
+     keySize - number of bits in the hash key
+     multiProbeLevel - number of bits to shift to het neighbouring buckets */
+  LshCvHashing(OnlineDatabase *database, int tableNum = 25, int keySize = 25,
+               int multiProbeLevel = 2);
 
   std::vector<int> getCandidates(int quId) override;
-
-  void setDatabase(OnlineDatabase *database);
 
   void train(const std::vector<std::unique_ptr<iFeature>> &features);
   /**
    * @brief      Not working for now, for unknown reason
    */
   void saveHashes();
-  void setParams(int tableNum, int keySize, int multi_probe_level);
 
   std::vector<int> hashFeature(const iFeature &fPtr);
 
 private:
-  const int _tableNum = 25; // number of hash tables
-  // number of bits in the hash key
-  const int _keySize = 15;
-  // number of bits to shift to het neighbouring buckets
-  const int _multiProbeLevel = 2;
-
-  cv::Ptr<cv::FlannBasedMatcher> _matcherPtr;
-  cv::Ptr<cv::flann::IndexParams> _indexParam;
-  OnlineDatabase *_database = nullptr;
+  cv::Ptr<cv::FlannBasedMatcher> matcherPtr_;
+  cv::Ptr<cv::flann::IndexParams> indexParam_;
+  OnlineDatabase *database_ = nullptr;
 };
 
 // table_number the number of hash tables to use (between 10 and 30 usually).
