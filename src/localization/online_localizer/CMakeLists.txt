@@ -8,4 +8,5 @@ target_link_libraries(online_localizer
 	node
 	timer
 	protos
+	glog::glog
 )

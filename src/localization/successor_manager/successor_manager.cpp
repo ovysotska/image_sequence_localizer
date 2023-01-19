@@ -30,6 +30,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <iostream>
 using std::vector;
 
 SuccessorManager::SuccessorManager(iDatabase *database,

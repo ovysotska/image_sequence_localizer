@@ -1,4 +1,4 @@
-/** vpr_relocalization: a library for visual place recognition in changing 
+/** vpr_relocalization: a library for visual place recognition in changing
 ** environments with efficient relocalization step.
 ** Copyright (c) 2017 O. Vysotska, C. Stachniss, University of Bonn
 **
@@ -33,7 +33,7 @@
  * @brief      Container class for a node in the graph
  */
 class Node {
- public:
+public:
   Node() {}
   Node(int quId, int refId, double idvCost);
   int quId = -1;
@@ -44,11 +44,11 @@ class Node {
   void print() const;
 
   /** WARNING: use only for the priority queue.
- * Comparison is based on the accumulated cost **/
+   * Comparison is based on the accumulated cost **/
   bool operator<(const Node &rhs) const { return this->accCost > rhs.accCost; }
 };
 
-#define SOURCE_NODE Node(-1, 0, 0.0)
+#define SOURCE_NODE Node(/*queryId=*/-1, /*refId=*/0, /*idvCost=*/0.0)
 
 /** WARNING: compares only the coordinates (quId, refId). Used mostly in
  * tests**/
@@ -57,16 +57,15 @@ bool operator==(const Node &lhs, const Node &rhs);
 // custom specialization of std::hash can be injected in namespace std
 // This makes a node hashable to use for std::unordered_set<Node>
 namespace std {
-template <>
-struct hash<Node> {
+template <> struct hash<Node> {
   std::size_t operator()(Node const &node) const {
     std::string s = std::to_string(node.quId) + std::to_string(node.refId);
     std::size_t const h(std::hash<std::string>{}(s));
     return h;
   }
 };
-}  // namespace std
+} // namespace std
 
 typedef std::unordered_set<Node> NodeSet;
 
-#endif  // SRC_SUCCESSOR_MANAGER_NODE_H_
+#endif // SRC_SUCCESSOR_MANAGER_NODE_H_

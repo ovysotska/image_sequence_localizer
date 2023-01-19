@@ -1,4 +1,4 @@
-/** vpr_relocalization: a library for visual place recognition in changing 
+/** vpr_relocalization: a library for visual place recognition in changing
 ** environments with efficient relocalization step.
 ** Copyright (c) 2017 O. Vysotska, C. Stachniss, University of Bonn
 **
@@ -22,6 +22,9 @@
 **/
 
 #include "timer.h"
+
+#include <glog/logging.h>
+
 #include <iostream>
 
 Timer::Timer() {}
@@ -55,24 +58,25 @@ std::chrono::nanoseconds Timer::get_elapsed_ns() {
 }
 
 void Timer::print_elapsed_time(TimeExt ext) {
-  std::cerr << "TIMER::Elapsed time ";
   switch (ext) {
-    case Sec: {
-      std::cerr << get_elapsed_s().count() << " s.\n";
-      break;
-    }
-    case MSec: {
-      std::cerr << get_elapsed_ms().count() << " ms.\n";
-      break;
-    }
-    case MicroSec: {
-      std::cerr << get_elapsed_micros().count() << " micros.\n";
-      break;
-    }
-    case NSec: {
-      std::cerr << get_elapsed_ns().count() << " ns.\n";
-      break;
-    }
-    default: { std::cerr << "\n Wrong time specification" << std::endl; }
+  case Sec: {
+    LOG(INFO) << "Elapsed time: " << get_elapsed_s().count() << " s.";
+    break;
+  }
+  case MSec: {
+    LOG(INFO) << "Elapsed time: " << get_elapsed_ms().count() << " ms";
+    break;
+  }
+  case MicroSec: {
+    LOG(INFO) << "Elapsed time: " << get_elapsed_micros().count() << " micros.";
+    break;
+  }
+  case NSec: {
+    LOG(INFO) << "Elapsed time: " << get_elapsed_ns().count() << " ns";
+    break;
+  }
+  default: {
+    LOG(ERROR) << "Wrong time specification";
+  }
   }
 }

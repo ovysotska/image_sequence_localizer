@@ -85,20 +85,15 @@ int main(int argc, char *argv[]) {
       /*multiProbeLevel=*/2);
   relocalizer->train(loadFeatures(parser.path2ref));
 
-  // initialize SuccessorManager
   std::unique_ptr<SuccessorManager> successorManager =
       std::make_unique<SuccessorManager>(database.get(), relocalizer.get(),
                                          parser.fanOut);
+  online_localizer::OnlineLocalizer localizer(
+      successorManager.get(), parser.expansionRate, parser.nonMatchCost);
+  online_localizer::Matches imageMatches =
+      localizer.findMatchesTill(parser.querySize);
+  online_localizer::storesMatchesAsProto(imageMatches, parser.matchingResult);
 
-  // create localizer and run it
-  OnlineLocalizer localizer;
-  localizer.setQuerySize(parser.querySize);
-  localizer.setSuccessorManager(successorManager.get());
-  localizer.setExpansionRate(parser.expansionRate);
-  localizer.setNonMatchingCost(parser.nonMatchCost);
-  localizer.run();
-
-  localizer.printPath(parser.matchingResult);
   printf("Done.\n");
   return 0;
 }
