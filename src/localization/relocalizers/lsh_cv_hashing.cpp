@@ -26,25 +26,22 @@
 #include "database/list_dir.h"
 #include "tools/timer/timer.h"
 
-void LshCvHashing::setParams(int tableNum, int keySize, int multi_probe_level) {
-  _indexParam =
-      new cv::flann::LshIndexParams(tableNum, keySize, multi_probe_level);
+#include <glog/logging.h>
+
+const int kMaxCandidateNum = 5;
+
+LshCvHashing::LshCvHashing(OnlineDatabase *database, int tableNum, int keySize,
+                           int multiProbeLevel) {
+  CHECK(database) << "Database is not set\n";
+  database_ = database;
+  indexParam_ =
+      new cv::flann::LshIndexParams(tableNum, keySize, multiProbeLevel);
 }
 
-void LshCvHashing::setDatabase(OnlineDatabase *database) {
-  if (!database) {
-    printf("[ERROR][LshAngleBasedRelocalizer] Database is not set\n");
-    exit(EXIT_FAILURE);
-  }
-  _database = database;
-}
-
-void LshCvHashing::train(const std::vector<std::unique_ptr<iFeature>> &features) {
-  if (!_indexParam) {
-    setParams(_tableNum, _keySize, _multiProbeLevel);
-  }
-  _matcherPtr =
-      cv::Ptr<cv::FlannBasedMatcher>(new cv::FlannBasedMatcher(_indexParam));
+void LshCvHashing::train(
+    const std::vector<std::unique_ptr<iFeature>> &features) {
+  matcherPtr_ =
+      cv::Ptr<cv::FlannBasedMatcher>(new cv::FlannBasedMatcher(indexParam_));
   // transform to cv::Mat array of arrays
   cv::Mat matFeatures(features.size(), features[0]->bits.size(), CV_8UC1);
   for (int f = 0; f < features.size(); ++f) {
@@ -52,13 +49,12 @@ void LshCvHashing::train(const std::vector<std::unique_ptr<iFeature>> &features)
       matFeatures.at<uchar>(f, d) = features[f]->bits[d];
     }
   }
-  printf("Features were converted to Mat type %d\n", matFeatures.type());
-  _matcherPtr->add(matFeatures);
-  _matcherPtr->train();
 
-  printf("[INFO][LSH_CV] Training completed\n");
+  LOG(INFO) << "Features were converted to Mat type " << matFeatures.type();
+  matcherPtr_->add(matFeatures);
+  matcherPtr_->train();
 
-  // m_matcherPtr->match(*query, knnmatches, 1);
+  LOG(INFO) << "Training completed";
 }
 
 std::vector<int> LshCvHashing::hashFeature(const iFeature &feature) {
@@ -67,12 +63,11 @@ std::vector<int> LshCvHashing::hashFeature(const iFeature &feature) {
   for (int i = 0; i < feature.bits.size(); ++i) {
     featureCV.at<uchar>(0, i) = feature.bits[i];
   }
-  // _matcherPtr->match(feature, matches);
   Timer timer;
   timer.start();
-  _matcherPtr->knnMatch(featureCV, matches, 5);
+  matcherPtr_->knnMatch(featureCV, matches, kMaxCandidateNum);
   timer.stop();
-  fprintf(stderr, "[LSH][CV] time to extract neighbours: ");
+  LOG(INFO) << "Time to extract neighbours:";
   timer.print_elapsed_time(TimeExt::MicroSec);
 
   std::vector<int> matchedIds;
@@ -85,20 +80,16 @@ std::vector<int> LshCvHashing::hashFeature(const iFeature &feature) {
 }
 void LshCvHashing::saveHashes() {
   cv::FileStorage fs("trained_trees.yaml", cv::FileStorage::WRITE);
-  _matcherPtr->write(fs);
+  matcherPtr_->write(fs);
 
   cv::FileStorage fsRead("trained_trees.yaml", cv::FileStorage::READ);
   cv::FileNode node = fsRead["indexParams"];
-  _matcherPtr->read(node);
+  matcherPtr_->read(node);
 }
 
 std::vector<int> LshCvHashing::getCandidates(int quId) {
-  if (!_database) {
-    printf("[ERROR][LshAngleBasedRelocalizer] Database is not set\n");
-    exit(EXIT_FAILURE);
-  }
-  printf("Getting candidates for a query image\n");
-  const auto &feature = _database->getQueryFeature(quId);
+  LOG(INFO) << "Getting candidates for a query image";
+  const auto &feature = database_->getQueryFeature(quId);
   Timer timer;
   timer.start();
 
@@ -106,8 +97,8 @@ std::vector<int> LshCvHashing::getCandidates(int quId) {
   candidates = hashFeature(feature);
 
   timer.stop();
-  fprintf(stderr, "[HASH] time ");
+  LOG(INFO) << "Hash retrieval time";
   timer.print_elapsed_time(TimeExt::MSec);
-  fprintf(stderr, "[HASH] candidates size %lu\n", candidates.size());
+  LOG(INFO) << "Candidates size: " << candidates.size();
   return candidates;
 }

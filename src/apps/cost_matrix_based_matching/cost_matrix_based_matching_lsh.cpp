@@ -39,8 +39,8 @@
 
 #include <glog/logging.h>
 
-
-std::vector<std::unique_ptr<iFeature>> loadFeatures(const std::string &path2folder) {
+std::vector<std::unique_ptr<iFeature>>
+loadFeatures(const std::string &path2folder) {
   LOG(INFO) << "Loading the features to hash with LSH.";
   std::vector<std::string> featureNames = listProtoDir(path2folder, ".Feature");
   std::vector<std::unique_ptr<iFeature>> features;
@@ -77,15 +77,17 @@ int main(int argc, char *argv[]) {
           /*refFeaturesDir=*/parser.path2ref, /*type=*/FeatureType::Cnn_Feature,
           /*bufferSize=*/parser.bufferSize);
 
-  // initialize Relocalizer
-  auto relocalizerPtr = LshCvHashing::Ptr(new LshCvHashing);
-  relocalizerPtr->setParams(1, 12, 2);
-  relocalizerPtr->setDatabase(database.get());
-  relocalizerPtr->train(loadFeatures(parser.path2ref));
+  // initialize Relocalizer.
+  auto relocalizer = std::make_unique<LshCvHashing>(
+      /*onlineDatabase=*/database.get(),
+      /*tableNum=*/1,
+      /*keySize=*/12,
+      /*multiProbeLevel=*/2);
+  relocalizer->train(loadFeatures(parser.path2ref));
 
   // initialize SuccessorManager
   std::unique_ptr<SuccessorManager> successorManager =
-      std::make_unique<SuccessorManager>(database.get(), relocalizerPtr.get(),
+      std::make_unique<SuccessorManager>(database.get(), relocalizer.get(),
                                          parser.fanOut);
 
   // create localizer and run it

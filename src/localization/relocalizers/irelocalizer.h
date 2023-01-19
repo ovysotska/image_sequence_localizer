@@ -1,4 +1,4 @@
-/** vpr_relocalization: a library for visual place recognition in changing 
+/** vpr_relocalization: a library for visual place recognition in changing
 ** environments with efficient relocalization step.
 ** Copyright (c) 2017 O. Vysotska, C. Stachniss, University of Bonn
 **
@@ -30,10 +30,7 @@
  * @brief      Interface class for relocalizers
  */
 class iRelocalizer {
- public:
-  using Ptr = std::shared_ptr<iRelocalizer>;
-  using ConstPtr = std::shared_ptr<const iRelocalizer>;
-
+public:
   virtual ~iRelocalizer() {}
 
   /**
@@ -47,4 +44,4 @@ class iRelocalizer {
   virtual std::vector<int> getCandidates(int quId) = 0;
 };
 
-#endif  // SRC_RELOCALIZERS_IRELOCALIZER_H_
+#endif // SRC_RELOCALIZERS_IRELOCALIZER_H_
