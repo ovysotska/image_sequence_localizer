@@ -56,15 +56,13 @@ bool operator==(const Node &lhs, const Node &rhs);
 
 // custom specialization of std::hash can be injected in namespace std
 // This makes a node hashable to use for std::unordered_set<Node>
-namespace std {
-template <> struct hash<Node> {
+template <> struct std::hash<Node> {
   std::size_t operator()(Node const &node) const {
     std::string s = std::to_string(node.quId) + std::to_string(node.refId);
     std::size_t const h(std::hash<std::string>{}(s));
     return h;
   }
 };
-} // namespace std
 
 typedef std::unordered_set<Node> NodeSet;
 

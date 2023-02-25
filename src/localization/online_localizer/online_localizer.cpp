@@ -37,7 +37,6 @@
 #include <limits>
 #include <sstream>
 #include <string>
-#include <unistd.h>
 #include <vector>
 
 namespace online_localizer {
@@ -47,8 +46,8 @@ using std::vector;
 
 const float kMaxLostNodesRatio = 0.8; // 80%
 
-void storesMatchesAsProto(const Matches &matches,
-                          const std::string &protoFilename) {
+void storeMatchesAsProto(const Matches &matches,
+                         const std::string &protoFilename) {
   image_sequence_localizer::MatchingResult matching_result_proto;
 
   for (const auto &match : matches) {

@@ -40,8 +40,8 @@
 namespace online_localizer {
 
 using Matches = std::vector<PathElement>;
-void storesMatchesAsProto(const Matches &matches,
-                          const std::string &protoFilename);
+void storeMatchesAsProto(const Matches &matches,
+                         const std::string &protoFilename);
 
 // Performs online localization.
 class OnlineLocalizer {

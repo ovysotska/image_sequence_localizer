@@ -65,14 +65,15 @@ inline void clearDataForOnlineDatabase(const std::filesystem::path &path) {
 inline image_sequence_localizer::CostMatrix
 computeCostMatrix(const fs::path &queryDir, const fs::path &refDir) {
 
-  std::vector<std::string> queryFiles = listProtoDir(queryDir, ".Feature");
-  std::vector<std::string> refFiles = listProtoDir(refDir, ".Feature");
+  const std::vector<std::string> queryFiles =
+      listProtoDir(queryDir, ".Feature");
+  const std::vector<std::string> refFiles = listProtoDir(refDir, ".Feature");
   image_sequence_localizer::CostMatrix cost_matrix;
 
   for (const auto &query : queryFiles) {
-    auto queryFeature = CnnFeature(query);
+    const auto queryFeature = CnnFeature(query);
     for (const auto &ref : refFiles) {
-      auto refFeature = CnnFeature(ref);
+      const auto refFeature = CnnFeature(ref);
       cost_matrix.add_values(queryFeature.computeSimilarityScore(refFeature));
     }
   }

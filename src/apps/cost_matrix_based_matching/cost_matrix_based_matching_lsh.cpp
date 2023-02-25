@@ -88,11 +88,11 @@ int main(int argc, char *argv[]) {
   std::unique_ptr<SuccessorManager> successorManager =
       std::make_unique<SuccessorManager>(database.get(), relocalizer.get(),
                                          parser.fanOut);
-  online_localizer::OnlineLocalizer localizer(
-      successorManager.get(), parser.expansionRate, parser.nonMatchCost);
-  online_localizer::Matches imageMatches =
+  online_localizer::OnlineLocalizer localizer{
+      successorManager.get(), parser.expansionRate, parser.nonMatchCost};
+  const online_localizer::Matches imageMatches =
       localizer.findMatchesTill(parser.querySize);
-  online_localizer::storesMatchesAsProto(imageMatches, parser.matchingResult);
+  online_localizer::storeMatchesAsProto(imageMatches, parser.matchingResult);
 
   printf("Done.\n");
   return 0;
