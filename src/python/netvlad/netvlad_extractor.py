@@ -192,8 +192,10 @@ def main():
     )
     args = parser.parse_args()
 
+    # TODO(olga): Make sure it works with GPU too.
     # Get cpu or gpu device for training.
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    # device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = "cpu"
     print(f"Using {device} device")
     model = NetVLAD(args.netvlad_weights_file).to(device)
 
