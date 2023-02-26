@@ -82,10 +82,10 @@ OnlineLocalizer::OnlineLocalizer(SuccessorManager *successorManager,
   expansionRate_ = expansionRate;
   nonMatchingCost_ = nonMatchingCost;
 
-  pred_[SOURCE_NODE.quId][SOURCE_NODE.refId] = SOURCE_NODE;
-  Node source = SOURCE_NODE;
+  pred_[kSourceNode.quId][kSourceNode.refId] = kSourceNode;
+  Node source = kSourceNode;
   source.accCost = 0.0;
-  accCosts_[SOURCE_NODE.quId][SOURCE_NODE.refId] = source.accCost;
+  accCosts_[kSourceNode.quId][kSourceNode.refId] = source.accCost;
   frontier_.push(source);
   currentBestHyp_ = source;
 }
@@ -198,11 +198,10 @@ void OnlineLocalizer::processImage(int quId) {
 }
 
 bool OnlineLocalizer::nodeWorthExpanding(const Node &node) const {
-  if (node == SOURCE_NODE) {
+  if (node == kSourceNode) {
     // source node-> always worth expanding
     return true;
   }
-  // if it the current best hypothesis
   if (node == currentBestHyp_) {
     return true;
   }
@@ -263,7 +262,7 @@ double OnlineLocalizer::computeAveragePathCost() const {
   Node pred = currentBestHyp_;
 
   while (!source_reached) {
-    if (pred == SOURCE_NODE) {
+    if (pred == kSourceNode) {
       source_reached = true;
       continue;
     }
@@ -278,7 +277,6 @@ double OnlineLocalizer::computeAveragePathCost() const {
 bool OnlineLocalizer::predExists(const Node &node) const {
   auto quId_found = pred_.find(node.quId);
   if (quId_found == pred_.end()) {
-    // not found
     return false;
   }
   auto node_found = quId_found->second.find(node.refId);
@@ -336,7 +334,7 @@ std::vector<PathElement> OnlineLocalizer::getCurrentPath() const {
   Node pred = currentBestHyp_;
 
   while (!source_reached) {
-    if (pred == SOURCE_NODE) {
+    if (pred == kSourceNode) {
       source_reached = true;
       continue;
     }
@@ -383,7 +381,7 @@ std::vector<PathElement> OnlineLocalizer::getLastNmatches(int N) const {
   int counter = N;
 
   while (!source_reached && counter > 0) {
-    if (pred == SOURCE_NODE) {
+    if (pred == kSourceNode) {
       source_reached = true;
       continue;
     }

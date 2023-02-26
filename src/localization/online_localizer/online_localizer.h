@@ -74,7 +74,7 @@ protected:
   void visualize() const;
 
 private:
-  const int kSlidingWindowSize_ = 5; // frames
+  int kSlidingWindowSize_ = 5; // frames
   bool needReloc_ = false;
   double expansionRate_ = -1.0;
   double nonMatchingCost_ = -1.0;

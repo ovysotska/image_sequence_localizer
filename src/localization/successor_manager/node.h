@@ -48,7 +48,8 @@ public:
   bool operator<(const Node &rhs) const { return this->accCost > rhs.accCost; }
 };
 
-#define SOURCE_NODE Node(/*queryId=*/-1, /*refId=*/0, /*idvCost=*/0.0)
+static inline const Node kSourceNode{/*queryId=*/-1, /*refId=*/0,
+                                     /*idvCost=*/0.0};
 
 /** WARNING: compares only the coordinates (quId, refId). Used mostly in
  * tests**/
