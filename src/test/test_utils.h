@@ -73,8 +73,8 @@ computeCostMatrix(const fs::path &queryDir, const fs::path &refDir) {
   for (const auto &query : queryFiles) {
     const auto queryFeature = CnnFeature(query);
     for (const auto &ref : refFiles) {
-      const auto refFeature = CnnFeature(ref);
-      cost_matrix.add_values(queryFeature.computeSimilarityScore(refFeature));
+      cost_matrix.add_values(
+          queryFeature.computeSimilarityScore(CnnFeature(ref)));
     }
   }
 
