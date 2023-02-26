@@ -37,42 +37,31 @@
 #include "successor_manager/node.h"
 #include "successor_manager/successor_manager.h"
 
-/**
- * @brief      Class for online localization
- */
+namespace online_localizer {
+
+using Matches = std::vector<PathElement>;
+void storeMatchesAsProto(const Matches &matches,
+                         const std::string &protoFilename);
+
+// Performs online localization.
 class OnlineLocalizer {
 public:
   using PredMap = std::unordered_map<int, std::unordered_map<int, Node>>;
   using AccCostsMap = std::unordered_map<int, std::unordered_map<int, double>>;
 
-  OnlineLocalizer();
+  OnlineLocalizer(SuccessorManager *successorManager, double expansionRate,
+                  double nonMatchingCost);
   ~OnlineLocalizer() {}
-  void setQuerySize(int size) { _querySize = size; }
-  bool setSuccessorManager(SuccessorManager *successorManager);
-  bool setVisualizer(iLocVisualizer::Ptr vis);
-  bool setExpansionRate(double rate);
-  bool setNonMatchingCost(double non_match);
 
-  /**
-   * @brief      dumps path to the file. Line format: quId refId status (0-
-   * hidden, 1-real)
-   *
-   * @param[in]  filename  The filename
-   */
-  void printPath(const std::string &filename) const;
-
-  bool isReady() const;
-  void run();
-  void processImage(int quId);
-  // core working function
-  void matchImage(int quId);
-  std::vector<PathElement> getCurrentPath() const;
-  std::vector<PathElement> getLastNmatches(int N) const;
-
+  Matches findMatchesTill(int queryId);
   void writeOutExpanded(const std::string &filename) const;
 
-  // TODO: move these into protected
-  // more on private side
+protected:
+  void processImage(int quId);
+  void matchImage(int quId);
+  std::vector<PathElement> getCurrentPath() const;
+
+  std::vector<PathElement> getLastNmatches(int N) const;
   void updateSearch(const NodeSet &successors);
   void updateGraph(const Node &parent, const NodeSet &successors);
   Node getProminentSuccessor(const NodeSet &successors) const;
@@ -85,23 +74,23 @@ public:
   void visualize() const;
 
 private:
-  int _querySize = 0;
-  int _slidingWindowSize = 5; // frames
-  bool _needReloc = false;
-  double _expansionRate = -1.0;
-  double _nonMatchCost = -1.0;
+  int kSlidingWindowSize_ = 5; // frames
+  bool needReloc_ = false;
+  double expansionRate_ = -1.0;
+  double nonMatchingCost_ = -1.0;
 
-  std::priority_queue<Node> _frontier;
+  std::priority_queue<Node> frontier_;
   // stores parent for each node
-  PredMap _pred;
+  PredMap pred_;
   // stores the accumulative  cost for each node
-  AccCostsMap _accCosts;
-  Node _currentBestHyp;
+  AccCostsMap accCosts_;
+  Node currentBestHyp_;
 
   SuccessorManager *successorManager_ = nullptr;
   iLocVisualizer::Ptr _vis = nullptr;
 
-  NodeSet _expandedRecently;
+  NodeSet expandedRecently_;
 };
+} // namespace online_localizer
 
 #endif // SRC_ONLINE_LOCALIZER_ONLINE_LOCALIZER_H_

@@ -30,6 +30,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <iostream>
 using std::vector;
 
 SuccessorManager::SuccessorManager(iDatabase *database,
@@ -77,7 +78,7 @@ bool SuccessorManager::setSimilarPlaces(const std::string &filename) {
 std::unordered_set<Node> SuccessorManager::getSuccessors(const Node &node) {
   _successors.clear();
 
-  LOG_IF(FATAL, node == SOURCE_NODE)
+  LOG_IF(FATAL, node == kSourceNode)
       << "Requested to connect the source node. Robot should "
          "be lost before first image. Use 'getSuccessorsIfLost' function "
          "instead.";

@@ -2,11 +2,14 @@
 #define TEST_TEST_UTILS_H_
 
 #include "database/cost_matrix_database.h"
+#include "database/list_dir.h"
 #include "database/online_database.h"
+#include "features/cnn_feature.h"
 #include "localization_protos.pb.h"
 
 #include "gtest/gtest.h"
 
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <string>
@@ -14,6 +17,8 @@
 
 namespace localization {
 namespace test {
+
+namespace fs = std::filesystem;
 
 inline image_sequence_localizer::Feature
 createFeatureProto(const std::vector<double> &values) {
@@ -56,6 +61,28 @@ inline std::filesystem::path createDataForOnlineDatabase() {
 inline void clearDataForOnlineDatabase(const std::filesystem::path &path) {
   std::filesystem::remove_all(path);
 }
+
+inline image_sequence_localizer::CostMatrix
+computeCostMatrix(const fs::path &queryDir, const fs::path &refDir) {
+
+  const std::vector<std::string> queryFiles =
+      listProtoDir(queryDir, ".Feature");
+  const std::vector<std::string> refFiles = listProtoDir(refDir, ".Feature");
+  image_sequence_localizer::CostMatrix cost_matrix;
+
+  for (const auto &query : queryFiles) {
+    const auto queryFeature = CnnFeature(query);
+    for (const auto &ref : refFiles) {
+      cost_matrix.add_values(
+          queryFeature.computeSimilarityScore(CnnFeature(ref)));
+    }
+  }
+
+  cost_matrix.set_cols(refFiles.size());
+  cost_matrix.set_rows(queryFiles.size());
+  return cost_matrix;
+}
+
 } // namespace test
 } // namespace localization
 
