@@ -46,24 +46,8 @@ public:
   /** gets the original cost and transforms it 1/cost **/
   double getCost(int quId, int refId) override;
 
-  /**
-   * @brief      Loads from txt. Expects specific format: Pure matrix values.
-   *
-   * @param[in]  filename  The filename
-   * @param[in]  rows      The rows
-   * @param[in]  cols      The cols
-   */
-  void loadFromTxt(const std::string &filename, int rows, int cols);
-
-  void loadFromProto(const std::string &filename);
-
-  void overrideCosts(const Matrix &costs, int rows, int cols);
-  const Matrix &getCosts() const { return costs_; }
-
 private:
-  Matrix costs_;
-  int rows_ = 0;
-  int cols_ = 0;
+  // CostMatrixDatabase
 };
 
 #endif // SRC_DATABASE_COST_MATRIX_DATABASE_H_

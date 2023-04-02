@@ -50,7 +50,7 @@ public:
 
   double computeMatchingCost(int quId, int refId);
 
-  const iFeature& getQueryFeature(int quId);
+  const iFeature &getQueryFeature(int quId);
 
 protected:
   std::vector<std::string> quFeaturesNames_;
@@ -62,6 +62,8 @@ private:
   std::unique_ptr<FeatureBuffer> refBuffer_{};
   std::unique_ptr<FeatureBuffer> queryBuffer_{};
   std::unordered_map<int, std::unordered_map<int, double>> costs_;
+
+  std::optional<CostMatrix> precomputedCosts;
 };
 
 #endif // SRC_DATABASE_ONLINE_DATABASE_H_

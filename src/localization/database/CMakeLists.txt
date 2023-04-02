@@ -13,9 +13,8 @@ target_link_libraries(online_database
 	glog::glog
 )
 	
-add_library(cost_matrix_database cost_matrix_database.cpp)
-target_link_libraries(cost_matrix_database 
-	online_database
+add_library(cost_matrix cost_matrix.cpp)
+target_link_libraries(cost_matrix 
 	protos
 	glog::glog
 )
