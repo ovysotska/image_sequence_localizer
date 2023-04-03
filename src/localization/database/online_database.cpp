@@ -60,7 +60,7 @@ OnlineDatabase::OnlineDatabase(const std::string &queryFeaturesDir,
   LOG_IF(FATAL, quFeaturesNames_.empty()) << "Query features are not set.";
   LOG_IF(FATAL, refFeaturesNames_.empty()) << "Reference features are not set.";
   if (!costMatrixFile.empty()) {
-    precomputedCosts_ = std::make_unique<CostMatrix>(costMatrixFile);
+    precomputedCosts_ = CostMatrix(costMatrixFile);
   }
 }
 

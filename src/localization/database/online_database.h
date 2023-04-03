@@ -64,8 +64,7 @@ private:
   std::unique_ptr<FeatureBuffer> queryBuffer_{};
   std::unordered_map<int, std::unordered_map<int, double>> costs_;
 
-  // TODO(olga): Can it be here std::optional?
-  std::unique_ptr<CostMatrix> precomputedCosts_ = nullptr;
+  std::optional<CostMatrix> precomputedCosts_ = {};
 };
 
 #endif // SRC_DATABASE_ONLINE_DATABASE_H_
