@@ -1,9 +1,41 @@
 #include "cost_matrix.h"
 #include <fstream>
 
+#include "database/list_dir.h"
+#include "features/feature_factory.h"
 #include "localization_protos.pb.h"
 
 #include <glog/logging.h>
+
+CostMatrix::CostMatrix(const std::string &costMatrixFile) {
+  CHECK(!costMatrixFile.empty()) << "Cost matrix file is not set";
+  loadFromProto(costMatrixFile);
+}
+CostMatrix::CostMatrix(const std::string &queryFeaturesDir,
+                       const std::string &refFeaturesDir,
+                       const FeatureType &type) {
+
+  std::vector<std::string> queryFeatureFiles =
+      listProtoDir(queryFeaturesDir, ".Feature");
+  std::vector<std::string> refFeaturesFiles =
+      listProtoDir(refFeaturesDir, ".Feature");
+
+  costs_.reserve(queryFeatureFiles.size());
+  for (const auto &queryFile : queryFeatureFiles) {
+    auto queryFeature = createFeature(type, queryFile);
+    std::vector<double> row(refFeaturesFiles.size());
+    for (const auto &refFile : refFeaturesFiles) {
+      const auto refFeature = createFeature(type, refFile);
+      row.push_back(queryFeature->computeSimilarityScore(*refFeature));
+    }
+    costs_.push_back(row);
+  }
+}
+CostMatrix::CostMatrix(const Matrix &costs) {
+  costs_ = costs;
+  rows_ = costs.size();
+  cols_ = rows_ > 0 ? costs[0].size() : 0;
+}
 
 void CostMatrix::loadFromTxt(const std::string &filename, int rows, int cols) {
   std::ifstream in(filename);
@@ -21,6 +53,22 @@ void CostMatrix::loadFromTxt(const std::string &filename, int rows, int cols) {
   }
   LOG(INFO) << "Matrix was read";
   in.close();
+  rows_ = rows;
+  cols_ = cols;
+}
+
+double CostMatrix::at(int row, int col) const {
+  CHECK(row >= 0 && row < rows_) << "Row outside range " << row;
+  CHECK(col >= 0 && col < cols_) << "Col outside range " << col;
+  return costs_[row][col];
+}
+
+double CostMatrix::getInverseCost(int row, int col) const {
+  const double value = this->at(row, col);
+  if (abs(value) < 1e-09) {
+    return std::numeric_limits<double>::max();
+  }
+  return 1. / value;
 }
 
 void CostMatrix::loadFromProto(const std::string &filename) {

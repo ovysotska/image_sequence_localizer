@@ -1,5 +1,6 @@
 
 #include "database/cost_matrix_database.h"
+#include "database/online_database.h"
 #include "features/ifeature.h"
 #include "localization_protos.pb.h"
 #include "online_localizer/online_localizer.h"
@@ -33,8 +34,8 @@ public:
     cost_matrix.SerializeToOstream(&out);
     out.close();
 
-    database = std::make_unique<CostMatrixDatabase>(
-        costMatrixFile, featureDir, featureDir, FeatureType::Cnn_Feature, 10);
+    database = std::make_unique<OnlineDatabase>(
+        featureDir, featureDir, FeatureType::Cnn_Feature, 10, costMatrixFile);
     relocalizer = std::make_unique<FakeRelocalizer>();
     successorManager = std::make_unique<SuccessorManager>(database.get(),
                                                           relocalizer.get(), 2);

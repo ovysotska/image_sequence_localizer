@@ -26,6 +26,7 @@
 #ifndef SRC_DATABASE_ONLINE_DATABASE_H_
 #define SRC_DATABASE_ONLINE_DATABASE_H_
 
+#include "database/cost_matrix.h"
 #include "database/idatabase.h"
 #include "features/feature_buffer.h"
 #include "features/feature_factory.h"
@@ -43,7 +44,7 @@ class OnlineDatabase : public iDatabase {
 public:
   OnlineDatabase(const std::string &queryFeaturesDir,
                  const std::string &refFeaturesDir, FeatureType type,
-                 int bufferSize);
+                 int bufferSize, const std::string &costMatrixFile = "");
 
   inline int refSize() override { return refFeaturesNames_.size(); }
   double getCost(int quId, int refId) override;
@@ -63,7 +64,8 @@ private:
   std::unique_ptr<FeatureBuffer> queryBuffer_{};
   std::unordered_map<int, std::unordered_map<int, double>> costs_;
 
-  std::optional<CostMatrix> precomputedCosts;
+  // TODO(olga): Can it be here std::optional?
+  std::unique_ptr<CostMatrix> precomputedCosts_ = nullptr;
 };
 
 #endif // SRC_DATABASE_ONLINE_DATABASE_H_

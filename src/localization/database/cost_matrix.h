@@ -1,9 +1,10 @@
-#ifndef SRC_DATABASE_COST_MATRIX_DATABASE_H_
-#define SRC_DATABASE_COST_MATRIX_DATABASE_H_
+#ifndef SRC_DATABASE_COST_MATRIX_H_
+#define SRC_DATABASE_COST_MATRIX_H_
 
-#include "database/online_database.h"
+#include "features/feature_factory.h"
 
 #include <string>
+#include <vector>
 
 using Matrix = std::vector<std::vector<double>>;
 
@@ -30,9 +31,15 @@ public:
   const Matrix &getCosts() const { return costs_; }
 
   double at(int row, int col) const;
+  // Computes 1/value.
+  double getInverseCost(int row, int col) const;
+  int rows() const { return rows_; }
+  int cols() const { return cols_; }
 
 private:
   Matrix costs_;
   int rows_ = 0;
   int cols_ = 0;
 };
+
+#endif // SRC_DATABASE_COST_MATRIX_H_

@@ -25,7 +25,6 @@
 #include <memory>
 #include <string>
 
-#include "database/cost_matrix_database.h"
 #include "database/idatabase.h"
 #include "database/list_dir.h"
 #include "database/online_database.h"
@@ -70,12 +69,11 @@ int main(int argc, char *argv[]) {
   parser.parseYaml(config_file);
   parser.print();
 
-  std::unique_ptr<OnlineDatabase> database =
-      std::make_unique<CostMatrixDatabase>(
-          /*costMatrixFile=*/parser.costMatrix,
-          /*queryFeaturesDir=*/parser.path2qu,
-          /*refFeaturesDir=*/parser.path2ref, /*type=*/FeatureType::Cnn_Feature,
-          /*bufferSize=*/parser.bufferSize);
+  std::unique_ptr<OnlineDatabase> database = std::make_unique<OnlineDatabase>(
+      /*queryFeaturesDir=*/parser.path2qu,
+      /*refFeaturesDir=*/parser.path2ref, /*type=*/FeatureType::Cnn_Feature,
+      /*bufferSize=*/parser.bufferSize,
+      /*costMatrixFile=*/parser.costMatrix);
 
   // initialize Relocalizer.
   auto relocalizer = std::make_unique<LshCvHashing>(

@@ -23,19 +23,17 @@
 
 /* Updated by O. Vysotska in 2022 */
 
-
 #include "cnn_feature.h"
 #include "features/ifeature.h"
 #include "localization_protos.pb.h"
 
-#include <math.h>
 #include <algorithm>
 #include <fstream>
 #include <limits>
+#include <math.h>
 #include <numeric>
 
 #include <glog/logging.h>
-
 
 CnnFeature::CnnFeature(const std::string &filename) {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -73,25 +71,22 @@ void CnnFeature::binarize() {
 }
 
 double CnnFeature::computeSimilarityScore(const iFeature &rhs) const {
-  CHECK(this->type == rhs.type) <<  "Features are not the same type";
-  double norm_qr =
-      sqrt(std::inner_product(dimensions.begin(), dimensions.end(), dimensions.begin(), 0.0L));
+  CHECK(this->type == rhs.type) << "Features are not the same type";
+  double norm_qr = sqrt(std::inner_product(dimensions.begin(), dimensions.end(),
+                                           dimensions.begin(), 0.0L));
   double norm_db =
       sqrt(std::inner_product(rhs.dimensions.begin(), rhs.dimensions.end(),
                               rhs.dimensions.begin(), 0.0L));
   double prod_qr_db = std::inner_product(
       rhs.dimensions.begin(), rhs.dimensions.end(), dimensions.begin(), 0.0L);
-  double cos_dist = prod_qr_db / (norm_qr * norm_db);
-  return cos_dist;
+  double cos_similarity = prod_qr_db / (norm_qr * norm_db);
+  return cos_similarity;
 }
 
 double CnnFeature::score2cost(double score) const {
-  double cost;
   if (score < 1e-09) {
-    cost = std::numeric_limits<double>::max();
     printf("[INFO] The cost of comparing two images is suspiciously small.\n");
-  } else {
-    cost = 1. / score;
+    return std::numeric_limits<double>::max();
   }
-  return cost;
+  return 1. / score;
 }

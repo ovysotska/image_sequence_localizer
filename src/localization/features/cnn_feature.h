@@ -33,10 +33,10 @@
  */
 class CnnFeature : public iFeature {
 public:
-
   CnnFeature(const std::string &filename);
 
-  // Computes the cosine distance between two vectors.
+  // Computes the cosine similarity between two vectors.
+  // The higher the score the more similar the features are.
   double computeSimilarityScore(const iFeature &rhs) const override;
   /**
    * @brief      weight/cost is an inverse of a score.

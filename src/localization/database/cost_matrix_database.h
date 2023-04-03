@@ -26,28 +26,24 @@
 #ifndef SRC_DATABASE_COST_MATRIX_DATABASE_H_
 #define SRC_DATABASE_COST_MATRIX_DATABASE_H_
 
-#include "database/online_database.h"
+#include "database/cost_matrix.h"
+#include "database/idatabase.h"
 
+#include <memory>
 #include <string>
-
-using Matrix = std::vector<std::vector<double>>;
 
 /**
  * @brief      Class for cost matrix database. Stores costs as matrix.
  */
-class CostMatrixDatabase : public OnlineDatabase {
+class CostMatrixDatabase : public iDatabase {
 public:
-  CostMatrixDatabase(const std::string &costMatrixFile,
-                     const std::string &queryFeaturesDir,
-                     const std::string &refFeaturesDir, const FeatureType &type,
-                     int bufferSize);
+  CostMatrixDatabase(const std::string &costMatrixFile);
 
-  int refSize() override { return cols_; }
-  /** gets the original cost and transforms it 1/cost **/
+  int refSize() override { return costMatrix_->cols(); }
   double getCost(int quId, int refId) override;
 
 private:
-  // CostMatrixDatabase
+  std::unique_ptr<CostMatrix> costMatrix_ = nullptr;
 };
 
 #endif // SRC_DATABASE_COST_MATRIX_DATABASE_H_

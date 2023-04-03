@@ -97,55 +97,36 @@ TEST_F(OnlineDatabaseTest, InvalidConstructorParams) {
 
 TEST_F(OnlineDatabaseTest, NoCostMatrixFile) {
 
-  ASSERT_DEATH(CostMatrixDatabase(tmp_dir, tmp_dir, tmp_dir,
-                                  FeatureType::Cnn_Feature, 10),
-               "Failed to parse cost_matrix file: ");
+  ASSERT_DEATH(
+      OnlineDatabase(tmp_dir, tmp_dir, FeatureType::Cnn_Feature, 10, tmp_dir),
+      "Failed to parse cost_matrix file: ");
 }
 
 TEST_F(OnlineDatabaseTest, CostMatrixDatabaseConstructor) {
   std::string cost_matrix_name = createCostMatrixProto(tmp_dir);
-  CostMatrixDatabase database(cost_matrix_name,
-                              /*queryFeaturesDir=*/tmp_dir,
-                              /*refFeaturesDir=*/tmp_dir,
-                              /*type=*/FeatureType::Cnn_Feature,
-                              /*bufferSize=*/10);
+  OnlineDatabase database(/*queryFeaturesDir=*/tmp_dir,
+                          /*refFeaturesDir=*/tmp_dir,
+                          /*type=*/FeatureType::Cnn_Feature,
+                          /*bufferSize=*/10, cost_matrix_name);
   EXPECT_EQ(database.getCost(0, 0), 1);
   EXPECT_DOUBLE_EQ(database.getCost(0, 2), 1. / 3);
   EXPECT_DOUBLE_EQ(database.getCost(1, 0), 1. / 4);
   EXPECT_DOUBLE_EQ(database.getCost(1, 2), 1. / 6);
-}
-
-TEST_F(OnlineDatabaseTest, CostMatrixDatabaseRefSize) {
-  std::string cost_matrix_name = createCostMatrixProto(tmp_dir);
-  CostMatrixDatabase database(cost_matrix_name,
-                              /*queryFeaturesDir=*/tmp_dir,
-                              /*refFeaturesDir=*/tmp_dir,
-                              /*type=*/FeatureType::Cnn_Feature,
-                              /*bufferSize=*/10);
-  EXPECT_EQ(database.refSize(), 3);
-  database.overrideCosts(
-      {
-          {1, 2, 3, 8},
-          {4, 5, 6, 7},
-      },
-      2, 4);
-  EXPECT_EQ(database.refSize(), 4);
 }
 
 TEST_F(OnlineDatabaseTest, CostMatrixDatabaseGetCost) {
   std::string cost_matrix_name = createCostMatrixProto(tmp_dir);
-  CostMatrixDatabase database(cost_matrix_name,
-                              /*queryFeaturesDir=*/tmp_dir,
-                              /*refFeaturesDir=*/tmp_dir,
-                              /*type=*/FeatureType::Cnn_Feature,
-                              /*bufferSize=*/10);
+  OnlineDatabase database(/*queryFeaturesDir=*/tmp_dir,
+                          /*refFeaturesDir=*/tmp_dir,
+                          /*type=*/FeatureType::Cnn_Feature,
+                          /*bufferSize=*/10, cost_matrix_name);
   EXPECT_EQ(database.getCost(0, 0), 1);
   EXPECT_DOUBLE_EQ(database.getCost(0, 2), 1. / 3);
   EXPECT_DOUBLE_EQ(database.getCost(1, 0), 1. / 4);
   EXPECT_DOUBLE_EQ(database.getCost(1, 2), 1. / 6);
-  ASSERT_DEATH(database.getCost(-1, 0), "Invalid query index -1");
-  ASSERT_DEATH(database.getCost(0, -1), "Invalid reference index -1");
-  ASSERT_DEATH(database.getCost(3, 0), "Invalid query index 3");
-  ASSERT_DEATH(database.getCost(0, 4), "Invalid reference index 4");
+  ASSERT_DEATH(database.getCost(-1, 0), "Row outside range -1");
+  ASSERT_DEATH(database.getCost(0, -1), "Col outside range -1");
+  ASSERT_DEATH(database.getCost(3, 0), "Row outside range 3");
+  ASSERT_DEATH(database.getCost(0, 4), "Col outside range 4");
 }
 } // namespace localization

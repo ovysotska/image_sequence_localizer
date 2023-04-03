@@ -36,21 +36,22 @@
 #include <string>
 
 namespace {
-const iFeature&
-addFeatureIfNeeded(FeatureBuffer &featureBuffer,
-                   const std::vector<std::string> &featureNames,
-                   FeatureType type, int featureId) {
+const iFeature &addFeatureIfNeeded(FeatureBuffer &featureBuffer,
+                                   const std::vector<std::string> &featureNames,
+                                   FeatureType type, int featureId) {
   if (featureBuffer.inBuffer(featureId)) {
     return featureBuffer.getFeature(featureId);
   }
-  featureBuffer.addFeature(featureId, createFeature(type, featureNames[featureId]));
+  featureBuffer.addFeature(featureId,
+                           createFeature(type, featureNames[featureId]));
   return featureBuffer.getFeature(featureId);
 }
 } // namespace
 
 OnlineDatabase::OnlineDatabase(const std::string &queryFeaturesDir,
                                const std::string &refFeaturesDir,
-                               FeatureType type, int bufferSize)
+                               FeatureType type, int bufferSize,
+                               const std::string &costMatrixFile)
     : quFeaturesNames_{listProtoDir(queryFeaturesDir, ".Feature")},
       refFeaturesNames_{listProtoDir(refFeaturesDir, ".Feature")},
       featureType_{type}, refBuffer_{std::make_unique<FeatureBuffer>(
@@ -58,6 +59,9 @@ OnlineDatabase::OnlineDatabase(const std::string &queryFeaturesDir,
       queryBuffer_{std::make_unique<FeatureBuffer>(bufferSize)} {
   LOG_IF(FATAL, quFeaturesNames_.empty()) << "Query features are not set.";
   LOG_IF(FATAL, refFeaturesNames_.empty()) << "Reference features are not set.";
+  if (!costMatrixFile.empty()) {
+    precomputedCosts_ = std::make_unique<CostMatrix>(costMatrixFile);
+  }
 }
 
 double OnlineDatabase::computeMatchingCost(int quId, int refId) {
@@ -71,11 +75,13 @@ double OnlineDatabase::computeMatchingCost(int quId, int refId) {
   const auto &refFeature =
       addFeatureIfNeeded(*refBuffer_, refFeaturesNames_, featureType_, refId);
 
-  return quFeature.score2cost(
-      quFeature.computeSimilarityScore(refFeature));
+  return quFeature.score2cost(quFeature.computeSimilarityScore(refFeature));
 }
 
 double OnlineDatabase::getCost(int quId, int refId) {
+  if (precomputedCosts_) {
+    return precomputedCosts_->getInverseCost(quId, refId);
+  }
   // Check if the cost was computed before.
   auto rowIter = costs_.find(quId);
   if (rowIter != costs_.end()) {
@@ -89,7 +95,7 @@ double OnlineDatabase::getCost(int quId, int refId) {
   return cost;
 }
 
-const iFeature& OnlineDatabase::getQueryFeature(int quId) {
+const iFeature &OnlineDatabase::getQueryFeature(int quId) {
   return addFeatureIfNeeded(*queryBuffer_, quFeaturesNames_, featureType_,
                             quId);
 }
