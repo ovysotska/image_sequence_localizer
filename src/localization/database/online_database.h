@@ -32,6 +32,7 @@
 #include "features/feature_factory.h"
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <vector>
