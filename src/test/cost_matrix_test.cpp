@@ -1,4 +1,5 @@
-// #include "database/online_database.h"
+/* By O. Vysotska in 2023 */
+
 #include "database/cost_matrix.h"
 #include "localization_protos.pb.h"
 #include "test_utils.h"
@@ -9,25 +10,45 @@
 class CostMatrixTest : public ::testing::Test {
 public:
   void SetUp() {
-    tmp_dir = localization::test::createDataForOnlineDatabase();
-    std::filesystem::path featureDir = tmp_dir;
-    image_sequence_localizer::CostMatrix cost_matrix =
-        localization::test::computeCostMatrix(featureDir, featureDir);
-    costMatrixFile = tmp_dir / "test.CostMatrix.pb";
+
+    tmp_dir = std::filesystem::temp_directory_path() / "costMatrixTest";
+    std::filesystem::create_directories(tmp_dir);
+    image_sequence_localizer::CostMatrix costMatrixProto;
+    for (int r = 0; r < 2; ++r) {
+      for (int c = 0; c < 3; ++c) {
+        costMatrixProto.add_values(costMatrixValues[r][c]);
+      }
+    }
+
+    costMatrixProto.set_cols(3);
+    costMatrixProto.set_rows(2);
+    std::string testName =
+        ::testing::UnitTest::GetInstance()->current_test_info()->name();
+
+    costMatrixFile = tmp_dir / (testName + "_test.CostMatrix.pb");
+    std::cout << "Saving to" << costMatrixFile;
     std::fstream out(costMatrixFile,
                      std::ios::out | std::ios::trunc | std::ios::binary);
-    cost_matrix.SerializeToOstream(&out);
+    costMatrixProto.SerializeToOstream(&out);
     out.close();
+  }
+
+  void TearDown() {
+    std::filesystem::remove(costMatrixFile);
+    std::filesystem::remove(tmp_dir);
+    tmp_dir = "";
   }
 
   std::filesystem::path tmp_dir = "";
   std::string costMatrixFile = "";
+  const std::vector<std::vector<double>> costMatrixValues = {{1, 2, 3},
+                                                             {4, 5, 6}};
 };
 
 TEST_F(CostMatrixTest, ConstructFromProto) {
   auto costMatrix = CostMatrix(costMatrixFile);
-  EXPECT_EQ(costMatrix.rows(), 4);
-  EXPECT_EQ(costMatrix.cols(), 4);
+  EXPECT_EQ(costMatrix.rows(), this->costMatrixValues.size());
+  EXPECT_EQ(costMatrix.cols(), this->costMatrixValues[0].size());
 }
 
 TEST_F(CostMatrixTest, FailedToConstruct) {
@@ -36,10 +57,7 @@ TEST_F(CostMatrixTest, FailedToConstruct) {
 
 TEST_F(CostMatrixTest, at) {
   auto costMatrix = CostMatrix(costMatrixFile);
-  Matrix expectedMatrix = {{1, 0.922225, 0.285714, 0.99449},
-                           {0.922225, 1, 0.634029, 0.922876},
-                           {0.285714, 0.634029, 1, 0.298347},
-                           {0.99449, 0.922876, 0.298347, 1}};
+  Matrix expectedMatrix = this->costMatrixValues;
   EXPECT_EQ(costMatrix.rows(), expectedMatrix.size());
   EXPECT_EQ(costMatrix.cols(), expectedMatrix[0].size());
 
@@ -57,5 +75,6 @@ TEST_F(CostMatrixTest, at) {
 TEST_F(CostMatrixTest, getInverseCost) {
   auto costMatrix = CostMatrix(costMatrixFile);
   EXPECT_DOUBLE_EQ(costMatrix.getInverseCost(0, 0), 1);
-  EXPECT_NEAR(costMatrix.getInverseCost(1, 0), 1 / 0.922225, 1e-06);
+  EXPECT_NEAR(costMatrix.getInverseCost(1, 0), 1 / this->costMatrixValues[1][0],
+              1e-06);
 }

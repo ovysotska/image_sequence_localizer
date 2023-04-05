@@ -1,3 +1,5 @@
+/* By O. Vysotska in 2023 */
+
 #ifndef SRC_DATABASE_COST_MATRIX_H_
 #define SRC_DATABASE_COST_MATRIX_H_
 

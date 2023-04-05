@@ -1,3 +1,5 @@
+/* By O. Vysotska in 2023 */
+
 #include "cost_matrix.h"
 #include <fstream>
 
@@ -11,6 +13,7 @@ CostMatrix::CostMatrix(const std::string &costMatrixFile) {
   CHECK(!costMatrixFile.empty()) << "Cost matrix file is not set";
   loadFromProto(costMatrixFile);
 }
+
 CostMatrix::CostMatrix(const std::string &queryFeaturesDir,
                        const std::string &refFeaturesDir,
                        const FeatureType &type) {
@@ -23,7 +26,8 @@ CostMatrix::CostMatrix(const std::string &queryFeaturesDir,
   costs_.reserve(queryFeatureFiles.size());
   for (const auto &queryFile : queryFeatureFiles) {
     auto queryFeature = createFeature(type, queryFile);
-    std::vector<double> row(refFeaturesFiles.size());
+    std::vector<double> row;
+    row.reserve(refFeaturesFiles.size());
     for (const auto &refFile : refFeaturesFiles) {
       const auto refFeature = createFeature(type, refFile);
       row.push_back(queryFeature->computeSimilarityScore(*refFeature));

@@ -1,3 +1,5 @@
+/* By O. Vysotska in 2023 */
+
 #include "default_relocalizer.h"
 
 #include <glog/logging.h>
