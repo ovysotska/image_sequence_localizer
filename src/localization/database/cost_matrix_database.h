@@ -36,13 +36,13 @@ namespace localization::database {
 
 class CostMatrixDatabase : public iDatabase {
 public:
-  CostMatrixDatabase(const std::string &costMatrixFile);
+  explicit CostMatrixDatabase(const std::string &costMatrixFile);
 
-  int refSize() override { return costMatrix_->cols(); }
+  int refSize() override { return costMatrix_.cols(); }
   double getCost(int quId, int refId) override;
 
 private:
-  std::unique_ptr<CostMatrix> costMatrix_ = nullptr;
+  CostMatrix costMatrix_;
 };
 
 } // namespace localization::database

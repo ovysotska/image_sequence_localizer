@@ -11,6 +11,10 @@
 
 namespace localization::database {
 
+namespace {
+constexpr auto kEpsilon = 1e-09;
+} // namespace
+
 CostMatrix::CostMatrix(const std::string &costMatrixFile) {
   CHECK(!costMatrixFile.empty()) << "Cost matrix file is not set";
   loadFromProto(costMatrixFile);
@@ -19,10 +23,9 @@ CostMatrix::CostMatrix(const std::string &costMatrixFile) {
 CostMatrix::CostMatrix(const std::string &queryFeaturesDir,
                        const std::string &refFeaturesDir,
                        const features::FeatureType &type) {
-
-  std::vector<std::string> queryFeatureFiles =
+  const std::vector<std::string> queryFeatureFiles =
       listProtoDir(queryFeaturesDir, ".Feature");
-  std::vector<std::string> refFeaturesFiles =
+  const std::vector<std::string> refFeaturesFiles =
       listProtoDir(refFeaturesDir, ".Feature");
 
   costs_.reserve(queryFeatureFiles.size());
@@ -52,8 +55,7 @@ void CostMatrix::loadFromTxt(const std::string &filename, int rows, int cols) {
     std::vector<double> row(cols);
     for (int c = 0; c < cols; ++c) {
       float value;
-      in >> value;
-      row[c] = value;
+      in >> row[c];
     }
     costs_.push_back(row);
   }
@@ -71,7 +73,7 @@ double CostMatrix::at(int row, int col) const {
 
 double CostMatrix::getInverseCost(int row, int col) const {
   const double value = this->at(row, col);
-  if (abs(value) < 1e-09) {
+  if (std::abs(value) < kEpsilon) {
     return std::numeric_limits<double>::max();
   }
   return 1. / value;

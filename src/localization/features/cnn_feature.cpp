@@ -74,11 +74,11 @@ void CnnFeature::binarize() {
 
 double CnnFeature::computeSimilarityScore(const iFeature &rhs) const {
   CHECK(this->type == rhs.type) << "Features are not the same type";
-  double norm_qr = sqrt(std::inner_product(dimensions.begin(), dimensions.end(),
-                                           dimensions.begin(), 0.0L));
+  double norm_qr = std::sqrt(std::inner_product(
+      dimensions.begin(), dimensions.end(), dimensions.begin(), 0.0L));
   double norm_db =
-      sqrt(std::inner_product(rhs.dimensions.begin(), rhs.dimensions.end(),
-                              rhs.dimensions.begin(), 0.0L));
+      std::sqrt(std::inner_product(rhs.dimensions.begin(), rhs.dimensions.end(),
+                                   rhs.dimensions.begin(), 0.0L));
   double prod_qr_db = std::inner_product(
       rhs.dimensions.begin(), rhs.dimensions.end(), dimensions.begin(), 0.0L);
   double cos_similarity = prod_qr_db / (norm_qr * norm_db);

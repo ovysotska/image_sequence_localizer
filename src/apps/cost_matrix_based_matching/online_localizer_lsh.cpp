@@ -80,7 +80,6 @@ int main(int argc, char *argv[]) {
       /*bufferSize=*/parser.bufferSize,
       /*costMatrixFile=*/parser.costMatrix);
 
-  // initialize Relocalizer.
   auto relocalizer = std::make_unique<loc::relocalizers::LshCvHashing>(
       /*onlineDatabase=*/database.get(),
       /*tableNum=*/1,

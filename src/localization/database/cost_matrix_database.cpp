@@ -24,6 +24,7 @@
 /* Updated by O. Vysotska in 2022 */
 
 #include "database/cost_matrix_database.h"
+#include "database/cost_matrix.h"
 
 #include <fstream>
 #include <limits>
@@ -32,12 +33,11 @@
 
 namespace localization::database {
 
-CostMatrixDatabase::CostMatrixDatabase(const std::string &costMatrixFile) {
-  costMatrix_ = std::make_unique<CostMatrix>(costMatrixFile);
-}
+CostMatrixDatabase::CostMatrixDatabase(const std::string &costMatrixFile)
+    : costMatrix_(CostMatrix(costMatrixFile)) {}
 
 double CostMatrixDatabase::getCost(int quId, int refId) {
-  return costMatrix_->getInverseCost(quId, refId);
+  return costMatrix_.getInverseCost(quId, refId);
 }
 
 } // namespace localization::database

@@ -13,11 +13,11 @@ class CostMatrix {
 public:
   using Matrix = std::vector<std::vector<double>>;
 
-  CostMatrix(const std::string &costMatrixFile);
+  explicit CostMatrix(const std::string &costMatrixFile);
   CostMatrix(const std::string &queryFeaturesDir,
              const std::string &refFeaturesDir,
              const features::FeatureType &type);
-  CostMatrix(const Matrix &costs);
+  explicit CostMatrix(const Matrix &costs);
 
   void loadFromTxt(const std::string &filename, int rows, int cols);
 
