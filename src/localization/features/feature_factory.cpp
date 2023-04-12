@@ -26,8 +26,10 @@
 
 #include <glog/logging.h>
 
+namespace localization::features {
+
 std::unique_ptr<iFeature> createFeature(FeatureType type,
-                            const std::string &featureFilename) {
+                                        const std::string &featureFilename) {
   switch (type) {
   case Cnn_Feature: {
     return std::make_unique<CnnFeature>(featureFilename);
@@ -35,3 +37,4 @@ std::unique_ptr<iFeature> createFeature(FeatureType type,
   }
   LOG(FATAL) << "Unknown feature type";
 }
+} // namespace localization::features

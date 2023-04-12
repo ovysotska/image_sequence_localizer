@@ -37,6 +37,7 @@
 #include <unordered_map>
 #include <vector>
 
+namespace localization::database {
 /**
  * @brief      Database for loading and matching features. Caches the computed
  * matching costs.
@@ -44,7 +45,7 @@
 class OnlineDatabase : public iDatabase {
 public:
   OnlineDatabase(const std::string &queryFeaturesDir,
-                 const std::string &refFeaturesDir, FeatureType type,
+                 const std::string &refFeaturesDir, features::FeatureType type,
                  int bufferSize, const std::string &costMatrixFile = "");
 
   inline int refSize() override { return refFeaturesNames_.size(); }
@@ -52,20 +53,21 @@ public:
 
   double computeMatchingCost(int quId, int refId);
 
-  const iFeature &getQueryFeature(int quId);
+  const features::iFeature &getQueryFeature(int quId);
 
 protected:
   std::vector<std::string> quFeaturesNames_;
   std::vector<std::string> refFeaturesNames_;
   // TODO(olga): Maybe temporary here.
-  FeatureType featureType_{};
+  features::FeatureType featureType_{};
 
 private:
-  std::unique_ptr<FeatureBuffer> refBuffer_{};
-  std::unique_ptr<FeatureBuffer> queryBuffer_{};
+  std::unique_ptr<features::FeatureBuffer> refBuffer_{};
+  std::unique_ptr<features::FeatureBuffer> queryBuffer_{};
   std::unordered_map<int, std::unordered_map<int, double>> costs_;
 
   std::optional<CostMatrix> precomputedCosts_ = {};
 };
+} // namespace localization::database
 
 #endif // SRC_DATABASE_ONLINE_DATABASE_H_

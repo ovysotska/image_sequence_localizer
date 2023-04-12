@@ -30,6 +30,8 @@
 
 #include <glog/logging.h>
 
+namespace localization::database {
+
 CostMatrixDatabase::CostMatrixDatabase(const std::string &costMatrixFile) {
   costMatrix_ = std::make_unique<CostMatrix>(costMatrixFile);
 }
@@ -37,3 +39,5 @@ CostMatrixDatabase::CostMatrixDatabase(const std::string &costMatrixFile) {
 double CostMatrixDatabase::getCost(int quId, int refId) {
   return costMatrix_->getInverseCost(quId, refId);
 }
+
+} // namespace localization::database

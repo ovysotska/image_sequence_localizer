@@ -22,16 +22,17 @@
 **/
 
 #include "lsh_cv_hashing.h"
-
 #include "database/list_dir.h"
 #include "tools/timer/timer.h"
 
 #include <glog/logging.h>
 
+namespace localization::relocalizers {
+
 const int kMaxCandidateNum = 5;
 
-LshCvHashing::LshCvHashing(OnlineDatabase *database, int tableNum, int keySize,
-                           int multiProbeLevel) {
+LshCvHashing::LshCvHashing(database::OnlineDatabase *database, int tableNum,
+                           int keySize, int multiProbeLevel) {
   CHECK(database) << "Database is not set\n";
   database_ = database;
   indexParam_ =
@@ -39,7 +40,7 @@ LshCvHashing::LshCvHashing(OnlineDatabase *database, int tableNum, int keySize,
 }
 
 void LshCvHashing::train(
-    const std::vector<std::unique_ptr<iFeature>> &features) {
+    const std::vector<std::unique_ptr<features::iFeature>> &features) {
   matcherPtr_ =
       cv::Ptr<cv::FlannBasedMatcher>(new cv::FlannBasedMatcher(indexParam_));
   // transform to cv::Mat array of arrays
@@ -57,7 +58,7 @@ void LshCvHashing::train(
   LOG(INFO) << "Training completed";
 }
 
-std::vector<int> LshCvHashing::hashFeature(const iFeature &feature) {
+std::vector<int> LshCvHashing::hashFeature(const features::iFeature &feature) {
   std::vector<std::vector<cv::DMatch>> matches;
   cv::Mat featureCV(1, feature.bits.size(), CV_8UC1);
   for (int i = 0; i < feature.bits.size(); ++i) {
@@ -102,3 +103,4 @@ std::vector<int> LshCvHashing::getCandidates(int quId) {
   LOG(INFO) << "Candidates size: " << candidates.size();
   return candidates;
 }
+} // namespace localization::relocalizers

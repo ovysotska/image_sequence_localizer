@@ -31,18 +31,21 @@
 #include <string>
 #include <vector>
 
-class DummyFeature : public iFeature {
+namespace test {
+
+namespace loc_features = localization::features;
+
+class DummyFeature : public loc_features::iFeature {
 public:
   DummyFeature(const std::vector<double> &values) { dimensions = values; }
   double computeSimilarityScore(const iFeature &rhs) const override {
     return 0.0;
   }
   double score2cost(double score) const override { return 0.0; }
-
 };
 
 TEST(featureBuffer, addFeature) {
-  FeatureBuffer buffer(2);
+  loc_features::FeatureBuffer buffer(2);
 
   buffer.addFeature(0,
                     std::make_unique<DummyFeature>(std::vector{1.0, 2.0, 3.0}));
@@ -60,7 +63,7 @@ TEST(featureBuffer, addFeature) {
 }
 
 TEST(featureBuffer, inBuffer) {
-  FeatureBuffer buffer(4);
+  loc_features::FeatureBuffer buffer(4);
   EXPECT_FALSE(buffer.inBuffer(4));
 
   buffer.addFeature(1,
@@ -70,11 +73,12 @@ TEST(featureBuffer, inBuffer) {
 }
 
 TEST(featureBuffer, getFeature) {
-  FeatureBuffer buffer(4);
+  loc_features::FeatureBuffer buffer(4);
   buffer.addFeature(1,
                     std::make_unique<DummyFeature>(std::vector{4.0, 5.0, 6.0}));
-  const auto &feature =buffer.getFeature(1);
+  const auto &feature = buffer.getFeature(1);
   EXPECT_DOUBLE_EQ(feature.dimensions[0], 4);
   EXPECT_DOUBLE_EQ(feature.dimensions[1], 5);
   EXPECT_DOUBLE_EQ(feature.dimensions[2], 6);
 }
+} // namespace test

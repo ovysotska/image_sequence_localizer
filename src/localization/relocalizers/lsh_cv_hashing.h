@@ -27,13 +27,16 @@
 #include "database/online_database.h"
 #include "features/ifeature.h"
 #include "relocalizers/irelocalizer.h"
+
+#include "opencv2/features2d/features2d.hpp"
+
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
-#include "opencv2/features2d/features2d.hpp"
+namespace localization::relocalizers {
 
 /**
  * @brief      Performs locality sensitive hashing for angle-based similarity
@@ -44,23 +47,23 @@ public:
   /* tableNum - number of hash tables
      keySize - number of bits in the hash key
      multiProbeLevel - number of bits to shift to het neighbouring buckets */
-  LshCvHashing(OnlineDatabase *database, int tableNum = 25, int keySize = 25,
-               int multiProbeLevel = 2);
+  LshCvHashing(database::OnlineDatabase *database, int tableNum = 25,
+               int keySize = 25, int multiProbeLevel = 2);
 
   std::vector<int> getCandidates(int quId) override;
 
-  void train(const std::vector<std::unique_ptr<iFeature>> &features);
+  void train(const std::vector<std::unique_ptr<features::iFeature>> &features);
   /**
    * @brief      Not working for now, for unknown reason
    */
   void saveHashes();
 
-  std::vector<int> hashFeature(const iFeature &fPtr);
+  std::vector<int> hashFeature(const features::iFeature &fPtr);
 
 private:
   cv::Ptr<cv::FlannBasedMatcher> matcherPtr_;
   cv::Ptr<cv::flann::IndexParams> indexParam_;
-  OnlineDatabase *database_ = nullptr;
+  database::OnlineDatabase *database_ = nullptr;
 };
 
 // table_number the number of hash tables to use (between 10 and 30 usually).
@@ -68,4 +71,5 @@ private:
 // multi_probe_level the number of bits to shift to check for neighboring
 // buckets (0 is regular LSH, 2 is recommended).
 
+} // namespace localization::relocalizers
 #endif // SRC_RELOCALIZERS_LSH_CV_HASHING_H_

@@ -29,6 +29,8 @@
 
 #include <glog/logging.h>
 
+namespace localization::features {
+
 FeatureBuffer::FeatureBuffer(int size) {
   LOG_IF(FATAL, size < 0) << "Invalid featureBuffer size.";
   bufferSize = size;
@@ -37,7 +39,7 @@ FeatureBuffer::FeatureBuffer(int size) {
 
 bool FeatureBuffer::inBuffer(int id) const { return featureMap.count(id) > 0; }
 
-const iFeature& FeatureBuffer::getFeature(int id) const {
+const iFeature &FeatureBuffer::getFeature(int id) const {
   return *featureMap.at(id);
 }
 
@@ -47,12 +49,15 @@ void FeatureBuffer::deleteFeature() {
   ids.erase(ids.begin());
 }
 
-void FeatureBuffer::addFeature(int id,  std::unique_ptr<iFeature>&& feature) {
+void FeatureBuffer::addFeature(int id, std::unique_ptr<iFeature> &&feature) {
 
   if (static_cast<int>(ids.size()) == bufferSize) {
     deleteFeature();
   }
   ids.push_back(id);
-  LOG_IF(WARNING, featureMap.count(id) > 0) << "Feature with id " << id << " exists. Overwriting..";
+  LOG_IF(WARNING, featureMap.count(id) > 0)
+      << "Feature with id " << id << " exists. Overwriting..";
   featureMap.emplace(id, std::move(feature));
 }
+
+} // namespace localization::features

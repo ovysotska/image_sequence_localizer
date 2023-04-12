@@ -6,6 +6,8 @@
 #include <memory>
 #include <vector>
 
+namespace localization::relocalizers {
+
 /**
  * Gives the candidates based on Fanout.
  */
@@ -18,5 +20,7 @@ private:
   int fanOut_ = 3;
   int refSize_ = -1;
 };
+
+} // namespace localization::relocalizers
 
 #endif // SRC_RELOCALIZERS_IRELOCALIZER_H_

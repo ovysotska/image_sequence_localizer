@@ -39,7 +39,7 @@
 #include <string>
 #include <vector>
 
-namespace online_localizer {
+namespace localization::online_localizer {
 
 using std::string;
 using std::vector;
@@ -69,8 +69,9 @@ void storeMatchesAsProto(const Matches &matches,
   LOG(INFO) << "The path was written to " << protoFilename;
 }
 
-OnlineLocalizer::OnlineLocalizer(SuccessorManager *successorManager,
-                                 double expansionRate, double nonMatchingCost) {
+OnlineLocalizer::OnlineLocalizer(
+    successor_manager::SuccessorManager *successorManager, double expansionRate,
+    double nonMatchingCost) {
 
   CHECK(successorManager) << "Successor manager is not set.";
   CHECK(expansionRate > 0 && expansionRate <= 1)
@@ -408,4 +409,4 @@ void OnlineLocalizer::visualize() const {
   _vis->drawPath(path);
 }
 
-} // namespace online_localizer
+} // namespace localization::online_localizer

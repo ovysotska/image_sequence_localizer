@@ -35,6 +35,8 @@
 
 #include <glog/logging.h>
 
+namespace localization::features {
+
 CnnFeature::CnnFeature(const std::string &filename) {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
   image_sequence_localizer::Feature feature_proto;
@@ -90,3 +92,4 @@ double CnnFeature::score2cost(double score) const {
   }
   return 1. / score;
 }
+} // namespace localization::features

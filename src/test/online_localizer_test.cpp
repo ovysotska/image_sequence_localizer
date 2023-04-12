@@ -14,9 +14,11 @@
 #include <memory>
 #include <string>
 
-namespace {
+namespace test {
 
-class FakeRelocalizer : public iRelocalizer {
+namespace loc = localization;
+
+class FakeRelocalizer : public loc::relocalizers::iRelocalizer {
 public:
   std::vector<int> getCandidates(int quId) override { return {0}; }
 };
@@ -24,33 +26,36 @@ public:
 class OnlineLocalizerTest : public ::testing::Test {
 public:
   void SetUp() {
-    tmp_dir = localization::test::createDataForOnlineDatabase();
+    tmp_dir = test::createDataForOnlineDatabase();
     std::filesystem::path featureDir = tmp_dir;
     image_sequence_localizer::CostMatrix cost_matrix =
-        localization::test::computeCostMatrix(featureDir, featureDir);
+        test::computeCostMatrix(featureDir, featureDir);
     std::string costMatrixFile = tmp_dir / "test.CostMatrix.pb";
     std::fstream out(costMatrixFile,
                      std::ios::out | std::ios::trunc | std::ios::binary);
     cost_matrix.SerializeToOstream(&out);
     out.close();
 
-    database = std::make_unique<OnlineDatabase>(
-        featureDir, featureDir, FeatureType::Cnn_Feature, 10, costMatrixFile);
+    database = std::make_unique<loc::database::OnlineDatabase>(
+        featureDir, featureDir, loc::features::FeatureType::Cnn_Feature, 10,
+        costMatrixFile);
     relocalizer = std::make_unique<FakeRelocalizer>();
-    successorManager = std::make_unique<SuccessorManager>(database.get(),
-                                                          relocalizer.get(), 2);
-    localizer = std::make_unique<online_localizer::OnlineLocalizer>(
+    successorManager =
+        std::make_unique<loc::successor_manager::SuccessorManager>(
+            database.get(), relocalizer.get(), 2);
+    localizer = std::make_unique<loc::online_localizer::OnlineLocalizer>(
         successorManager.get(), 1.0, 100.0);
   }
-  std::unique_ptr<online_localizer::OnlineLocalizer> localizer = nullptr;
-  std::unique_ptr<SuccessorManager> successorManager = nullptr;
-  std::unique_ptr<iRelocalizer> relocalizer = nullptr;
-  std::unique_ptr<OnlineDatabase> database = nullptr;
+  std::unique_ptr<loc::online_localizer::OnlineLocalizer> localizer = nullptr;
+  std::unique_ptr<loc::successor_manager::SuccessorManager> successorManager =
+      nullptr;
+  std::unique_ptr<loc::relocalizers::iRelocalizer> relocalizer = nullptr;
+  std::unique_ptr<loc::database::OnlineDatabase> database = nullptr;
   std::filesystem::path tmp_dir = "";
 };
 
 TEST_F(OnlineLocalizerTest, Get) {
-  online_localizer::Matches matches = localizer->findMatchesTill(4);
+  loc::online_localizer::Matches matches = localizer->findMatchesTill(4);
 
   // Expecting diagonal elements as path in reverse.
   for (int i = 0; i < matches.size(); ++i) {
@@ -60,4 +65,4 @@ TEST_F(OnlineLocalizerTest, Get) {
   }
 }
 
-} // namespace
+} // namespace test

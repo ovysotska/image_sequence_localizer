@@ -35,13 +35,15 @@
 #include "relocalizers/irelocalizer.h"
 #include "successor_manager/node.h"
 
+namespace localization::successor_manager {
 /**
  * @brief      Class that communicates between database and localizer.
  *             Knows how to maintain successor.
  */
 class SuccessorManager {
 public:
-  SuccessorManager(iDatabase *database, iRelocalizer *relocalizer, int fanOut);
+  SuccessorManager(database::iDatabase *database,
+                   relocalizers::iRelocalizer *relocalizer, int fanOut);
   ~SuccessorManager() {}
 
   /**
@@ -61,7 +63,7 @@ public:
   void getSuccessorsSimPlaces(int quId, int refId);
 
 protected:
-  iDatabase *database_ = nullptr;
+  database::iDatabase *database_ = nullptr;
   int fanOut_ = 0;
 
 private:
@@ -71,7 +73,8 @@ private:
    * for refId gives the vector of refIds, that represent similar places
    */
   std::unordered_map<int, std::set<int>> _sameRefPlaces;
-  iRelocalizer *relocalizer_ = nullptr;
+  relocalizers::iRelocalizer *relocalizer_ = nullptr;
 };
+} // namespace localization::successor_manager
 
 #endif // SRC_SUCCESSOR_MANAGER_SUCCESSOR_MANAGER_H_

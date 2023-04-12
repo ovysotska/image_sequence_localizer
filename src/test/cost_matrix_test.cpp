@@ -7,6 +7,8 @@
 #include "gtest/gtest.h"
 #include <filesystem>
 
+namespace test {
+
 class CostMatrixTest : public ::testing::Test {
 public:
   void SetUp() {
@@ -46,18 +48,20 @@ public:
 };
 
 TEST_F(CostMatrixTest, ConstructFromProto) {
-  auto costMatrix = CostMatrix(costMatrixFile);
+  auto costMatrix = localization::database::CostMatrix(costMatrixFile);
   EXPECT_EQ(costMatrix.rows(), this->costMatrixValues.size());
   EXPECT_EQ(costMatrix.cols(), this->costMatrixValues[0].size());
 }
 
 TEST_F(CostMatrixTest, FailedToConstruct) {
-  ASSERT_DEATH(CostMatrix(""), "Cost matrix file is not set");
+  ASSERT_DEATH(localization::database::CostMatrix(""),
+               "Cost matrix file is not set");
 }
 
 TEST_F(CostMatrixTest, at) {
-  auto costMatrix = CostMatrix(costMatrixFile);
-  Matrix expectedMatrix = this->costMatrixValues;
+  auto costMatrix = localization::database::CostMatrix(costMatrixFile);
+  localization::database::CostMatrix::Matrix expectedMatrix =
+      this->costMatrixValues;
   EXPECT_EQ(costMatrix.rows(), expectedMatrix.size());
   EXPECT_EQ(costMatrix.cols(), expectedMatrix[0].size());
 
@@ -73,8 +77,9 @@ TEST_F(CostMatrixTest, at) {
 }
 
 TEST_F(CostMatrixTest, getInverseCost) {
-  auto costMatrix = CostMatrix(costMatrixFile);
+  auto costMatrix = localization::database::CostMatrix(costMatrixFile);
   EXPECT_DOUBLE_EQ(costMatrix.getInverseCost(0, 0), 1);
   EXPECT_NEAR(costMatrix.getInverseCost(1, 0), 1 / this->costMatrixValues[1][0],
               1e-06);
 }
+} // namespace test

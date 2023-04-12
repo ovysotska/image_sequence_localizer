@@ -1,13 +1,15 @@
 /* By O. Vysotska in 2023 */
 
 #include "cost_matrix.h"
-#include <fstream>
-
 #include "database/list_dir.h"
 #include "features/feature_factory.h"
 #include "localization_protos.pb.h"
 
 #include <glog/logging.h>
+
+#include <fstream>
+
+namespace localization::database {
 
 CostMatrix::CostMatrix(const std::string &costMatrixFile) {
   CHECK(!costMatrixFile.empty()) << "Cost matrix file is not set";
@@ -16,7 +18,7 @@ CostMatrix::CostMatrix(const std::string &costMatrixFile) {
 
 CostMatrix::CostMatrix(const std::string &queryFeaturesDir,
                        const std::string &refFeaturesDir,
-                       const FeatureType &type) {
+                       const features::FeatureType &type) {
 
   std::vector<std::string> queryFeatureFiles =
       listProtoDir(queryFeaturesDir, ".Feature");
@@ -96,3 +98,4 @@ void CostMatrix::loadFromProto(const std::string &filename) {
   LOG(INFO) << "Read cost matrix with " << rows_ << " rows and " << cols_
             << " cols.";
 }
+} // namespace localization::database

@@ -6,7 +6,10 @@
 #include "relocalizers/default_relocalizer.h"
 #include "successor_manager/successor_manager.h"
 #include "tools/config_parser/config_parser.h"
+
 #include <glog/logging.h>
+
+namespace loc = localization;
 
 int main(int argc, char *argv[]) {
   google::InitGoogleLogging(argv[0]);
@@ -26,18 +29,22 @@ int main(int argc, char *argv[]) {
   parser.parseYaml(config_file);
   parser.print();
 
-  const auto database = std::make_unique<CostMatrixDatabase>(parser.costMatrix);
+  const auto database =
+      std::make_unique<loc::database::CostMatrixDatabase>(parser.costMatrix);
 
   const auto relocalizer =
-      std::make_unique<DefaultRelocalizer>(parser.fanOut, database->refSize());
+      std::make_unique<loc::relocalizers::DefaultRelocalizer>(
+          parser.fanOut, database->refSize());
 
-  const auto successorManager = std::make_unique<SuccessorManager>(
-      database.get(), relocalizer.get(), parser.fanOut);
-  online_localizer::OnlineLocalizer localizer{
+  const auto successorManager =
+      std::make_unique<loc::successor_manager::SuccessorManager>(
+          database.get(), relocalizer.get(), parser.fanOut);
+  loc::online_localizer::OnlineLocalizer localizer{
       successorManager.get(), parser.expansionRate, parser.nonMatchCost};
-  const online_localizer::Matches imageMatches =
+  const loc::online_localizer::Matches imageMatches =
       localizer.findMatchesTill(parser.querySize);
-  online_localizer::storeMatchesAsProto(imageMatches, parser.matchingResult);
+  loc::online_localizer::storeMatchesAsProto(imageMatches,
+                                             parser.matchingResult);
 
   LOG(INFO) << "Done.";
   return 0;

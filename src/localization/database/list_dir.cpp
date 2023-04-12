@@ -30,6 +30,8 @@
 
 #include <glog/logging.h>
 
+namespace localization::database {
+
 namespace fs = std::filesystem;
 
 std::vector<std::string> listDir(const std::string &dir_name) {
@@ -80,3 +82,4 @@ std::vector<std::string> listProtoDir(const std::string &pathToDir,
   std::sort(proto_files.begin(), proto_files.end());
   return proto_files;
 }
+} // namespace localization::database

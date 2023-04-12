@@ -26,6 +26,8 @@
 #include <memory>
 #include <vector>
 
+namespace localization::relocalizers {
+
 /**
  * @brief      Interface class for relocalizers
  */
@@ -43,5 +45,6 @@ public:
    */
   virtual std::vector<int> getCandidates(int quId) = 0;
 };
+} // namespace localization::relocalizers
 
 #endif // SRC_RELOCALIZERS_IRELOCALIZER_H_

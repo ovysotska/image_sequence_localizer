@@ -8,25 +8,17 @@
 #include <string>
 #include <vector>
 
-using Matrix = std::vector<std::vector<double>>;
-
-/**
- * @brief  Stores costs as matrix.
- */
+namespace localization::database {
 class CostMatrix {
 public:
+  using Matrix = std::vector<std::vector<double>>;
+
   CostMatrix(const std::string &costMatrixFile);
   CostMatrix(const std::string &queryFeaturesDir,
-             const std::string &refFeaturesDir, const FeatureType &type);
+             const std::string &refFeaturesDir,
+             const features::FeatureType &type);
   CostMatrix(const Matrix &costs);
 
-  /**
-   * @brief      Loads from txt. Expects specific format: Pure matrix values.
-   *
-   * @param[in]  filename  The filename
-   * @param[in]  rows      The rows
-   * @param[in]  cols      The cols
-   */
   void loadFromTxt(const std::string &filename, int rows, int cols);
 
   void loadFromProto(const std::string &filename);
@@ -43,5 +35,6 @@ private:
   int rows_ = 0;
   int cols_ = 0;
 };
+} // namespace localization::database
 
 #endif // SRC_DATABASE_COST_MATRIX_H_

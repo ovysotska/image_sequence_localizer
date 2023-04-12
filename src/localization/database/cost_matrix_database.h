@@ -32,9 +32,8 @@
 #include <memory>
 #include <string>
 
-/**
- * @brief      Class for cost matrix database. Stores costs as matrix.
- */
+namespace localization::database {
+
 class CostMatrixDatabase : public iDatabase {
 public:
   CostMatrixDatabase(const std::string &costMatrixFile);
@@ -45,5 +44,7 @@ public:
 private:
   std::unique_ptr<CostMatrix> costMatrix_ = nullptr;
 };
+
+} // namespace localization::database
 
 #endif // SRC_DATABASE_COST_MATRIX_DATABASE_H_

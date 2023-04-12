@@ -35,10 +35,13 @@
 #include <memory>
 #include <string>
 
+namespace localization::database {
+
 namespace {
-const iFeature &addFeatureIfNeeded(FeatureBuffer &featureBuffer,
-                                   const std::vector<std::string> &featureNames,
-                                   FeatureType type, int featureId) {
+const features::iFeature &
+addFeatureIfNeeded(features::FeatureBuffer &featureBuffer,
+                   const std::vector<std::string> &featureNames,
+                   features::FeatureType type, int featureId) {
   if (featureBuffer.inBuffer(featureId)) {
     return featureBuffer.getFeature(featureId);
   }
@@ -50,13 +53,13 @@ const iFeature &addFeatureIfNeeded(FeatureBuffer &featureBuffer,
 
 OnlineDatabase::OnlineDatabase(const std::string &queryFeaturesDir,
                                const std::string &refFeaturesDir,
-                               FeatureType type, int bufferSize,
+                               features::FeatureType type, int bufferSize,
                                const std::string &costMatrixFile)
     : quFeaturesNames_{listProtoDir(queryFeaturesDir, ".Feature")},
       refFeaturesNames_{listProtoDir(refFeaturesDir, ".Feature")},
-      featureType_{type}, refBuffer_{std::make_unique<FeatureBuffer>(
+      featureType_{type}, refBuffer_{std::make_unique<features::FeatureBuffer>(
                               bufferSize)},
-      queryBuffer_{std::make_unique<FeatureBuffer>(bufferSize)} {
+      queryBuffer_{std::make_unique<features::FeatureBuffer>(bufferSize)} {
   LOG_IF(FATAL, quFeaturesNames_.empty()) << "Query features are not set.";
   LOG_IF(FATAL, refFeaturesNames_.empty()) << "Reference features are not set.";
   if (!costMatrixFile.empty()) {
@@ -95,7 +98,8 @@ double OnlineDatabase::getCost(int quId, int refId) {
   return cost;
 }
 
-const iFeature &OnlineDatabase::getQueryFeature(int quId) {
+const features::iFeature &OnlineDatabase::getQueryFeature(int quId) {
   return addFeatureIfNeeded(*queryBuffer_, quFeaturesNames_, featureType_,
                             quId);
 }
+} // namespace localization::database

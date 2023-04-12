@@ -27,6 +27,8 @@
 #include <string>
 #include <vector>
 
+namespace localization::features {
+
 /**
  * @brief      Class for cnn feature. By default binarizable with Mid
  * binarization
@@ -55,4 +57,5 @@ protected:
   void binarize();
 };
 
+} // namespace localization::features
 #endif // SRC_FEATURES_CNNFEATURE_H_
