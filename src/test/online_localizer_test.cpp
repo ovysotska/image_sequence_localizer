@@ -26,10 +26,10 @@ public:
 class OnlineLocalizerTest : public ::testing::Test {
 public:
   void SetUp() {
-    tmp_dir = test::createDataForOnlineDatabase();
+    tmp_dir = test::createFeatures();
     std::filesystem::path featureDir = tmp_dir;
     image_sequence_localizer::CostMatrix cost_matrix =
-        test::computeCostMatrix(featureDir, featureDir);
+        test::computeCostMatrixProto(featureDir, featureDir);
     std::string costMatrixFile = tmp_dir / "test.CostMatrix.pb";
     std::fstream out(costMatrixFile,
                      std::ios::out | std::ios::trunc | std::ios::binary);
@@ -46,6 +46,12 @@ public:
     localizer = std::make_unique<loc::online_localizer::OnlineLocalizer>(
         successorManager.get(), 1.0, 100.0);
   }
+
+  void TearDown() {
+    test::clearDataUnderPath(tmp_dir);
+    tmp_dir = "";
+  }
+
   std::unique_ptr<loc::online_localizer::OnlineLocalizer> localizer = nullptr;
   std::unique_ptr<loc::successor_manager::SuccessorManager> successorManager =
       nullptr;

@@ -61,9 +61,9 @@ protected:
     out.close();
     return cost_matrix_name;
   }
-  void SetUp() { tmp_dir = test::createDataForOnlineDatabase(); }
+  void SetUp() { tmp_dir = test::createFeatures(); }
   void TearDown() {
-    test::clearDataForOnlineDatabase(tmp_dir);
+    test::clearDataUnderPath(tmp_dir);
     tmp_dir = "";
   }
   std::filesystem::path tmp_dir = "";

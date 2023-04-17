@@ -10,9 +10,9 @@ namespace fs = std::filesystem;
 
 class SuccessorManagerTest : public ::testing::Test {
 protected:
-  void SetUp() { tmp_dir = test::createDataForOnlineDatabase(); }
+  void SetUp() { tmp_dir = test::createFeatures(); }
   void TearDown() {
-    test::clearDataForOnlineDatabase(tmp_dir);
+    test::clearDataUnderPath(tmp_dir);
     tmp_dir = "";
   }
   fs::path tmp_dir = "";

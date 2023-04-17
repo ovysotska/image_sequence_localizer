@@ -23,13 +23,16 @@ CostMatrix::CostMatrix(const std::string &costMatrixFile) {
 CostMatrix::CostMatrix(const std::string &queryFeaturesDir,
                        const std::string &refFeaturesDir,
                        const features::FeatureType &type) {
-  const std::vector<std::string> queryFeatureFiles =
+  const std::vector<std::string> queryFeaturesFiles =
       listProtoDir(queryFeaturesDir, ".Feature");
   const std::vector<std::string> refFeaturesFiles =
       listProtoDir(refFeaturesDir, ".Feature");
 
-  costs_.reserve(queryFeatureFiles.size());
-  for (const auto &queryFile : queryFeatureFiles) {
+  std::cerr << "Query features" << queryFeaturesFiles.size() << std::endl;
+  std::cerr << "ref features" << refFeaturesFiles.size() << std::endl;
+
+  costs_.reserve(queryFeaturesFiles.size());
+  for (const auto &queryFile : queryFeaturesFiles) {
     auto queryFeature = createFeature(type, queryFile);
     std::vector<double> row;
     row.reserve(refFeaturesFiles.size());
@@ -39,7 +42,12 @@ CostMatrix::CostMatrix(const std::string &queryFeaturesDir,
     }
     costs_.push_back(row);
   }
+  rows_ = costs_.size();
+  if (costs_.size() > 0) {
+    cols_ = costs_[0].size();
+  }
 }
+
 CostMatrix::CostMatrix(const Matrix &costs) {
   costs_ = costs;
   rows_ = costs.size();

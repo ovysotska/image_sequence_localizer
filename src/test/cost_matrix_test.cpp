@@ -82,4 +82,17 @@ TEST_F(CostMatrixTest, getInverseCost) {
   EXPECT_NEAR(costMatrix.getInverseCost(1, 0), 1 / this->costMatrixValues[1][0],
               1e-06);
 }
+
+TEST(CostMatrixComputation, createCostMatrixFromFeatures) {
+  const fs::path tmp_dir = test::createFeatures();
+
+  auto costMatrix = localization::database::CostMatrix(
+      tmp_dir, tmp_dir, localization::features::Cnn_Feature);
+
+  for (int r = 0; r < costMatrix.rows(); ++r) {
+    for (int c = 0; c < costMatrix.cols(); ++c) {
+      EXPECT_NEAR(costMatrix.at(r, c), kCostMatrix[r][c], kTestEpsilon);
+    }
+  }
+}
 } // namespace test
