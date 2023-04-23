@@ -1,10 +1,9 @@
 #ifndef TEST_TEST_UTILS_H_
 #define TEST_TEST_UTILS_H_
 
-#include "database/cost_matrix_database.h"
 #include "database/list_dir.h"
-#include "database/online_database.h"
 #include "features/cnn_feature.h"
+#include "features/feature_factory.h"
 #include "localization_protos.pb.h"
 
 #include "gtest/gtest.h"
@@ -15,8 +14,9 @@
 #include <string>
 #include <vector>
 
-namespace localization {
 namespace test {
+
+constexpr auto kTestEpsilon = 1e-06;
 
 namespace fs = std::filesystem;
 
@@ -43,7 +43,7 @@ createFeatureFile(const std::filesystem::path &dir, const std::string &name,
   output.close();
 }
 
-inline std::filesystem::path createDataForOnlineDatabase() {
+inline std::filesystem::path createFeatures() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
   std::filesystem::path tmp_dir =
       std::filesystem::temp_directory_path() / "features";
@@ -58,23 +58,30 @@ inline std::filesystem::path createDataForOnlineDatabase() {
                     createFeatureProto({0, 1, 2.5, 3}));
   return tmp_dir;
 }
-inline void clearDataForOnlineDatabase(const std::filesystem::path &path) {
+inline void clearDataUnderPath(const std::filesystem::path &path) {
   std::filesystem::remove_all(path);
 }
 
+const std::vector<std::vector<double>> kCostMatrix = {
+    {1, 0.922225, 0.285714, 0.99449},
+    {0.922225, 1, 0.634029, 0.922876},
+    {0.285714, 0.634029, 1, 0.298347},
+    {0.99449, 0.922876, 0.298347, 1}};
+
 inline image_sequence_localizer::CostMatrix
-computeCostMatrix(const fs::path &queryDir, const fs::path &refDir) {
+computeCostMatrixProto(const fs::path &queryDir, const fs::path &refDir) {
 
   const std::vector<std::string> queryFiles =
-      listProtoDir(queryDir, ".Feature");
-  const std::vector<std::string> refFiles = listProtoDir(refDir, ".Feature");
+      localization::database::listProtoDir(queryDir, ".Feature");
+  const std::vector<std::string> refFiles =
+      localization::database::listProtoDir(refDir, ".Feature");
   image_sequence_localizer::CostMatrix cost_matrix;
 
   for (const auto &query : queryFiles) {
-    const auto queryFeature = CnnFeature(query);
+    const auto queryFeature = localization::features::CnnFeature(query);
     for (const auto &ref : refFiles) {
-      cost_matrix.add_values(
-          queryFeature.computeSimilarityScore(CnnFeature(ref)));
+      cost_matrix.add_values(queryFeature.computeSimilarityScore(
+          localization::features::CnnFeature(ref)));
     }
   }
 
@@ -84,6 +91,5 @@ computeCostMatrix(const fs::path &queryDir, const fs::path &refDir) {
 }
 
 } // namespace test
-} // namespace localization
 
 #endif // TEST_TEST_UTILS_H_

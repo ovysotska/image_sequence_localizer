@@ -37,7 +37,7 @@
 #include "successor_manager/node.h"
 #include "successor_manager/successor_manager.h"
 
-namespace online_localizer {
+namespace localization::online_localizer {
 
 using Matches = std::vector<PathElement>;
 void storeMatchesAsProto(const Matches &matches,
@@ -49,8 +49,8 @@ public:
   using PredMap = std::unordered_map<int, std::unordered_map<int, Node>>;
   using AccCostsMap = std::unordered_map<int, std::unordered_map<int, double>>;
 
-  OnlineLocalizer(SuccessorManager *successorManager, double expansionRate,
-                  double nonMatchingCost);
+  OnlineLocalizer(successor_manager::SuccessorManager *successorManager,
+                  double expansionRate, double nonMatchingCost);
   ~OnlineLocalizer() {}
 
   Matches findMatchesTill(int queryId);
@@ -86,11 +86,11 @@ private:
   AccCostsMap accCosts_;
   Node currentBestHyp_;
 
-  SuccessorManager *successorManager_ = nullptr;
+  successor_manager::SuccessorManager *successorManager_ = nullptr;
   iLocVisualizer::Ptr _vis = nullptr;
 
   NodeSet expandedRecently_;
 };
-} // namespace online_localizer
+} // namespace localization::online_localizer
 
 #endif // SRC_ONLINE_LOCALIZER_ONLINE_LOCALIZER_H_

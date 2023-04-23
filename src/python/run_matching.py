@@ -116,9 +116,7 @@ def computeCostMatrix(config):
 
 
 def runMatching(config_yaml_file):
-    binary = (
-        "../../build/src/apps/cost_matrix_based_matching/cost_matrix_based_matching_lsh"
-    )
+    binary = "../../build/src/apps/cost_matrix_based_matching/online_localizer_lsh"
     command = binary + " " + str(config_yaml_file)
     print("Calling:", command)
     os.system(command)

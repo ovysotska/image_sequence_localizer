@@ -21,11 +21,6 @@
 ** SOFTWARE.
 **/
 
-#include <iostream>
-#include <memory>
-#include <string>
-
-#include "database/cost_matrix_database.h"
 #include "database/idatabase.h"
 #include "database/list_dir.h"
 #include "database/online_database.h"
@@ -39,14 +34,22 @@
 
 #include <glog/logging.h>
 
-std::vector<std::unique_ptr<iFeature>>
+#include <iostream>
+#include <memory>
+#include <string>
+
+namespace loc = localization;
+
+std::vector<std::unique_ptr<loc::features::iFeature>>
 loadFeatures(const std::string &path2folder) {
   LOG(INFO) << "Loading the features to hash with LSH.";
-  std::vector<std::string> featureNames = listProtoDir(path2folder, ".Feature");
-  std::vector<std::unique_ptr<iFeature>> features;
+  std::vector<std::string> featureNames =
+      loc::database::listProtoDir(path2folder, ".Feature");
+  std::vector<std::unique_ptr<loc::features::iFeature>> features;
 
   for (size_t i = 0; i < featureNames.size(); ++i) {
-    features.emplace_back(std::make_unique<CnnFeature>(featureNames[i]));
+    features.emplace_back(
+        std::make_unique<loc::features::CnnFeature>(featureNames[i]));
     fprintf(stderr, ".");
   }
   fprintf(stderr, "\n");
@@ -70,29 +73,29 @@ int main(int argc, char *argv[]) {
   parser.parseYaml(config_file);
   parser.print();
 
-  std::unique_ptr<OnlineDatabase> database =
-      std::make_unique<CostMatrixDatabase>(
-          /*costMatrixFile=*/parser.costMatrix,
-          /*queryFeaturesDir=*/parser.path2qu,
-          /*refFeaturesDir=*/parser.path2ref, /*type=*/FeatureType::Cnn_Feature,
-          /*bufferSize=*/parser.bufferSize);
+  const auto database = std::make_unique<loc::database::OnlineDatabase>(
+      /*queryFeaturesDir=*/parser.path2qu,
+      /*refFeaturesDir=*/parser.path2ref,
+      /*type=*/loc::features::FeatureType::Cnn_Feature,
+      /*bufferSize=*/parser.bufferSize,
+      /*costMatrixFile=*/parser.costMatrix);
 
-  // initialize Relocalizer.
-  auto relocalizer = std::make_unique<LshCvHashing>(
+  auto relocalizer = std::make_unique<loc::relocalizers::LshCvHashing>(
       /*onlineDatabase=*/database.get(),
       /*tableNum=*/1,
       /*keySize=*/12,
       /*multiProbeLevel=*/2);
   relocalizer->train(loadFeatures(parser.path2ref));
 
-  std::unique_ptr<SuccessorManager> successorManager =
-      std::make_unique<SuccessorManager>(database.get(), relocalizer.get(),
-                                         parser.fanOut);
-  online_localizer::OnlineLocalizer localizer{
+  auto successorManager =
+      std::make_unique<loc::successor_manager::SuccessorManager>(
+          database.get(), relocalizer.get(), parser.fanOut);
+  loc::online_localizer::OnlineLocalizer localizer{
       successorManager.get(), parser.expansionRate, parser.nonMatchCost};
-  const online_localizer::Matches imageMatches =
+  const loc::online_localizer::Matches imageMatches =
       localizer.findMatchesTill(parser.querySize);
-  online_localizer::storeMatchesAsProto(imageMatches, parser.matchingResult);
+  loc::online_localizer::storeMatchesAsProto(imageMatches,
+                                             parser.matchingResult);
 
   printf("Done.\n");
   return 0;

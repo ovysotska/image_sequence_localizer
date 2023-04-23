@@ -35,8 +35,12 @@
 #include <iostream>
 #include <string>
 
-namespace localization {
+namespace test {
+
 namespace fs = std::filesystem;
+namespace loc_database = localization::database;
+
+using FeatureType = localization::features::FeatureType;
 
 class OnlineDatabaseTest : public ::testing::Test {
 protected:
@@ -57,9 +61,9 @@ protected:
     out.close();
     return cost_matrix_name;
   }
-  void SetUp() { tmp_dir = test::createDataForOnlineDatabase(); }
+  void SetUp() { tmp_dir = test::createFeatures(); }
   void TearDown() {
-    test::clearDataForOnlineDatabase(tmp_dir);
+    test::clearDataUnderPath(tmp_dir);
     tmp_dir = "";
   }
   std::filesystem::path tmp_dir = "";
@@ -68,84 +72,66 @@ protected:
 TEST(OnlineDatabase, NoFeatureFiles) {
   fs::path empty_tmp_dir = fs::temp_directory_path();
   fs::create_directories(empty_tmp_dir);
-  ASSERT_DEATH(OnlineDatabase(empty_tmp_dir, empty_tmp_dir,
-                              FeatureType::Cnn_Feature, 10),
+  ASSERT_DEATH(loc_database::OnlineDatabase(empty_tmp_dir, empty_tmp_dir,
+                                            FeatureType::Cnn_Feature, 10),
                "Query features are not set.");
 }
 
 TEST_F(OnlineDatabaseTest, refSize) {
-  OnlineDatabase database(/*queryFeaturesDir=*/tmp_dir,
-                          /*refFeaturesDir=*/tmp_dir,
-                          /*type=*/FeatureType::Cnn_Feature,
-                          /*bufferSize=*/10);
+  loc_database::OnlineDatabase database(
+      /*queryFeaturesDir=*/tmp_dir,
+      /*refFeaturesDir=*/tmp_dir, FeatureType::Cnn_Feature,
+      /*bufferSize=*/10);
   EXPECT_EQ(4, database.refSize());
 }
 
 TEST_F(OnlineDatabaseTest, InvalidConstructorParams) {
-  ASSERT_DEATH(OnlineDatabase(
+  ASSERT_DEATH(loc_database::OnlineDatabase(
                    /*queryFeaturesDir=*/"",
-                   /*refFeaturesDir=*/"",
-                   /*type=*/FeatureType::Cnn_Feature,
+                   /*refFeaturesDir=*/"", FeatureType::Cnn_Feature,
                    /*bufferSize=*/10),
                "Feature directory does not exist.");
 
-  ASSERT_DEATH(OnlineDatabase(tmp_dir, "", FeatureType::Cnn_Feature, 10),
-               "Feature directory does not exist.");
-  ASSERT_DEATH(OnlineDatabase(tmp_dir, tmp_dir, FeatureType::Cnn_Feature, -1),
+  ASSERT_DEATH(
+      loc_database::OnlineDatabase(tmp_dir, "", FeatureType::Cnn_Feature, 10),
+      "Feature directory does not exist.");
+  ASSERT_DEATH(loc_database::OnlineDatabase(tmp_dir, tmp_dir,
+                                            FeatureType::Cnn_Feature, -1),
                "Invalid featureBuffer size.");
 }
 
 TEST_F(OnlineDatabaseTest, NoCostMatrixFile) {
 
-  ASSERT_DEATH(CostMatrixDatabase(tmp_dir, tmp_dir, tmp_dir,
-                                  FeatureType::Cnn_Feature, 10),
+  ASSERT_DEATH(loc_database::OnlineDatabase(
+                   tmp_dir, tmp_dir, FeatureType::Cnn_Feature, 10, tmp_dir),
                "Failed to parse cost_matrix file: ");
 }
 
 TEST_F(OnlineDatabaseTest, CostMatrixDatabaseConstructor) {
   std::string cost_matrix_name = createCostMatrixProto(tmp_dir);
-  CostMatrixDatabase database(cost_matrix_name,
-                              /*queryFeaturesDir=*/tmp_dir,
-                              /*refFeaturesDir=*/tmp_dir,
-                              /*type=*/FeatureType::Cnn_Feature,
-                              /*bufferSize=*/10);
+  loc_database::OnlineDatabase database(/*queryFeaturesDir=*/tmp_dir,
+                                        /*refFeaturesDir=*/tmp_dir,
+                                        /*type=*/FeatureType::Cnn_Feature,
+                                        /*bufferSize=*/10, cost_matrix_name);
   EXPECT_EQ(database.getCost(0, 0), 1);
   EXPECT_DOUBLE_EQ(database.getCost(0, 2), 1. / 3);
   EXPECT_DOUBLE_EQ(database.getCost(1, 0), 1. / 4);
   EXPECT_DOUBLE_EQ(database.getCost(1, 2), 1. / 6);
-}
-
-TEST_F(OnlineDatabaseTest, CostMatrixDatabaseRefSize) {
-  std::string cost_matrix_name = createCostMatrixProto(tmp_dir);
-  CostMatrixDatabase database(cost_matrix_name,
-                              /*queryFeaturesDir=*/tmp_dir,
-                              /*refFeaturesDir=*/tmp_dir,
-                              /*type=*/FeatureType::Cnn_Feature,
-                              /*bufferSize=*/10);
-  EXPECT_EQ(database.refSize(), 3);
-  database.overrideCosts(
-      {
-          {1, 2, 3, 8},
-          {4, 5, 6, 7},
-      },
-      2, 4);
-  EXPECT_EQ(database.refSize(), 4);
 }
 
 TEST_F(OnlineDatabaseTest, CostMatrixDatabaseGetCost) {
   std::string cost_matrix_name = createCostMatrixProto(tmp_dir);
-  CostMatrixDatabase database(cost_matrix_name,
-                              /*queryFeaturesDir=*/tmp_dir,
-                              /*refFeaturesDir=*/tmp_dir,
-                              /*type=*/FeatureType::Cnn_Feature,
-                              /*bufferSize=*/10);
+  loc_database::OnlineDatabase database(/*queryFeaturesDir=*/tmp_dir,
+                                        /*refFeaturesDir=*/tmp_dir,
+                                        /*type=*/FeatureType::Cnn_Feature,
+                                        /*bufferSize=*/10, cost_matrix_name);
   EXPECT_EQ(database.getCost(0, 0), 1);
   EXPECT_DOUBLE_EQ(database.getCost(0, 2), 1. / 3);
   EXPECT_DOUBLE_EQ(database.getCost(1, 0), 1. / 4);
   EXPECT_DOUBLE_EQ(database.getCost(1, 2), 1. / 6);
-  ASSERT_DEATH(database.getCost(-1, 0), "Invalid query index -1");
-  ASSERT_DEATH(database.getCost(0, -1), "Invalid reference index -1");
-  ASSERT_DEATH(database.getCost(3, 0), "Invalid query index 3");
-  ASSERT_DEATH(database.getCost(0, 4), "Invalid reference index 4");
+  ASSERT_DEATH(database.getCost(-1, 0), "Row outside range -1");
+  ASSERT_DEATH(database.getCost(0, -1), "Col outside range -1");
+  ASSERT_DEATH(database.getCost(3, 0), "Row outside range 3");
+  ASSERT_DEATH(database.getCost(0, 4), "Col outside range 4");
 }
-} // namespace localization
+} // namespace test

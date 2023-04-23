@@ -24,79 +24,20 @@
 /* Updated by O. Vysotska in 2022 */
 
 #include "database/cost_matrix_database.h"
+#include "database/cost_matrix.h"
 
 #include <fstream>
 #include <limits>
 
-#include "database/online_database.h"
-#include "localization_protos.pb.h"
-
 #include <glog/logging.h>
 
-CostMatrixDatabase::CostMatrixDatabase(const std::string &costMatrixFile,
-                                       const std::string &queryFeaturesDir,
-                                       const std::string &refFeaturesDir,
-                                       const FeatureType &type, int bufferSize)
-    : OnlineDatabase{queryFeaturesDir, refFeaturesDir, type, bufferSize} {
-  loadFromProto(costMatrixFile);
-}
+namespace localization::database {
 
-void CostMatrixDatabase::loadFromTxt(const std::string &filename, int rows,
-                                     int cols) {
-  std::ifstream in(filename);
-  LOG_IF(FATAL, !in) << "The file cannot be opened " << filename;
-
-  LOG(INFO) << "The matrix has " << rows << " rows and " << cols << "cols";
-  for (int r = 0; r < rows; ++r) {
-    std::vector<double> row(cols);
-    for (int c = 0; c < cols; ++c) {
-      float value;
-      in >> value;
-      row[c] = value;
-    }
-    costs_.push_back(row);
-  }
-  LOG(INFO) << "Matrix was read";
-  in.close();
-}
-
-void CostMatrixDatabase::overrideCosts(const Matrix &costs, int rows,
-                                       int cols) {
-  rows_ = rows;
-  cols_ = cols;
-  costs_ = costs;
-}
+CostMatrixDatabase::CostMatrixDatabase(const std::string &costMatrixFile)
+    : costMatrix_(CostMatrix(costMatrixFile)) {}
 
 double CostMatrixDatabase::getCost(int quId, int refId) {
-  LOG_IF(FATAL, quId >= rows_ || quId < 0) << " Invalid query index " << quId;
-  LOG_IF(FATAL, refId >= cols_ || refId < 0)
-      << " Invalid reference index " << refId;
-
-  double value = costs_[quId][refId];
-  if (value < 1e-09) {
-    return std::numeric_limits<double>::max();
-  }
-  return 1. / value;
+  return costMatrix_.getInverseCost(quId, refId);
 }
 
-void CostMatrixDatabase::loadFromProto(const std::string &filename) {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-  image_sequence_localizer::CostMatrix cost_matrix_proto;
-  std::fstream input(filename, std::ios::in | std::ios::binary);
-
-  if (!cost_matrix_proto.ParseFromIstream(&input)) {
-    LOG(FATAL) << "Failed to parse cost_matrix file: " << filename;
-  }
-  std::vector<double> row;
-  for (int idx = 0; idx < cost_matrix_proto.values_size(); ++idx) {
-    row.push_back(cost_matrix_proto.values(idx));
-    if (row.size() == cost_matrix_proto.cols()) {
-      costs_.push_back(row);
-      row.clear();
-    }
-  }
-  cols_ = cost_matrix_proto.cols();
-  rows_ = cost_matrix_proto.rows();
-  LOG(INFO) << "Read cost matrix with " << rows_ << " rows and " << cols_
-            << " cols.";
-}
+} // namespace localization::database

@@ -27,16 +27,18 @@
 #include <string>
 #include <vector>
 
+namespace localization::features {
+
 /**
  * @brief      Class for cnn feature. By default binarizable with Mid
  * binarization
  */
 class CnnFeature : public iFeature {
 public:
-
   CnnFeature(const std::string &filename);
 
-  // Computes the cosine distance between two vectors.
+  // Computes the cosine similarity between two vectors.
+  // The higher the score the more similar the features are.
   double computeSimilarityScore(const iFeature &rhs) const override;
   /**
    * @brief      weight/cost is an inverse of a score.
@@ -55,4 +57,5 @@ protected:
   void binarize();
 };
 
+} // namespace localization::features
 #endif // SRC_FEATURES_CNNFEATURE_H_

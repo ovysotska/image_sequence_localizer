@@ -24,6 +24,8 @@
 #ifndef SRC_DATABASE_IDATABASE_H_
 #define SRC_DATABASE_IDATABASE_H_
 
+namespace localization::database {
+
 /**
  * @brief      Interface class for a database.
  */
@@ -48,5 +50,7 @@ public:
   iDatabase &operator=(iDatabase &&) = delete;
   virtual ~iDatabase() {}
 };
+
+} // namespace localization::database
 
 #endif // SRC_DATABASE_IDATABASE_H_

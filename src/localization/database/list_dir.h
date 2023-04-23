@@ -27,9 +27,13 @@
 #include <string>
 #include <vector>
 
+namespace localization::database {
+
 std::vector<std::string> listDir(const std::string &dir_name);
 
 std::vector<std::string> listProtoDir(const std::string &pathToDir,
                                       const std::string &protoExtension);
+
+} // namespace localization::database
 
 #endif // SRC_DATABASE_LIST_DIR_H_

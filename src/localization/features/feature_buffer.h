@@ -29,6 +29,8 @@
 #include <unordered_map>
 #include <vector>
 
+namespace localization::features {
+
 /**
  * @brief      Class for feature buffer. Stores the features kept in memory
  * during the search
@@ -38,8 +40,8 @@ public:
   FeatureBuffer(int size);
   bool inBuffer(int id) const;
   /** returns empty vector if a feature is not in buffer */
-  const iFeature& getFeature(int id) const;
-  void addFeature(int id, std::unique_ptr<iFeature>&& feature);
+  const iFeature &getFeature(int id) const;
+  void addFeature(int id, std::unique_ptr<iFeature> &&feature);
 
   void deleteFeature();
 
@@ -48,5 +50,7 @@ public:
   std::vector<int> ids;
   std::unordered_map<int, std::unique_ptr<iFeature>> featureMap;
 };
+
+} // namespace localization::features
 
 #endif // SRC_FEATURES_FEATURE_BUFFER_H_

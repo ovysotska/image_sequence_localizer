@@ -9,14 +9,16 @@ set(TESTNAME test_${PROJECT_NAME})
 # )
 
 add_executable(${TESTNAME} 
+    cost_matrix_test.cpp
     database_test.cpp
     feature_buffer_test.cpp
     online_localizer_test.cpp
 )
 target_link_libraries(${TESTNAME} 
+    cost_matrix
     cnn_feature
     feature_buffer
-    cost_matrix_database
+    online_database
     successor_manager
     online_localizer
     list_dir

@@ -26,11 +26,14 @@
 
 #include "features/ifeature.h"
 
+namespace localization::features {
+
 enum FeatureType {
   Cnn_Feature,
 };
 
 std::unique_ptr<iFeature> createFeature(FeatureType type,
-                            const std::string &featureFilename);
+                                        const std::string &featureFilename);
+} // namespace localization::features
 
 #endif // SRC_FEATURES_FEATURE_FACTORY_H_

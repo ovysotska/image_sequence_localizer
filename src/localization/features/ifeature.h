@@ -23,12 +23,14 @@
 
 /* Updated by O. Vysotska in 2022 */
 
-
 #ifndef SRC_FEATURES_IFEATURE_H_
 #define SRC_FEATURES_IFEATURE_H_
+
 #include <memory>
 #include <string>
 #include <vector>
+
+namespace localization::features {
 
 /**
  * @brief      Interface class for features.
@@ -43,8 +45,7 @@ public:
    *
    * @return     One double value as a result of comparison.
    */
-  virtual double
-  computeSimilarityScore(const iFeature &rhs) const = 0;
+  virtual double computeSimilarityScore(const iFeature &rhs) const = 0;
   /**
    * @brief      Transforms similarity into the weights/cost for the graph.
 
@@ -73,5 +74,6 @@ public:
   just return the same value it takes as an input.
 
 */
+} // namespace localization::features
 
 #endif // SRC_FEATURES_IFEATURE_H_

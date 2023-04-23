@@ -33,8 +33,11 @@
 #include <iostream>
 using std::vector;
 
-SuccessorManager::SuccessorManager(iDatabase *database,
-                                   iRelocalizer *relocalizer, int fanOut)
+namespace localization::successor_manager {
+
+SuccessorManager::SuccessorManager(database::iDatabase *database,
+                                   relocalizers::iRelocalizer *relocalizer,
+                                   int fanOut)
     : database_{database}, relocalizer_{relocalizer}, fanOut_{fanOut} {
   CHECK(database_ != nullptr) << "Database is not set.";
   CHECK(relocalizer_ != nullptr) << "Relocalizer is not set.";
@@ -93,7 +96,6 @@ std::unordered_set<Node> SuccessorManager::getSuccessors(const Node &node) {
   if (!_sameRefPlaces.empty()) {
     getSuccessorsSimPlaces(node.quId, node.refId);
   }
-  // printf("Successors were computed %d \n", _successors.size());
   return _successors;
 }
 
@@ -169,3 +171,4 @@ SuccessorManager::getSuccessorsIfLost(const Node &node) {
   }
   return _successors;
 }
+} // namespace localization::successor_manager

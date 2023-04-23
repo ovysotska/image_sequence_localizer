@@ -26,44 +26,25 @@
 #ifndef SRC_DATABASE_COST_MATRIX_DATABASE_H_
 #define SRC_DATABASE_COST_MATRIX_DATABASE_H_
 
-#include "database/online_database.h"
+#include "database/cost_matrix.h"
+#include "database/idatabase.h"
 
+#include <memory>
 #include <string>
 
-using Matrix = std::vector<std::vector<double>>;
+namespace localization::database {
 
-/**
- * @brief      Class for cost matrix database. Stores costs as matrix.
- */
-class CostMatrixDatabase : public OnlineDatabase {
+class CostMatrixDatabase : public iDatabase {
 public:
-  CostMatrixDatabase(const std::string &costMatrixFile,
-                     const std::string &queryFeaturesDir,
-                     const std::string &refFeaturesDir, const FeatureType &type,
-                     int bufferSize);
+  explicit CostMatrixDatabase(const std::string &costMatrixFile);
 
-  int refSize() override { return cols_; }
-  /** gets the original cost and transforms it 1/cost **/
+  int refSize() override { return costMatrix_.cols(); }
   double getCost(int quId, int refId) override;
 
-  /**
-   * @brief      Loads from txt. Expects specific format: Pure matrix values.
-   *
-   * @param[in]  filename  The filename
-   * @param[in]  rows      The rows
-   * @param[in]  cols      The cols
-   */
-  void loadFromTxt(const std::string &filename, int rows, int cols);
-
-  void loadFromProto(const std::string &filename);
-
-  void overrideCosts(const Matrix &costs, int rows, int cols);
-  const Matrix &getCosts() const { return costs_; }
-
 private:
-  Matrix costs_;
-  int rows_ = 0;
-  int cols_ = 0;
+  CostMatrix costMatrix_;
 };
+
+} // namespace localization::database
 
 #endif // SRC_DATABASE_COST_MATRIX_DATABASE_H_
