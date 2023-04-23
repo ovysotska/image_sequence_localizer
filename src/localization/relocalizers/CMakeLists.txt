@@ -12,3 +12,15 @@ target_link_libraries(default_relocalizer
     cxx_flags
     glog::glog
 )
+
+find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+
+add_library(scan_context_relocalizer scan_context_relocalizer.cpp)
+target_link_libraries(scan_context_relocalizer 
+    online_database
+    scan_context
+    Eigen3::Eigen
+    ${OpenCV_LIBS}
+    cxx_flags
+    glog::glog
+)

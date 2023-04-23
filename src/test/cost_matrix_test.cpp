@@ -60,6 +60,7 @@ TEST_F(CostMatrixTest, FailedToConstruct) {
 
 TEST_F(CostMatrixTest, at) {
   auto costMatrix = localization::database::CostMatrix(costMatrixFile);
+  costMatrix.inverseCosts(false);
   localization::database::CostMatrix::Matrix expectedMatrix =
       this->costMatrixValues;
   EXPECT_EQ(costMatrix.rows(), expectedMatrix.size());
@@ -88,6 +89,7 @@ TEST(CostMatrixComputation, createCostMatrixFromFeatures) {
 
   auto costMatrix = localization::database::CostMatrix(
       tmp_dir, tmp_dir, localization::features::Cnn_Feature);
+  costMatrix.inverseCosts(false);
 
   for (int r = 0; r < costMatrix.rows(); ++r) {
     for (int c = 0; c < costMatrix.cols(); ++c) {

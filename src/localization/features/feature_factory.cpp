@@ -23,8 +23,10 @@
 
 #include "feature_factory.h"
 #include "cnn_feature.h"
+#include "features/scan_context.h"
 
 #include <glog/logging.h>
+#include <memory>
 
 namespace localization::features {
 
@@ -33,6 +35,9 @@ std::unique_ptr<iFeature> createFeature(FeatureType type,
   switch (type) {
   case Cnn_Feature: {
     return std::make_unique<CnnFeature>(featureFilename);
+  }
+  case Scan_Context: {
+    return std::make_unique<ScanContext>(featureFilename);
   }
   }
   LOG(FATAL) << "Unknown feature type";

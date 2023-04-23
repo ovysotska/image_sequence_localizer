@@ -37,3 +37,20 @@ target_link_libraries(localization_by_hashing
     ${OpenCV_LIBS} 
 )
 
+add_executable(scan_context_matching scan_context_matching.cpp)
+target_link_libraries(scan_context_matching
+    cost_matrix 
+    config_parser
+    online_database
+    successor_manager
+    online_localizer
+    scan_context_relocalizer 
+    glog::glog
+)
+
+add_executable(compute_scan_context_cost_matrix compute_scan_context_cost_matrix.cpp)
+target_link_libraries(compute_scan_context_cost_matrix
+    cost_matrix 
+    glog::glog
+)
+
