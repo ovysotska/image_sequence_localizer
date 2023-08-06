@@ -111,15 +111,27 @@ function InteractiveCostMatrix(props: InteractiveCostMatrixProps) {
   }, [props, cellSize, onCellHover, onCellUnHover]);
 
   return (
-    <div>
-      <svg
-        ref={svgRef}
-        style={{
-          backgroundColor: "lightpink",
-          width: "400px",
-          height: "400px",
-        }}
-      ></svg>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+      }}
+    >
+      <div>
+        <h3> Interactive Zoom in</h3>
+      </div>
+      <div>
+        <svg
+          ref={svgRef}
+          style={{
+            backgroundColor: "salmon",
+            width: "400px",
+            height: "400px",
+            margin: "10px",
+          }}
+        ></svg>
+      </div>
       {tooltipVisible && tooltipProps && <Tooltip {...tooltipProps} />}
     </div>
   );
