@@ -1,0 +1,1 @@
+cp ../localization_protos.proto public/

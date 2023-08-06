@@ -1,10 +1,14 @@
-# How to use viewer?
+# Viewer
+This viewer should be used for debug purposes. Right now, you can only examine the cost matrix.
+
+## Install
+Call from `src/viewer`:
+
+`./copy_protos.sh`
+`npm install d3 @types/d3 protobufjs`
 
 
-### `npm start`
+## Use
+Call from the terminal and load any `*.CostMatrix.pb`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+`npm run start`
