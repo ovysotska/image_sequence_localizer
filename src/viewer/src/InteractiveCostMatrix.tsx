@@ -9,10 +9,19 @@ type TooltipProps = {
   opacity: number;
   leftCornerPx: number;
   topCornerPx: number;
-  text: string;
+  queryId: number;
+  refId: number;
+  value: number;
 };
 
 function Tooltip(props: TooltipProps): React.ReactElement {
+  const text =
+    "query id: " +
+    props.queryId +
+    " ref id: " +
+    props.refId +
+    " value: " +
+    props.value.toFixed(5);
   return (
     <div
       title={"tooltip"}
@@ -29,7 +38,7 @@ function Tooltip(props: TooltipProps): React.ReactElement {
         // transition: 50,
       }}
     >
-      {props.text}
+      {text}
     </div>
   );
 }
@@ -39,10 +48,14 @@ type InteractiveCostMatrixProps = {
   zoomBlock: ZoomBlockParams;
 };
 
-function InteractiveCostMatrix(props: InteractiveCostMatrixProps) {
+function InteractiveCostMatrix(
+  props: InteractiveCostMatrixProps
+): React.ReactElement {
   const svgRef = useRef<any>();
   const [tooltipVisible, setTooltipVisible] = useState<boolean>(false);
   const [tooltipProps, setTooltipProps] = useState<TooltipProps>();
+
+  const [selectedPixel, setSelectedPixel] = useState<CostMatrixElement>();
 
   const height = 500;
   const cellSize = height / props.costMatrix.rows;
@@ -53,13 +66,9 @@ function InteractiveCostMatrix(props: InteractiveCostMatrixProps) {
     setTooltipProps({
       leftCornerPx: event.layerX + 10,
       topCornerPx: event.layerY + 10,
-      text:
-        "query id: " +
-        cell.queryId +
-        " ref id: " +
-        cell.refId +
-        " value: " +
-        cell.value.toFixed(5),
+      queryId: cell.queryId,
+      refId: cell.refId,
+      value: cell.value,
       opacity: 1.0,
     });
   }, []);
@@ -68,6 +77,14 @@ function InteractiveCostMatrix(props: InteractiveCostMatrixProps) {
     setTooltipVisible(false);
     event.target.setAttribute("opacity", 1.0);
   }, []);
+
+  const onCellClick = useCallback((event: any, cell: CostMatrixElement) => {
+    setSelectedPixel(cell);
+  }, []);
+
+  useEffect(() => {
+    console.log("Changed the value of selectedPixel", selectedPixel);
+  }, [selectedPixel]);
 
   useEffect(() => {
     if (svgRef.current == null) {
@@ -107,8 +124,9 @@ function InteractiveCostMatrix(props: InteractiveCostMatrixProps) {
       .on("mouseover", (event, cell) => {
         onCellHover(event, cell);
       })
-      .on("mouseout", onCellUnHover);
-  }, [props, cellSize, onCellHover, onCellUnHover]);
+      .on("mouseout", onCellUnHover)
+      .on("click", onCellClick);
+  }, [props, cellSize, onCellHover, onCellUnHover, onCellClick]);
 
   return (
     <div

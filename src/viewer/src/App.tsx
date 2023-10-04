@@ -5,6 +5,7 @@ import { ImageCostMatrix, ZoomBlockParams } from "./ImageCostMatrix";
 import ProtoLoader from "./ProtoLoader";
 import CostMatrix from "./costMatrix";
 import InteractiveCostMatrix from "./InteractiveCostMatrix";
+import ImagesLoader from "./ImagesLoader";
 
 function App() {
   const [image, setImage] = useState<ImageBitmap>();
@@ -45,6 +46,7 @@ function App() {
     <div className="App">
       <h1 style={{ textAlign: "center" }}>Cost Matrix Viewer</h1>
       <ProtoLoader onLoad={setCostMatrixProto} />
+      <ImagesLoader />
 
       <div
         style={{
