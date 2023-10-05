@@ -17,7 +17,11 @@ type ImageData = {
   base64Encoding?: string;
 };
 
-function ImagesLoader() {
+type ImageLoaderProps = {
+  imageType: string;
+};
+
+function ImagesLoader(props: ImageLoaderProps) {
   const [images, setImages] = useState<ImageData[]>();
   const [currentImageId, setCurrentImageId] = useState<number>(0);
 
@@ -63,16 +67,27 @@ function ImagesLoader() {
     });
   }
 
+  function handleButtonClick() {
+    if (images == null) {
+      return;
+    }
+    setCurrentImageId(Math.min(currentImageId + 1, images.length - 1));
+    console.log("curreImageId", currentImageId);
+    console.log("images length", images?.length);
+  }
+
   return (
     <div>
-      <label htmlFor="folder">Select folder</label>
+      <label htmlFor="folder">Select {props.imageType} images</label>
       <input type="file" id="folder" multiple onChange={onChange} />
       <ul id="folder"></ul>
       {images && images.length > currentImageId && (
         <img src={images[currentImageId].base64Encoding} alt="preview" />
       )}
+      <button onClick={handleButtonClick}>next</button>
     </div>
   );
 }
 
-export default ImagesLoader;
+export { ImagesLoader };
+export type { ImageLoaderProps };
