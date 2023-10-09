@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useRef, useEffect, useCallback } from "react";
-import CostMatrix, { CostMatrixElement } from "./costMatrix";
+import { CostMatrix, CostMatrixElement } from "./costMatrix";
 import { ZoomBlockParams } from "./ImageCostMatrix";
 
 import * as d3 from "d3";
@@ -46,6 +46,7 @@ function Tooltip(props: TooltipProps): React.ReactElement {
 type InteractiveCostMatrixProps = {
   costMatrix: CostMatrix;
   zoomBlock: ZoomBlockParams;
+  setSelectedElement: (element: CostMatrixElement) => void;
 };
 
 function InteractiveCostMatrix(
@@ -82,9 +83,12 @@ function InteractiveCostMatrix(
     setSelectedPixel(cell);
   }, []);
 
+  const { setSelectedElement } = props;
   useEffect(() => {
-    console.log("Changed the value of selectedPixel", selectedPixel);
-  }, [selectedPixel]);
+    if (selectedPixel) {
+      setSelectedElement(selectedPixel);
+    }
+  }, [selectedPixel, setSelectedElement]);
 
   useEffect(() => {
     if (svgRef.current == null) {

@@ -19,6 +19,7 @@ type ImageData = {
 
 type ImageLoaderProps = {
   imageType: string;
+  showImageId?: number;
 };
 
 function ImagesLoader(props: ImageLoaderProps) {
@@ -33,9 +34,20 @@ function ImagesLoader(props: ImageLoaderProps) {
   }
 
   useEffect(() => {
-    console.log("Changed state Images", images);
-    console.log("state Images length", images?.length);
-  }, [images]);
+    console.log("Got signal to change showImageId");
+    if (images == null || props.showImageId == null) {
+      return;
+    }
+    if (props.showImageId < 0 || props.showImageId >= images.length) {
+      return;
+    }
+    setCurrentImageId(props.showImageId);
+  }, [props.showImageId, images]);
+
+  // useEffect(() => {
+  //   console.log("Changed state Images", images);
+  //   console.log("state Images length", images?.length);
+  // }, [images]);
 
   function onChange(event: React.ChangeEvent<HTMLInputElement>) {
     event.preventDefault();
@@ -72,8 +84,6 @@ function ImagesLoader(props: ImageLoaderProps) {
       return;
     }
     setCurrentImageId(Math.min(currentImageId + 1, images.length - 1));
-    console.log("curreImageId", currentImageId);
-    console.log("images length", images?.length);
   }
 
   return (

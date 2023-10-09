@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import "./App.css";
 import { ImageCostMatrix, ZoomBlockParams } from "./ImageCostMatrix";
 import ProtoLoader from "./ProtoLoader";
-import CostMatrix from "./costMatrix";
+import { CostMatrix, CostMatrixElement } from "./costMatrix";
 import InteractiveCostMatrix from "./InteractiveCostMatrix";
 import { ImagesLoader } from "./ImagesLoader";
 
@@ -13,6 +13,8 @@ function App() {
   const [costMatrix, setCostMatrix] = useState<CostMatrix>();
   const [zoomParams, setZoomParams] = useState<ZoomBlockParams>();
   const [zoomedCostMatrix, setZoomedCostMatrix] = useState<CostMatrix>();
+  const [selectedCostMatrixElement, setSelectedCostMatrixElement] =
+    useState<CostMatrixElement>();
 
   useEffect(() => {
     if (costMatrixProto != null) {
@@ -42,12 +44,25 @@ function App() {
     );
   }, [zoomParams, costMatrix]);
 
+  useEffect(() => {
+    console.log(
+      "Selected Cost Matrix Element changed to",
+      selectedCostMatrixElement
+    );
+  }, [selectedCostMatrixElement]);
+
   return (
     <div className="App">
       <h1 style={{ textAlign: "center" }}>Cost Matrix Viewer</h1>
       <ProtoLoader onLoad={setCostMatrixProto} />
-      <ImagesLoader imageType={"query"} />
-      <ImagesLoader imageType={"reference"} />
+      <ImagesLoader
+        imageType={"query"}
+        showImageId={selectedCostMatrixElement?.queryId}
+      />
+      <ImagesLoader
+        imageType={"reference"}
+        showImageId={selectedCostMatrixElement?.refId}
+      />
 
       <div
         style={{
@@ -66,6 +81,7 @@ function App() {
             <InteractiveCostMatrix
               costMatrix={zoomedCostMatrix}
               zoomBlock={zoomParams}
+              setSelectedElement={setSelectedCostMatrixElement}
             />
           )}
         </div>
