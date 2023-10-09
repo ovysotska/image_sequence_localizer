@@ -1,4 +1,4 @@
-import React from "react";
+// Created by O. Vysotska in 2023
 import { useState, useEffect } from "react";
 import "./App.css";
 import { ImageCostMatrix, ZoomBlockParams } from "./ImageCostMatrix";
@@ -44,46 +44,56 @@ function App() {
     );
   }, [zoomParams, costMatrix]);
 
-  useEffect(() => {
-    console.log(
-      "Selected Cost Matrix Element changed to",
-      selectedCostMatrixElement
-    );
-  }, [selectedCostMatrixElement]);
-
   return (
     <div className="App">
-      <h1 style={{ textAlign: "center" }}>Cost Matrix Viewer</h1>
-      <ProtoLoader onLoad={setCostMatrixProto} />
-      <ImagesLoader
-        imageType={"query"}
-        showImageId={selectedCostMatrixElement?.queryId}
-      />
-      <ImagesLoader
-        imageType={"reference"}
-        showImageId={selectedCostMatrixElement?.refId}
-      />
-
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-        }}
-      >
-        <div>
-          {image && (
-            <ImageCostMatrix image={image} setZoomParams={setZoomParams} />
-          )}
+      <div style={{ width: "80%", margin: "auto" }}>
+        <h1 style={{ textAlign: "center" }}>Cost Matrix Viewer</h1>
+        <div className="costMatrix" style={{ backgroundColor: "ghostwhite" }}>
+          <ProtoLoader onLoad={setCostMatrixProto} />
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "left",
+            }}
+          >
+            <div>
+              {image && (
+                <ImageCostMatrix image={image} setZoomParams={setZoomParams} />
+              )}
+            </div>
+            <div style={{ margin: "auto" }}>
+              {zoomParams && zoomedCostMatrix && (
+                <InteractiveCostMatrix
+                  costMatrix={zoomedCostMatrix}
+                  zoomBlock={zoomParams}
+                  setSelectedElement={setSelectedCostMatrixElement}
+                />
+              )}
+            </div>
+          </div>
         </div>
-        <div>
-          {zoomParams && zoomedCostMatrix && (
-            <InteractiveCostMatrix
-              costMatrix={zoomedCostMatrix}
-              zoomBlock={zoomParams}
-              setSelectedElement={setSelectedCostMatrixElement}
+
+        <div
+          className="imageLoaders"
+          style={{
+            backgroundColor: "lavender",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <div style={{ width: "50%", alignContent: "center" }}>
+            <ImagesLoader
+              imageType={"Query"}
+              showImageId={selectedCostMatrixElement?.queryId}
             />
-          )}
+          </div>
+          <div style={{ width: "50%" }}>
+            <ImagesLoader
+              imageType={"Reference"}
+              showImageId={selectedCostMatrixElement?.refId}
+            />
+          </div>
         </div>
       </div>
     </div>

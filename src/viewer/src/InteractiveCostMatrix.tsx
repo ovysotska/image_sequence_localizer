@@ -135,9 +135,7 @@ function InteractiveCostMatrix(
   return (
     <div
       style={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
+        textAlign: "center",
       }}
     >
       <div>
@@ -147,7 +145,7 @@ function InteractiveCostMatrix(
         <svg
           ref={svgRef}
           style={{
-            backgroundColor: "salmon",
+            backgroundColor: "tomato",
             width: "400px",
             height: "400px",
             margin: "10px",

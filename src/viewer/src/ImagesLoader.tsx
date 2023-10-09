@@ -26,13 +26,6 @@ function ImagesLoader(props: ImageLoaderProps) {
   const [images, setImages] = useState<ImageData[]>();
   const [currentImageId, setCurrentImageId] = useState<number>(0);
 
-  async function loadImage(file: Blob) {
-    if (file) {
-      let imageAsBase64 = await readImageAsync(file);
-      return imageAsBase64;
-    }
-  }
-
   useEffect(() => {
     console.log("Got signal to change showImageId");
     if (images == null || props.showImageId == null) {
@@ -43,11 +36,6 @@ function ImagesLoader(props: ImageLoaderProps) {
     }
     setCurrentImageId(props.showImageId);
   }, [props.showImageId, images]);
-
-  // useEffect(() => {
-  //   console.log("Changed state Images", images);
-  //   console.log("state Images length", images?.length);
-  // }, [images]);
 
   function onChange(event: React.ChangeEvent<HTMLInputElement>) {
     event.preventDefault();
@@ -79,22 +67,45 @@ function ImagesLoader(props: ImageLoaderProps) {
     });
   }
 
-  function handleButtonClick() {
+  function handleNextClick() {
     if (images == null) {
       return;
     }
     setCurrentImageId(Math.min(currentImageId + 1, images.length - 1));
   }
 
+  function handlePrevClick() {
+    if (images == null) {
+      return;
+    }
+    setCurrentImageId(Math.max(currentImageId - 1, 0));
+  }
+
   return (
-    <div>
-      <label htmlFor="folder">Select {props.imageType} images</label>
-      <input type="file" id="folder" multiple onChange={onChange} />
-      <ul id="folder"></ul>
+    <div
+      style={{
+        textAlign: "center",
+      }}
+    >
+      <h2>{props.imageType} images</h2>
+
+      <div>
+        <label htmlFor="folder">Select {props.imageType} images </label>
+        <input type="file" id="folder" multiple onChange={onChange} />
+      </div>
       {images && images.length > currentImageId && (
-        <img src={images[currentImageId].base64Encoding} alt="preview" />
+        <div>
+          <img src={images[currentImageId].base64Encoding} alt="preview" />
+          <p>
+            id: {images[currentImageId].id}; filename:{" "}
+            {images[currentImageId].fileName}
+          </p>
+        </div>
       )}
-      <button onClick={handleButtonClick}>next</button>
+      <div>
+        <button onClick={handlePrevClick}>prev</button>
+        <button onClick={handleNextClick}>next</button>
+      </div>
     </div>
   );
 }
