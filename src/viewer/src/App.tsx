@@ -44,13 +44,6 @@ function App() {
     );
   }, [zoomParams, costMatrix]);
 
-  useEffect(() => {
-    console.log(
-      "Selected Cost Matrix Element changed to",
-      selectedCostMatrixElement
-    );
-  }, [selectedCostMatrixElement]);
-
   return (
     <div className="App">
       <div
