@@ -46,7 +46,15 @@ function App() {
 
   return (
     <div className="App">
-      <div style={{ width: "80%", margin: "auto" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          gap: "10px",
+        }}
+      >
         <h1 style={{ textAlign: "center" }}>Cost Matrix Viewer</h1>
         <div className="costMatrix" style={{ backgroundColor: "ghostwhite" }}>
           <ProtoLoader onLoad={setCostMatrixProto} />
@@ -54,15 +62,21 @@ function App() {
             style={{
               display: "flex",
               flexDirection: "row",
-              justifyContent: "left",
+              flexWrap: "wrap",
+              justifyContent: "center",
             }}
           >
             <div>
               {image && (
-                <ImageCostMatrix image={image} setZoomParams={setZoomParams} />
+                <ImageCostMatrix
+                  image={image}
+                  setZoomParams={setZoomParams}
+                  width="100%"
+                  height="100%"
+                />
               )}
             </div>
-            <div style={{ margin: "auto" }}>
+            <div>
               {zoomParams && zoomedCostMatrix && (
                 <InteractiveCostMatrix
                   costMatrix={zoomedCostMatrix}
@@ -79,16 +93,19 @@ function App() {
           style={{
             backgroundColor: "lavender",
             display: "flex",
+            flexDirection: "row",
+            flexWrap: "wrap",
             justifyContent: "center",
+            columnGap: "20px",
           }}
         >
-          <div style={{ width: "50%", alignContent: "center" }}>
+          <div>
             <ImagesLoader
               imageType={"Query"}
               showImageId={selectedCostMatrixElement?.queryId}
             />
           </div>
-          <div style={{ width: "50%" }}>
+          <div>
             <ImagesLoader
               imageType={"Reference"}
               showImageId={selectedCostMatrixElement?.refId}
