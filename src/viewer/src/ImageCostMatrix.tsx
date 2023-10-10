@@ -1,5 +1,6 @@
 import React, { forwardRef } from "react";
 import { useState, useRef, useEffect } from "react";
+import { NumberLiteralType } from "typescript";
 
 const kZoomWindowPx = 30;
 
@@ -75,6 +76,8 @@ function drawZoomBoxInContext(
 type ImageCostMatrixProps = {
   image: ImageBitmap;
   setZoomParams: (zoomParams: ZoomBlockParams) => void;
+  width: string;
+  height: string;
 };
 
 type ImageSize = {
@@ -175,7 +178,10 @@ function ImageCostMatrix(props: ImageCostMatrixProps): React.ReactElement {
       <div
         className="costMatrix"
         style={{
+          height: props.height,
+          width: props.width,
           maxHeight: "500px",
+          maxWidth: "800px",
           overflow: "auto",
           margin: "10px",
         }}

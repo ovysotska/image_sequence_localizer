@@ -56,6 +56,7 @@ function ProtoLoader({ onLoad }) {
 
   return (
     <div>
+      <label htmlFor="folder">Select *.CostMatrix.proto file </label>
       <input type="file" id="fileInput" onChange={processFile}></input>
     </div>
   );
