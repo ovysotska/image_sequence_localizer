@@ -58,8 +58,13 @@ def main():
 
     args.output_dir.mkdir(exist_ok=True)
 
-    query_images = sorted(list(args.query_images.glob("*.jpg" or "*.png")))
-    reference_images = sorted(list(args.reference_images.glob("*.jpg" or "*.png")))
+    query_images = list(args.query_images.glob("*.png"))
+    query_images.extend(args.query_images.glob(".jpg"))
+    query_images = sorted(query_images)
+
+    reference_images = list(args.reference_images.glob("*.png"))
+    reference_images.extend(args.reference_images.glob(".jpg"))
+    reference_images = sorted(reference_images)
 
     for match in matching_result.matches:
         query_image = cv2.imread(str(query_images[match.query_id]))
