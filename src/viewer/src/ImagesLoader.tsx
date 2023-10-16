@@ -48,16 +48,16 @@ function ImagesLoader(props: ImageLoaderProps) {
       return a.name.localeCompare(b.name);
     });
 
-    const imageList: ImageData[] = [];
+    const imageList = new Array<ImageData>(sortedFiles.length);
     sortedFiles.forEach((file, index) => {
       if (file) {
         readImageAsync(file)
           .then((imageAsBase64) => {
-            imageList.push({
+            imageList[index] = {
               id: index,
               fileName: file.name,
               base64Encoding: imageAsBase64,
-            });
+            };
             setImages(imageList);
           })
           .catch((error) => {
@@ -93,15 +93,17 @@ function ImagesLoader(props: ImageLoaderProps) {
         <label htmlFor="folder">Select {props.imageType} images </label>
         <input type="file" id="folder" multiple onChange={onChange} />
       </div>
-      {images && images.length > currentImageId && (
-        <div>
-          <img src={images[currentImageId].base64Encoding} alt="preview" />
-          <p>
-            id: {images[currentImageId].id}; filename:{" "}
-            {images[currentImageId].fileName}
-          </p>
-        </div>
-      )}
+      {images &&
+        images.length > currentImageId &&
+        images[currentImageId] !== undefined && (
+          <div>
+            <img src={images[currentImageId].base64Encoding} alt="preview" />
+            <p>
+              id: {images[currentImageId].id}; filename:{" "}
+              {images[currentImageId].fileName}
+            </p>
+          </div>
+        )}
       <div>
         <button onClick={handlePrevClick}>prev</button>
         <button onClick={handleNextClick}>next</button>
