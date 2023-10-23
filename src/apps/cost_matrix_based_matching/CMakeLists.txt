@@ -23,3 +23,14 @@ target_link_libraries(cost_matrix_no_hashing
     default_relocalizer
     ${OpenCV_LIBS} 
 )
+
+add_executable(kdtree_retrieval kdtree_retrieval.cpp)
+target_link_libraries(kdtree_retrieval
+    glog::glog
+    online_localizer
+    cost_matrix_database
+    config_parser
+    lsh_cv_hashing
+    ${OpenCV_LIBS} 
+)
+
