@@ -2,14 +2,21 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 import { ImageCostMatrix, ZoomBlockParams } from "./ImageCostMatrix";
-import ProtoLoader from "./ProtoLoader";
+import { ProtoLoader, MessageType } from "./ProtoLoader";
 import { CostMatrix, CostMatrixElement } from "./costMatrix";
 import InteractiveCostMatrix from "./InteractiveCostMatrix";
 import { ImagesLoader } from "./ImagesLoader";
+import {
+  MatchingResultElement,
+  readMatchingResultFromProto,
+} from "./matchingResult";
 
 function App() {
   const [image, setImage] = useState<ImageBitmap>();
   const [costMatrixProto, setCostMatrixProto] = useState(null);
+  const [matchingResultProto, setMatchingResultProto] = useState(null);
+  const [matchingResult, setMatchingResult] =
+    useState<MatchingResultElement[]>();
   const [costMatrix, setCostMatrix] = useState<CostMatrix>();
   const [zoomParams, setZoomParams] = useState<ZoomBlockParams>();
   const [zoomedCostMatrix, setZoomedCostMatrix] = useState<CostMatrix>();
@@ -44,6 +51,11 @@ function App() {
     );
   }, [zoomParams, costMatrix]);
 
+  useEffect(() => {
+    console.log("Matching result changed", matchingResultProto);
+    setMatchingResult(readMatchingResultFromProto(matchingResultProto));
+  }, [matchingResultProto]);
+
   return (
     <div className="App">
       <div
@@ -57,7 +69,14 @@ function App() {
       >
         <h1 style={{ textAlign: "center" }}>Cost Matrix Viewer</h1>
         <div className="costMatrix" style={{ backgroundColor: "ghostwhite" }}>
-          <ProtoLoader onLoad={setCostMatrixProto} />
+          <ProtoLoader
+            onLoad={setCostMatrixProto}
+            messageType={MessageType.CostMatrix}
+          />
+          <ProtoLoader
+            onLoad={setMatchingResultProto}
+            messageType={MessageType.MatchingResult}
+          />
           <div
             style={{
               display: "flex",
@@ -73,6 +92,7 @@ function App() {
                   setZoomParams={setZoomParams}
                   width="100%"
                   height="100%"
+                  matches={matchingResult}
                 />
               )}
             </div>
