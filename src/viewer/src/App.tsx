@@ -1,25 +1,21 @@
 // Created by O. Vysotska in 2023
 import { useState, useEffect } from "react";
 import "./App.css";
-import { ImageCostMatrix, ZoomBlockParams } from "./ImageCostMatrix";
 import { ProtoLoader, MessageType } from "./ProtoLoader";
 import { CostMatrix, CostMatrixElement } from "./costMatrix";
-import InteractiveCostMatrix from "./InteractiveCostMatrix";
 import { ImagesLoader } from "./ImagesLoader";
 import {
   MatchingResultElement,
   readMatchingResultFromProto,
 } from "./matchingResult";
+import CostMatrixComponent from "./CostMatrixComponent";
 
 function App() {
-  const [image, setImage] = useState<ImageBitmap>();
   const [costMatrixProto, setCostMatrixProto] = useState(null);
+  const [costMatrix, setCostMatrix] = useState<CostMatrix>();
   const [matchingResultProto, setMatchingResultProto] = useState(null);
   const [matchingResult, setMatchingResult] =
     useState<MatchingResultElement[]>();
-  const [costMatrix, setCostMatrix] = useState<CostMatrix>();
-  const [zoomParams, setZoomParams] = useState<ZoomBlockParams>();
-  const [zoomedCostMatrix, setZoomedCostMatrix] = useState<CostMatrix>();
   const [selectedCostMatrixElement, setSelectedCostMatrixElement] =
     useState<CostMatrixElement>();
 
@@ -29,27 +25,6 @@ function App() {
       setCostMatrix(new CostMatrix(costMatrixProto));
     }
   }, [costMatrixProto]);
-
-  useEffect(() => {
-    if (costMatrix != null) {
-      costMatrix.createImage().then((result) => {
-        setImage(result);
-      });
-    }
-  }, [costMatrix]);
-
-  useEffect(() => {
-    if (zoomParams == null || costMatrix == null) {
-      return;
-    }
-    setZoomedCostMatrix(
-      costMatrix.getSubMatrix(
-        zoomParams.topLeftX,
-        zoomParams.topLeftY,
-        zoomParams.windowHeightPx
-      )
-    );
-  }, [zoomParams, costMatrix]);
 
   useEffect(() => {
     console.log("Matching result changed", matchingResultProto);
@@ -77,35 +52,13 @@ function App() {
             onLoad={setMatchingResultProto}
             messageType={MessageType.MatchingResult}
           />
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              flexWrap: "wrap",
-              justifyContent: "center",
-            }}
-          >
-            <div>
-              {image && (
-                <ImageCostMatrix
-                  image={image}
-                  setZoomParams={setZoomParams}
-                  width="100%"
-                  height="100%"
-                  matches={matchingResult}
-                />
-              )}
-            </div>
-            <div>
-              {zoomParams && zoomedCostMatrix && (
-                <InteractiveCostMatrix
-                  costMatrix={zoomedCostMatrix}
-                  zoomBlock={zoomParams}
-                  setSelectedElement={setSelectedCostMatrixElement}
-                />
-              )}
-            </div>
-          </div>
+          {costMatrix && (
+            <CostMatrixComponent
+              costMatrix={costMatrix}
+              matchingResult={matchingResult}
+              setSelectedCostMatrixElement={setSelectedCostMatrixElement}
+            />
+          )}
         </div>
 
         <div

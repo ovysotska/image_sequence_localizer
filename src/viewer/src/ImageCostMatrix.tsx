@@ -109,6 +109,7 @@ type ImageCostMatrixProps = {
   width: string;
   height: string;
   matches?: MatchingResultElement[];
+  showMatches?: boolean;
 };
 
 type ImageSize = {
@@ -119,6 +120,8 @@ type HoverCoords = {
   screenX: number;
   screenY: number;
 };
+
+// TODO(olga): Maybe separate canvas for image and matching path is a better solution. Then need to make sure it gets propagated to the zoomTooltip
 
 function ImageCostMatrix(props: ImageCostMatrixProps): React.ReactElement {
   const imageCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -132,6 +135,10 @@ function ImageCostMatrix(props: ImageCostMatrixProps): React.ReactElement {
   const [hoverCoords, setHoverCoords] = useState<HoverCoords>();
 
   useEffect(() => {
+    if (props.image == null) {
+      console.log("Image is empty");
+      return;
+    }
     setImage(props.image);
   }, [props.image]);
 
@@ -143,7 +150,6 @@ function ImageCostMatrix(props: ImageCostMatrixProps): React.ReactElement {
     // canvasRef.current.height = 150;
 
     if (image == null) {
-      console.error("Image is empty.");
       return;
     }
 
@@ -209,8 +215,7 @@ function ImageCostMatrix(props: ImageCostMatrixProps): React.ReactElement {
     });
   }
 
-  function showMatchingResult(event: any) {
-    console.log("Checker checked", event.target.checked);
+  useEffect(() => {
     const imageCanvas = imageCanvasRef.current;
     if (imageCanvas == null) {
       console.error("Canvas is not set");
@@ -222,26 +227,33 @@ function ImageCostMatrix(props: ImageCostMatrixProps): React.ReactElement {
       return;
     }
 
-    if (event.target.checked) {
-      console.log("Checked checked");
-      // show matching result
-      const imageData = imageContext.getImageData(
-        0,
-        0,
-        imageCanvas.width,
-        imageCanvas.height
-      );
-      overlayMatchingResult(imageData.data, imageCanvas.width, props.matches);
-      imageContext.putImageData(imageData, 0, 0);
+    if (props.showMatches) {
+      if (props.matches) {
+        console.log("Show matches", props.matches);
+        // show matching result
+        const imageData = imageContext.getImageData(
+          0,
+          0,
+          imageCanvas.width,
+          imageCanvas.height
+        );
+        overlayMatchingResult(imageData.data, imageCanvas.width, props.matches);
+        imageContext.putImageData(imageData, 0, 0);
+      } else {
+        console.error("Can't display matches. Matches are not set");
+        return;
+      }
     } else {
-      imageContext.drawImage(props.image, 0, 0);
+      console.log("Hide matches");
+      // hide matches
+      if (image) {
+        imageContext.drawImage(image, 0, 0);
+      }
     }
-  }
+  }, [props.matches, props.showMatches, image]);
 
   return (
     <div>
-      <input id="checkbox" type="checkbox" onChange={showMatchingResult} />
-      <label htmlFor="checkbox">Hello</label>
       <div
         className="costMatrix"
         style={{
@@ -272,9 +284,6 @@ function ImageCostMatrix(props: ImageCostMatrixProps): React.ReactElement {
     </div>
   );
 }
-
-//TODO(olga):
-// * Start with figuring out how many images do I need
 
 export { ImageCostMatrix };
 export type { ImageCostMatrixProps, ZoomBlockParams };

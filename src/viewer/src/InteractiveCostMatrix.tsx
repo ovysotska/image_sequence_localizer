@@ -4,6 +4,8 @@ import { CostMatrix, CostMatrixElement } from "./costMatrix";
 import { ZoomBlockParams } from "./ImageCostMatrix";
 
 import * as d3 from "d3";
+import { MatchingResultElement } from "./matchingResult";
+import { svg } from "d3";
 
 type TooltipProps = {
   opacity: number;
@@ -47,6 +49,8 @@ type InteractiveCostMatrixProps = {
   costMatrix: CostMatrix;
   zoomBlock: ZoomBlockParams;
   setSelectedElement: (element: CostMatrixElement) => void;
+  matches?: MatchingResultElement[];
+  showMatches?: boolean;
 };
 
 function InteractiveCostMatrix(
@@ -106,7 +110,10 @@ function InteractiveCostMatrix(
       .attr("id", "main")
       .attr("class", "main");
 
-    const valuesGroup = chartGroup.append("g").attr("class", "values");
+    const valuesGroup = chartGroup
+      .append("g")
+      .attr("class", "values")
+      .attr("id", "values");
 
     valuesGroup
       .selectAll("rect")
@@ -130,7 +137,48 @@ function InteractiveCostMatrix(
       })
       .on("mouseout", onCellUnHover)
       .on("click", onCellClick);
-  }, [props, cellSize, onCellHover, onCellUnHover, onCellClick]);
+  }, [
+    props.costMatrix.valuesArray,
+    props.zoomBlock.topLeftX,
+    props.zoomBlock.topLeftY,
+    cellSize,
+    onCellHover,
+    onCellUnHover,
+    onCellClick,
+  ]);
+
+  useEffect(() => {
+    if (props.matches == null) {
+      return;
+    }
+    console.log("Changes matches");
+    const svgElement = d3.select(svgRef.current);
+    const valuesGroup = svgElement.select(".values");
+    valuesGroup
+      .selectAll("rect")
+      .data(props.matches)
+      .enter()
+      .append("rect")
+      .attr("x", (cell: MatchingResultElement) => {
+        return (cell.refId - props.zoomBlock.topLeftX) * cellSize;
+      }) // top left corner of the rect
+      .attr("y", (cell) => {
+        return (cell.queryId - props.zoomBlock.topLeftY) * cellSize;
+      })
+      .attr("height", cellSize)
+      .attr("width", cellSize)
+      .attr("fill", (cell: any) => {
+        return cell.real
+          ? d3.rgb(255, 0, 0).toString()
+          : d3.rgb(0, 0, 255).toString();
+      });
+  }, [
+    props.matches,
+    props.showMatches,
+    cellSize,
+    props.zoomBlock.topLeftX,
+    props.zoomBlock.topLeftY,
+  ]);
 
   return (
     <div
@@ -145,7 +193,7 @@ function InteractiveCostMatrix(
         <svg
           ref={svgRef}
           style={{
-            backgroundColor: "tomato",
+            backgroundColor: "lavender",
             width: "400px",
             height: "400px",
             margin: "10px",
@@ -156,5 +204,11 @@ function InteractiveCostMatrix(
     </div>
   );
 }
+
+//TODO(Olga):
+// Figure out why adding new rectangles confuses the Tooltip
+// If matches are received create new group
+// If showMatches received true -> show group
+//if no showMatches -> hide matches group
 
 export default InteractiveCostMatrix;

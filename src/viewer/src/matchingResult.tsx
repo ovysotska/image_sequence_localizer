@@ -6,9 +6,9 @@ type MatchingResultElement = {
 
 function readMatchingResultFromProto(
   matchingResultProto?: any
-): MatchingResultElement[] {
+): MatchingResultElement[] | undefined {
   if (matchingResultProto == null) {
-    return [];
+    return undefined;
   }
   return matchingResultProto.matches;
 }
