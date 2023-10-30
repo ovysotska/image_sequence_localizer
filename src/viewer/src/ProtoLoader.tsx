@@ -69,10 +69,11 @@ function ProtoLoader(props: ProtoLoaderProps): React.ReactElement {
     }
   }
 
+  const { onLoad } = props;
   useEffect(() => {
     console.log("Proto state changed", protoMessage);
-    props.onLoad(protoMessage);
-  }, [protoMessage, props]);
+    onLoad(protoMessage);
+  }, [protoMessage, onLoad]);
 
   return (
     <div>

@@ -27,7 +27,7 @@ function App() {
   }, [costMatrixProto]);
 
   useEffect(() => {
-    console.log("Matching result changed", matchingResultProto);
+    console.log("Matching result proto changed", matchingResultProto);
     setMatchingResult(readMatchingResultFromProto(matchingResultProto));
   }, [matchingResultProto]);
 

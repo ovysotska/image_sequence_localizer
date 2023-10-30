@@ -229,7 +229,6 @@ function ImageCostMatrix(props: ImageCostMatrixProps): React.ReactElement {
 
     if (props.showMatches) {
       if (props.matches) {
-        console.log("Show matches", props.matches);
         // show matching result
         const imageData = imageContext.getImageData(
           0,

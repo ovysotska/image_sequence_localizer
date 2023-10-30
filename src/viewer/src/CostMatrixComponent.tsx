@@ -5,6 +5,19 @@ import { ImageCostMatrix, ZoomBlockParams } from "./ImageCostMatrix";
 import { MatchingResultElement } from "./matchingResult";
 import InteractiveCostMatrix from "./InteractiveCostMatrix";
 
+function getMatchingResultInZoomBlock(
+  results: MatchingResultElement[],
+  zoomParams: ZoomBlockParams
+) {
+  return results.filter(
+    (result) =>
+      result.queryId >= zoomParams.topLeftY &&
+      result.queryId < zoomParams.topLeftY + zoomParams.windowHeightPx &&
+      result.refId >= zoomParams.topLeftX &&
+      result.refId < zoomParams.topLeftX + zoomParams.windowWidthPx
+  );
+}
+
 type CostMatrixProps = {
   costMatrix: CostMatrix;
   matchingResult?: MatchingResultElement[];
@@ -19,6 +32,15 @@ function CostMatrixComponent(props: CostMatrixProps): React.ReactElement {
   const [zoomedCostMatrix, setZoomedCostMatrix] = useState<CostMatrix>();
   const [matchingResultVisible, setMatchingResultVisible] =
     useState<boolean>(false);
+  const [selectedElement, setSelectedElement] = useState<CostMatrixElement>();
+
+  const { setSelectedCostMatrixElement } = props;
+  useEffect(() => {
+    if (selectedElement == null) {
+      return;
+    }
+    setSelectedCostMatrixElement(selectedElement);
+  }, [selectedElement, setSelectedCostMatrixElement]);
 
   useEffect(() => {
     if (props.costMatrix != null) {
@@ -89,9 +111,12 @@ function CostMatrixComponent(props: CostMatrixProps): React.ReactElement {
             <InteractiveCostMatrix
               costMatrix={zoomedCostMatrix}
               zoomBlock={zoomParams}
-              setSelectedElement={props.setSelectedCostMatrixElement}
+              setSelectedElement={setSelectedElement}
               showMatches={matchingResultVisible}
-              matches={matchingResult}
+              matches={
+                matchingResult &&
+                getMatchingResultInZoomBlock(matchingResult, zoomParams)
+              }
             />
           )}
         </div>

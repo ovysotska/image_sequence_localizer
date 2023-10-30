@@ -27,7 +27,6 @@ function ImagesLoader(props: ImageLoaderProps) {
   const [currentImageId, setCurrentImageId] = useState<number>(0);
 
   useEffect(() => {
-    console.log("Got signal to change showImageId");
     if (images == null || props.showImageId == null) {
       return;
     }
