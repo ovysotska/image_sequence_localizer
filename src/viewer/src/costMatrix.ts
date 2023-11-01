@@ -55,6 +55,12 @@ class CostMatrix {
     return row * this.cols + col;
   }
 
+  at(queryId: number, refId: number): number | undefined {
+    return this.valuesArray.find(
+      (element) => element.queryId === queryId && element.refId === refId
+    )?.value;
+  }
+
   getSubMatrix(topLeftCol: number, topLeftRow: number, windowSize: number) {
     if (topLeftCol == null || topLeftRow == null || windowSize == null) {
       console.warn("Boundaries for submatrix are not valid");

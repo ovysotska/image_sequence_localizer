@@ -4,6 +4,7 @@ import { CostMatrix, CostMatrixElement } from "./costMatrix";
 import { ZoomBlockParams } from "./ImageCostMatrix";
 
 import * as d3 from "d3";
+import { MatchingResultElement } from "./matchingResult";
 
 type TooltipProps = {
   opacity: number;
@@ -11,17 +12,17 @@ type TooltipProps = {
   topCornerPx: number;
   queryId: number;
   refId: number;
-  value: number;
+  value?: number;
 };
 
 function Tooltip(props: TooltipProps): React.ReactElement {
   const text =
     "query id: " +
-    props.queryId +
-    " ref id: " +
-    props.refId +
-    " value: " +
-    props.value.toFixed(5);
+      props.queryId +
+      " ref id: " +
+      props.refId +
+      " value: " +
+      props.value?.toFixed(5) ?? "none";
   return (
     <div
       title={"tooltip"}
@@ -47,6 +48,8 @@ type InteractiveCostMatrixProps = {
   costMatrix: CostMatrix;
   zoomBlock: ZoomBlockParams;
   setSelectedElement: (element: CostMatrixElement) => void;
+  matches?: MatchingResultElement[];
+  showMatches?: boolean;
 };
 
 function InteractiveCostMatrix(
@@ -56,10 +59,42 @@ function InteractiveCostMatrix(
   const [tooltipVisible, setTooltipVisible] = useState<boolean>(false);
   const [tooltipProps, setTooltipProps] = useState<TooltipProps>();
 
+  const [matchesVisible, setMatchesVisible] = useState<boolean>(false);
   const [selectedPixel, setSelectedPixel] = useState<CostMatrixElement>();
 
   const height = 500;
   const cellSize = height / props.costMatrix.rows;
+
+  useEffect(() => {
+    if (props.showMatches == null) {
+      return;
+    }
+    setMatchesVisible(props.showMatches);
+  }, [props.showMatches]);
+
+  useEffect(() => {
+    if (svgRef.current == null) {
+      console.log("Svg ref is not set");
+      return;
+    }
+    const svgElement = d3.select(svgRef.current);
+    if (!svgElement.select("#main").empty()) {
+      console.log("Removing previous chart");
+      svgElement.select("#main").remove();
+    }
+
+    const chartGroup = svgElement
+      .append("g")
+      .attr("id", "main")
+      .attr("class", "main");
+    // Add a group for cost matrix rectangles
+    chartGroup
+      .append("g")
+      .attr("class", "matrixEntries")
+      .attr("id", "matrixEntries");
+    // Add a group for  matches
+    chartGroup.append("g").attr("class", "matches").attr("id", "matches");
+  }, [props.costMatrix]);
 
   const onCellHover = useCallback((event: any, cell: CostMatrixElement) => {
     setTooltipVisible(true);
@@ -91,23 +126,8 @@ function InteractiveCostMatrix(
   }, [selectedPixel, setSelectedElement]);
 
   useEffect(() => {
-    if (svgRef.current == null) {
-      console.log("Svg ref is not set");
-      return;
-    }
-    const svgElement = d3.select(svgRef.current);
-    if (!svgElement.select("#main").empty()) {
-      console.log("Removing previous chart");
-      svgElement.select("#main").remove();
-    }
-
-    const chartGroup = svgElement
-      .append("g")
-      .attr("id", "main")
-      .attr("class", "main");
-
-    const valuesGroup = chartGroup.append("g").attr("class", "values");
-
+    // Retrieve the group for matrix elements
+    const valuesGroup = d3.select(svgRef.current).select(".matrixEntries");
     valuesGroup
       .selectAll("rect")
       .data(props.costMatrix.valuesArray)
@@ -130,7 +150,68 @@ function InteractiveCostMatrix(
       })
       .on("mouseout", onCellUnHover)
       .on("click", onCellClick);
-  }, [props, cellSize, onCellHover, onCellUnHover, onCellClick]);
+  }, [
+    props.costMatrix,
+    props.zoomBlock,
+    cellSize,
+    onCellHover,
+    onCellUnHover,
+    onCellClick,
+  ]);
+
+  useEffect(() => {
+    if (props.matches == null) {
+      return;
+    }
+    // Retrieve the group for matches
+    const matchesGroup = d3.select(svgRef.current).select(".matches");
+    matchesGroup
+      .selectAll("rect")
+      .data(props.matches)
+      .enter()
+      .append("rect")
+      .attr("x", (cell: MatchingResultElement) => {
+        return (cell.refId - props.zoomBlock.topLeftX) * cellSize;
+      }) // top left corner of the rect
+      .attr("y", (cell) => {
+        return (cell.queryId - props.zoomBlock.topLeftY) * cellSize;
+      })
+      .attr("height", cellSize)
+      .attr("width", cellSize)
+      .attr("fill", (cell: any) => {
+        return cell.real
+          ? d3.rgb(255, 0, 0).toString()
+          : d3.rgb(0, 0, 255).toString();
+      })
+      .on("mouseover", (event, cell) => {
+        onCellHover(event, {
+          queryId: cell.queryId,
+          refId: cell.refId,
+          value: props.costMatrix.at(cell.queryId, cell.refId) ?? -1,
+        });
+      })
+      .on("mouseout", onCellUnHover)
+      .on("click", (event, cell) => {
+        onCellClick(event, {
+          queryId: cell.queryId,
+          refId: cell.refId,
+          value: props.costMatrix.at(cell.queryId, cell.refId) ?? -1,
+        });
+      });
+  }, [
+    props.matches,
+    props.costMatrix,
+    props.zoomBlock,
+    cellSize,
+    onCellHover,
+    onCellUnHover,
+    onCellClick,
+  ]);
+
+  useEffect(() => {
+    const matchGroup = d3.select(svgRef.current).select(".matches");
+    matchGroup.style("visibility", matchesVisible ? "visible" : "hidden");
+  }, [matchesVisible, props.matches]);
 
   return (
     <div
@@ -145,7 +226,7 @@ function InteractiveCostMatrix(
         <svg
           ref={svgRef}
           style={{
-            backgroundColor: "tomato",
+            backgroundColor: "lavender",
             width: "400px",
             height: "400px",
             margin: "10px",
@@ -156,5 +237,4 @@ function InteractiveCostMatrix(
     </div>
   );
 }
-
 export default InteractiveCostMatrix;
