@@ -46,8 +46,6 @@ function ProtoLoader(props: ProtoLoaderProps): React.ReactElement {
   async function processFile(event: React.FormEvent<HTMLInputElement>) {
     try {
       const target = event.target as HTMLInputElement & { files: FileList };
-      console.log("target", target.files);
-
       if (!target.files || target.files.length <= 0) {
         console.log("No file was uploaded");
         return;
@@ -57,12 +55,11 @@ function ProtoLoader(props: ProtoLoaderProps): React.ReactElement {
       if (contentBuffer == null) {
         throw new Error("Empty content");
       }
-      console.log("Hello content", contentBuffer);
       let protoMessage = await readProto(
         new Uint8Array(contentBuffer),
         "image_sequence_localizer." + props.messageType.toString()
       );
-      console.log("Proto message", protoMessage);
+      console.log("Read proto message", protoMessage);
       setProtoMessage(protoMessage);
     } catch (err) {
       console.log("File was not processed", err);

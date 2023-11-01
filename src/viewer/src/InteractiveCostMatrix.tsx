@@ -126,7 +126,7 @@ function InteractiveCostMatrix(
   }, [selectedPixel, setSelectedElement]);
 
   useEffect(() => {
-    // Retrieve group for matrix elements
+    // Retrieve the group for matrix elements
     const valuesGroup = d3.select(svgRef.current).select(".matrixEntries");
     valuesGroup
       .selectAll("rect")
@@ -163,7 +163,7 @@ function InteractiveCostMatrix(
     if (props.matches == null) {
       return;
     }
-    // Retrieve group for matrix elements
+    // Retrieve the group for matches
     const matchesGroup = d3.select(svgRef.current).select(".matches");
     matchesGroup
       .selectAll("rect")
