@@ -2,7 +2,6 @@ import numpy as np
 import cv2
 import argparse
 from pathlib import Path
-import matplotlib.pyplot as plt
 
 from sklearn import preprocessing
 from sklearn.cluster import KMeans
@@ -19,6 +18,14 @@ def listImagesInFolder(folderPath):
 
 
 def rescaleImageIfNeeded(image):
+    """Rescales the image to have a maximum kDefaultWidth and keeps the aspect ratio.
+
+    Args:
+        image (np.array): image
+
+    Returns:
+        np.array: rescaled or original image
+    """
     height, width = image.shape
     if width > kDefaultWidth:
         newHeight = (height * kDefaultWidth) / width
@@ -45,7 +52,7 @@ def extractSiftsFromImage(imageFile):
 
 
 def computeIDF(descriptorsPerImage, clusters):
-    """Compute inverse document frequence (IDF). Here means in how many images does the word occur.
+    """Compute inverse document frequence (IDF). IDF in visual BoW context means in how many images does the word occur.
 
     Args:
         descriptorsByImages (list(list(1xD)): List of descriptors per image
@@ -79,6 +86,9 @@ def trainVocabulary(imageFiles, outputFile=""):
 
     Args:
         imageFiles (list(Path)): paths to images
+    Returns:
+        (np.array, np.array): A pair of values: CxD array of computed words and Cx1 inverse word occurance
+
     """
     descriptorsPerImage = []
     for imageFile in imageFiles:
@@ -87,7 +97,9 @@ def trainVocabulary(imageFiles, outputFile=""):
 
     # flatten the descriptors list
     descriptors = [
-        descriptor for descriptors in descriptorsPerImage for descriptor in descriptors
+        descriptor
+        for imageDescriptors in descriptorsPerImage
+        for descriptor in imageDescriptors
     ]
     descriptors = np.array(descriptors)
 
@@ -97,9 +109,6 @@ def trainVocabulary(imageFiles, outputFile=""):
     words = kmeans.cluster_centers_
 
     idfs = computeIDF(descriptorsPerImage, words)
-
-    plt.bar(range(0, len(idfs)), idfs)
-    plt.savefig("idf_" + str(kDefaultClusterSize) + ".png")
 
     if outputFile:
         np.savez(outputFile, vocabulary=words, idfs=idfs)
@@ -112,13 +121,23 @@ def trainVocabularyFromFolder(folderPath, outputFile=""):
 
 
 def getVocabulary(imageTrainFolder, vocabularyFile):
-    if vocabularyFile is not None:
+    """Trains a vocabulary from images in imageTrainFolder or loads if the vocabulary exists under vocabularyFile
+
+    Args:
+        imageTrainFolder (Path): path to folder with images to be used for training
+        vocabularyFile (Path): a file with vocabulary. If file doesn't exists, the new vocabulary will be computed
+
+    Returns:
+        (np.array, np.array) | None: A pair of values: CxD array of computed words and Cx1 inverse word occurance,
+        or None if it was impossible to read or compute the vocabulary
+    """
+    if vocabularyFile:
         if vocabularyFile.exists():
             print("Vocabulary exists and will be loaded")
             data = np.load(vocabularyFile)
             return data["vocabulary"], data["idfs"]
         elif imageTrainFolder is None:
-            print("Vocabulary doesn't exits, please provide images to train on")
+            print("Vocabulary doesn't exits, please provide images to train on.")
             return None
         else:
             return trainVocabularyFromFolder(imageTrainFolder, vocabularyFile)
@@ -184,7 +203,7 @@ def main():
         help="Path to the image directory for which the histograms should be computed.",
     )
     parser.add_argument(
-        "--outputFile",
+        "--output_file",
         required=False,
         type=Path,
         help="Filename where Bow features will be stored, .csv recommended.",
@@ -197,7 +216,7 @@ def main():
     numberOfWords = vocabulary.shape[0]
     vocabularyTree = KDTree(vocabulary)
     if args.images:
-        if not args.outputFile:
+        if not args.output_file:
             print(
                 "WARNING: The output file is not specified. The features will not be stored."
             )
@@ -213,9 +232,9 @@ def main():
             histograms.append(histogram)
             print("Processing done")
         histograms = np.array(histograms)
-        if args.outputFile:
-            np.savetxt(args.outputFile, histograms)
-            print("Features were saved to", args.outputFile)
+        if args.output_file:
+            np.savetxt(args.output_file, histograms)
+            print("Features were saved to", args.output_file)
 
     return
 
