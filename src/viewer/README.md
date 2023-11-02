@@ -1,9 +1,9 @@
 # Viewer
 This viewer should be used for debug purposes. In the viewer, you can:
-* Examine cost matrices that are stored in ".CostMatrix.pb" format
-* Preview images in both sequences
+* Examine cost matrices that are stored in ".CostMatrix.pb" format.
+* Preview images in both sequences.
 * OnClick on the cost matrix preview the corresponding image pair.
-* Preview the matchign result, stored in ".MatchingResult.pb"
+* Preview the matchign result, stored in ".MatchingResult.pb".
 
 ## Install
 Make sure you have installed **npm** and **node** of the correct version.
