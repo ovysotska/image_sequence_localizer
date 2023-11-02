@@ -13,7 +13,7 @@ The assumption is then that the input is a sequence of images. The program outpu
 
 Prerequisites:
 ```
-sudo apt-get install -y libopencv-dev libyaml-cpp-dev libprotobuf-dev libprotoc-dev protobuf-compiler
+sudo apt-get install -y build-essential libopencv-dev libyaml-cpp-dev libprotobuf-dev libprotoc-dev protobuf-compiler
 ```
 Tested on Ubuntu 20.04.
 
