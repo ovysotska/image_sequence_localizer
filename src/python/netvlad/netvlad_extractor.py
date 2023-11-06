@@ -144,7 +144,7 @@ class NetVLAD(nn.Module):
         }
 
     def forward(self, image):
-        assert image.shape[0] == 3
+        # assert image.shape[0] == 3
         image = torch.clamp(image * 255, 0.0, 255.0)  # Input should be 0-255.
 
         mean_tensor = image.new_tensor(self.preprocess["mean"]).view(1, -1, 1, 1)
@@ -192,10 +192,7 @@ def main():
     )
     args = parser.parse_args()
 
-    # TODO(olga): Make sure it works with GPU too.
-    # Get cpu or gpu device for training.
-    # device = "cuda" if torch.cuda.is_available() else "cpu"
-    device = "cpu"
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print(f"Using {device} device")
     model = NetVLAD(args.netvlad_weights_file).to(device)
 
@@ -204,8 +201,9 @@ def main():
     dataset = ImageDataset(img_dir=args.data_dir, transform=ToTensor())
     for image_idx in range(len(dataset)):
         image = dataset[image_idx]
+        image = image.to(device)
         prediction = model(image)
-        pred_np = prediction.detach().numpy()[0]
+        pred_np = prediction.detach().cpu().numpy()[0]
         netVladDescriptors.append(pred_np)
         print(f"Processed image {image_idx}")
 

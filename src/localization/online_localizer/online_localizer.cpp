@@ -155,7 +155,6 @@ void OnlineLocalizer::matchImage(int quId) {
     updateGraph(expandedNode, children);
   } else {
     bool row_reached = false;
-    // printf("[INFO][OnlineLocalizer] NOT LOST\n");
     while (!frontier_.empty() && !row_reached) {
       Node expandedNode = frontier_.top();
       frontier_.pop();

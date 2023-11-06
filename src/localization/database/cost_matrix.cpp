@@ -84,7 +84,11 @@ double CostMatrix::getInverseCost(int row, int col) const {
   if (std::abs(value) < kEpsilon) {
     return std::numeric_limits<double>::max();
   }
-  return 1. / value;
+  if (value < 0){
+    LOG(WARNING) << "The cost value for row:" << row  << " and col:" << col <<" is < 0: " << value<< ". This should not be like this. I will make a positive value of it for now. But please check your values";
+
+  }
+  return 1. / std::abs(value);
 }
 
 void CostMatrix::loadFromProto(const std::string &filename) {
