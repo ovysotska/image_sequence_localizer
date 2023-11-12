@@ -46,29 +46,6 @@ using std::vector;
 
 const float kMaxLostNodesRatio = 0.8; // 80%
 
-void storeMatchesAsProto(const Matches &matches,
-                         const std::string &protoFilename) {
-  image_sequence_localizer::MatchingResult matching_result_proto;
-
-  for (const auto &match : matches) {
-    image_sequence_localizer::MatchingResult::Match *match_proto =
-        matching_result_proto.add_matches();
-    match_proto->set_query_id(match.quId);
-    match_proto->set_ref_id(match.refId);
-    match_proto->set_real(match.state == NodeState::HIDDEN ? 0 : 1);
-  }
-
-  std::fstream out(protoFilename,
-                   std::ios::out | std::ios::trunc | std::ios::binary);
-  if (!matching_result_proto.SerializeToOstream(&out)) {
-    LOG(ERROR) << "Couldn't open the file " << protoFilename;
-    LOG(ERROR) << "The path is NOT saved.";
-    return;
-  }
-  out.close();
-  LOG(INFO) << "The path was written to " << protoFilename;
-}
-
 OnlineLocalizer::OnlineLocalizer(
     successor_manager::SuccessorManager *successorManager, double expansionRate,
     double nonMatchingCost) {

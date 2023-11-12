@@ -1,4 +1,4 @@
-/** vpr_relocalization: a library for visual place recognition in changing 
+/** vpr_relocalization: a library for visual place recognition in changing
 ** environments with efficient relocalization step.
 ** Copyright (c) 2017 O. Vysotska, C. Stachniss, University of Bonn
 **
@@ -24,13 +24,18 @@
 #ifndef SRC_ONLINE_LOCALIZER_PATH_ELEMENT_H_
 #define SRC_ONLINE_LOCALIZER_PATH_ELEMENT_H_
 
+#include <string>
+#include <vector>
+
+namespace localization::online_localizer {
+
 enum NodeState { REAL, HIDDEN };
 
 /**
  * @brief     Container class representing an element of the resulting path
  */
 class PathElement {
- public:
+public:
   PathElement() {}
   PathElement(int quId, int refId, NodeState state) {
     this->quId = quId;
@@ -43,4 +48,9 @@ class PathElement {
   void print() const;
 };
 
-#endif  // SRC_ONLINE_LOCALIZER_PATH_ELEMENT_H_
+using Matches = std::vector<PathElement>;
+void storeMatchesAsProto(const Matches &matches,
+                         const std::string &protoFilename);
+}; // namespace localization::online_localizer
+
+#endif // SRC_ONLINE_LOCALIZER_PATH_ELEMENT_H_
