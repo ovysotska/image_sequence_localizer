@@ -39,10 +39,6 @@
 
 namespace localization::online_localizer {
 
-using Matches = std::vector<PathElement>;
-void storeMatchesAsProto(const Matches &matches,
-                         const std::string &protoFilename);
-
 // Performs online localization.
 class OnlineLocalizer {
 public:

@@ -32,19 +32,22 @@
 #include "online_localizer/path_element.h"
 #include "successor_manager/node.h"
 
+namespace localization::online_localizer {
+
 /**
  * @brief      interface to visualize the localizer. To write your own
  * visualizer inherit from this class.
  */
 class iLocVisualizer {
-   public:
-    using Ptr = std::shared_ptr<iLocVisualizer>;
-    using ConstPtr = std::shared_ptr<const iLocVisualizer>;
+public:
+  using Ptr = std::shared_ptr<iLocVisualizer>;
+  using ConstPtr = std::shared_ptr<const iLocVisualizer>;
 
-    virtual void drawPath(const std::vector<PathElement> &path) = 0;
-    virtual void drawFrontier(const std::unordered_set<Node> &frontier) = 0;
-    virtual void drawExpansion(NodeSet expansion) = 0;
-    virtual void processFinished() = 0;
+  virtual void drawPath(const std::vector<PathElement> &path) = 0;
+  virtual void drawFrontier(const std::unordered_set<Node> &frontier) = 0;
+  virtual void drawExpansion(NodeSet expansion) = 0;
+  virtual void processFinished() = 0;
 };
+}; // namespace localization::online_localizer
 
-#endif  // SRC_ONLINE_LOCALIZER_ILOCVISUALIZER_H_
+#endif // SRC_ONLINE_LOCALIZER_ILOCVISUALIZER_H_

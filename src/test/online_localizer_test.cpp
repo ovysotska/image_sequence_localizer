@@ -67,7 +67,7 @@ TEST_F(OnlineLocalizerTest, Get) {
   for (int i = 0; i < matches.size(); ++i) {
     EXPECT_EQ(matches[i].quId, matches.size() - 1 - i);
     EXPECT_EQ(matches[i].refId, matches.size() - 1 - i);
-    EXPECT_EQ(matches[i].state, NodeState::REAL);
+    EXPECT_EQ(matches[i].state, loc::online_localizer::NodeState::REAL);
   }
 }
 

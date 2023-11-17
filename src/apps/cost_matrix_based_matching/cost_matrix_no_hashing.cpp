@@ -3,6 +3,7 @@
 #include "database/cost_matrix_database.h"
 #include "database/idatabase.h"
 #include "online_localizer/online_localizer.h"
+#include "online_localizer/path_element.h"
 #include "relocalizers/default_relocalizer.h"
 #include "successor_manager/successor_manager.h"
 #include "tools/config_parser/config_parser.h"
