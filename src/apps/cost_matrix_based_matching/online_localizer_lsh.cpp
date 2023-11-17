@@ -26,11 +26,9 @@
 #include "database/online_database.h"
 #include "features/cnn_feature.h"
 #include "features/ifeature.h"
-// #include "online_localizer/ilocvisualizer.h"
 #include "online_localizer/online_localizer.h"
 #include "online_localizer/path_element.h"
 #include "relocalizers/lsh_cv_hashing.h"
-#include "successor_manager/successor_manager.h"
 #include "tools/config_parser/config_parser.h"
 
 #include <glog/logging.h>
