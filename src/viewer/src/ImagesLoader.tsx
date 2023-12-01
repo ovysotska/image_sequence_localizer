@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
 
+import "./ImagesLoader.css"
+
+import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
+import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded';
+
 function readImageAsync(file: Blob) {
   return new Promise<string>((resolve, reject) => {
     let reader = new FileReader();
@@ -95,17 +100,18 @@ function ImagesLoader(props: ImageLoaderProps) {
       {images &&
         images.length > currentImageId &&
         images[currentImageId] !== undefined && (
-          <div>
-            <img src={images[currentImageId].base64Encoding} alt="preview" />
-            <p>
+          <div className="imageCarousel">
+            <img src={images[currentImageId].base64Encoding} alt="preview"  className="slide"/>
+            <p className="info">
               id: {images[currentImageId].id}; filename:{" "}
               {images[currentImageId].fileName}
             </p>
+
+            <ArrowForwardIosRoundedIcon className ="arrow arrow-right" onClick={handleNextClick}></ArrowForwardIosRoundedIcon>
+            <ArrowBackIosRoundedIcon className ="arrow arrow-left" onClick={handlePrevClick}></ArrowBackIosRoundedIcon>
           </div>
         )}
       <div>
-        <button onClick={handlePrevClick}>prev</button>
-        <button onClick={handleNextClick}>next</button>
       </div>
     </div>
   );
