@@ -4,6 +4,7 @@ import "./ImagesLoader.css"
 
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
 import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded';
+import { Input } from '@mui/material';
 
 function readImageAsync(file: Blob) {
   return new Promise<string>((resolve, reject) => {

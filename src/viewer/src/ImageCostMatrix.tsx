@@ -39,6 +39,7 @@ const ZoomTooltip = forwardRef((props: ZoomTooltipProps, pixelZoomRef: any) => {
         left: props.coordX + "px",
         border: "3px solid pink",
         visibility: props.coordX && props.coordY ? "visible" : "hidden",
+        zIndex: 2
       }}
     >
       <canvas ref={pixelZoomRef}></canvas>
@@ -262,6 +263,7 @@ function ImageCostMatrix(props: ImageCostMatrixProps): React.ReactElement {
           maxWidth: "800px",
           overflow: "auto",
           margin: "10px",
+          zIndex: 2,
         }}
       >
         <canvas

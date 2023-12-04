@@ -75,7 +75,7 @@ function ProtoLoader(props: ProtoLoaderProps): React.ReactElement {
   return (
     <div>
       <label htmlFor="folder">
-        Select *.{props.messageType.toString()}.proto file{" "}
+        Select <b>*.{props.messageType.toString()}.proto</b> file{" "}
       </label>
       <input type="file" id="fileInput" onChange={processFile}></input>
     </div>

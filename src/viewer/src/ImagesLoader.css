@@ -1,0 +1,43 @@
+.imageCarousel{
+    position: relative;
+    width: 600px;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+}
+
+.slide{
+    border-radius: 0.5rem;
+    box-shadow: 0px 0px 7px #666;
+    width: 100%;
+    height:100%;
+}
+
+.info{
+    position: absolute;
+    background-color:rgba(255,255,255,.8);
+    top: -1rem;
+}
+
+.arrow{
+    position: absolute;
+    width: 3rem;
+    height: 3rem;
+    color: black;
+    background-color: white;
+    box-shadow: 0px 0px 7px #666;
+    border-radius: 0.5rem;
+}
+.arrow:hover{
+    cursor: pointer;
+}
+
+.arrow-right{
+    right: 2rem;
+}
+
+.arrow-left{
+    left: 2rem;
+}
