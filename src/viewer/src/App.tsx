@@ -44,14 +44,18 @@ function App() {
       >
         <h1 style={{ textAlign: "center" }}>Cost Matrix Viewer</h1>
         <div className="costMatrix" style={{ backgroundColor: "ghostwhite" }}>
-          <ProtoLoader
-            onLoad={setCostMatrixProto}
-            messageType={MessageType.CostMatrix}
-          />
-          <ProtoLoader
-            onLoad={setMatchingResultProto}
-            messageType={MessageType.MatchingResult}
-          />
+          <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+            <div>
+              <ProtoLoader
+                onLoad={setCostMatrixProto}
+                messageType={MessageType.CostMatrix}
+              />
+              <ProtoLoader
+                onLoad={setMatchingResultProto}
+                messageType={MessageType.MatchingResult}
+              />
+            </div>
+          </div>
           {costMatrix && (
             <CostMatrixComponent
               costMatrix={costMatrix}

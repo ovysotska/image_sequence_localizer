@@ -5,6 +5,8 @@ import { ImageCostMatrix, ZoomBlockParams } from "./ImageCostMatrix";
 import { MatchingResultElement } from "./matchingResult";
 import InteractiveCostMatrix from "./InteractiveCostMatrix";
 
+import { FormGroup, FormControlLabel, Switch } from "@mui/material";
+
 function getMatchingResultInZoomBlock(
   results: MatchingResultElement[],
   zoomParams: ZoomBlockParams
@@ -82,10 +84,24 @@ function CostMatrixComponent(props: CostMatrixProps): React.ReactElement {
         flexDirection: "column",
       }}
     >
-      <div>
-        <input id="checkbox" type="checkbox" onChange={showMatchingResult} />
-        <label htmlFor="checkbox">Show matching result</label>
-      </div>
+      <FormGroup
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+        }}
+      >
+        <FormControlLabel
+          disabled={matchingResult ? false : true}
+          control={<Switch onChange={showMatchingResult} color="secondary" />}
+          label="Matching result"
+        />
+        <FormControlLabel
+          disabled
+          control={<Switch onChange={showMatchingResult} />}
+          label="Expanded nodes"
+        />
+      </FormGroup>
       <div
         style={{
           display: "flex",
