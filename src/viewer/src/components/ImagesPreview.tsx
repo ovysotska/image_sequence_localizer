@@ -23,28 +23,19 @@ type ImageData = {
   base64Encoding?: string;
 };
 
-type ImageLoaderProps = {
-  imageType: string;
+type ImagePreviewProps = {
+  imageFiles?: File[];
+  imageSource: string;
   showImageId?: number;
 };
 
-function ImagesLoader(props: ImageLoaderProps) {
+function ImagesPreview(props: ImagePreviewProps) {
   const [images, setImages] = useState<ImageData[]>();
   const [currentImageId, setCurrentImageId] = useState<number>(0);
 
-  useEffect(() => {
-    if (images == null || props.showImageId == null) {
-      return;
-    }
-    if (props.showImageId < 0 || props.showImageId >= images.length) {
-      return;
-    }
-    setCurrentImageId(props.showImageId);
-  }, [props.showImageId, images]);
+  const { imageFiles, showImageId } = props;
 
-  function onChange(event: React.ChangeEvent<HTMLInputElement>) {
-    event.preventDefault();
-    let files = event.target.files;
+  function loadImages(files?: File[]) {
     if (files == null) {
       return;
     }
@@ -66,10 +57,35 @@ function ImagesLoader(props: ImageLoaderProps) {
             setImages(imageList);
           })
           .catch((error) => {
-            console.log("Image was not loaded");
+            console.log("Image was not loaded", error);
           });
       }
     });
+  }
+
+  useEffect(() => {
+    // Loads from props
+    loadImages(imageFiles);
+  }, [imageFiles]);
+
+  useEffect(() => {
+    if (images == null || showImageId == null) {
+      return;
+    }
+    if (showImageId < 0 || showImageId >= images.length) {
+      return;
+    }
+    setCurrentImageId(showImageId);
+  }, [showImageId, images]);
+
+  function onChange(event: React.ChangeEvent<HTMLInputElement>) {
+    // Loads from input
+    event.preventDefault();
+    let files = event.target.files;
+    if (files == null) {
+      return;
+    }
+    loadImages(Array.from(files));
   }
 
   function handleNextClick() {
@@ -92,12 +108,14 @@ function ImagesLoader(props: ImageLoaderProps) {
         textAlign: "center",
       }}
     >
-      <h2>{props.imageType} images</h2>
+      <h2> {props.imageSource} images</h2>
 
-      <div>
-        <label htmlFor="folder">Select {props.imageType} images </label>
-        <input type="file" id="folder" multiple onChange={onChange} />
-      </div>
+      {!props.imageFiles && (
+        <div>
+          <label htmlFor="folder">Select {props.imageSource} images </label>
+          <input type="file" id="folder" multiple onChange={onChange} />
+        </div>
+      )}
       {images &&
         images.length > currentImageId &&
         images[currentImageId] !== undefined && (
@@ -118,5 +136,5 @@ function ImagesLoader(props: ImageLoaderProps) {
   );
 }
 
-export { ImagesLoader };
-export type { ImageLoaderProps };
+export { ImagesPreview };
+export type { ImagePreviewProps };

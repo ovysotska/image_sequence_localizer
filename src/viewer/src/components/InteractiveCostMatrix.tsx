@@ -1,10 +1,10 @@
 import React from "react";
 import { useState, useRef, useEffect, useCallback } from "react";
-import { CostMatrix, CostMatrixElement } from "./costMatrix";
+import { CostMatrix, CostMatrixElement } from "../resources/costMatrix";
 import { ZoomBlockParams } from "./ImageCostMatrix";
 
 import * as d3 from "d3";
-import { MatchingResultElement } from "./matchingResult";
+import { MatchingResultElement } from "../resources/readers";
 
 type TooltipProps = {
   opacity: number;

@@ -1,6 +1,6 @@
 import React, { forwardRef } from "react";
 import { useState, useRef, useEffect } from "react";
-import { MatchingResultElement } from "./matchingResult";
+import { MatchingResultElement } from "../resources/readers";
 
 const kZoomWindowPx = 30;
 
