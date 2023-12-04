@@ -1,5 +1,7 @@
 .imageCarousel{
     position: relative;
+    min-width: 200px;
+    min-height: 100px;
     width: 600px;
     height: 400px;
     display: flex;

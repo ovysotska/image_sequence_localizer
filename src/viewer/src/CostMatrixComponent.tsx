@@ -84,9 +84,16 @@ function CostMatrixComponent(props: CostMatrixProps): React.ReactElement {
         flexDirection: "column",
       }}
     >
-      <FormGroup style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
+      <FormGroup
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+        }}
+      >
         <FormControlLabel
-          control={<Switch onChange={showMatchingResult}  color="secondary"/>}
+          disabled={matchingResult ? false : true}
+          control={<Switch onChange={showMatchingResult} color="secondary" />}
           label="Matching result"
         />
         <FormControlLabel
