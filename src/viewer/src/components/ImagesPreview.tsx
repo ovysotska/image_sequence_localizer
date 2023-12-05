@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 
-import "./ImagesLoader.css"
+import "./ImagesLoader.css";
 
-import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
-import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded';
-import { Input } from '@mui/material';
+import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
+import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
 
 function readImageAsync(file: Blob) {
   return new Promise<string>((resolve, reject) => {
@@ -38,6 +37,9 @@ function ImagesPreview(props: ImagePreviewProps) {
   function loadImages(files?: File[]) {
     if (files == null) {
       return;
+    }
+    if (files.length === 0) {
+      setImages(undefined);
     }
 
     const sortedFiles = Array.from(files).sort((a, b) => {
@@ -110,7 +112,7 @@ function ImagesPreview(props: ImagePreviewProps) {
     >
       <h2> {props.imageSource} images</h2>
 
-      {!props.imageFiles && (
+      {!images && (
         <div>
           <label htmlFor="folder">Select {props.imageSource} images </label>
           <input type="file" id="folder" multiple onChange={onChange} />
@@ -120,18 +122,27 @@ function ImagesPreview(props: ImagePreviewProps) {
         images.length > currentImageId &&
         images[currentImageId] !== undefined && (
           <div className="imageCarousel">
-            <img src={images[currentImageId].base64Encoding} alt="preview"  className="slide"/>
+            <img
+              src={images[currentImageId].base64Encoding}
+              alt="preview"
+              className="slide"
+            />
             <p className="info">
               id: {images[currentImageId].id}; filename:{" "}
               {images[currentImageId].fileName}
             </p>
 
-            <ArrowForwardIosRoundedIcon className ="arrow arrow-right" onClick={handleNextClick}></ArrowForwardIosRoundedIcon>
-            <ArrowBackIosRoundedIcon className ="arrow arrow-left" onClick={handlePrevClick}></ArrowBackIosRoundedIcon>
+            <ArrowForwardIosRoundedIcon
+              className="arrow arrow-right"
+              onClick={handleNextClick}
+            ></ArrowForwardIosRoundedIcon>
+            <ArrowBackIosRoundedIcon
+              className="arrow arrow-left"
+              onClick={handlePrevClick}
+            ></ArrowBackIosRoundedIcon>
           </div>
         )}
-      <div>
-      </div>
+      <div></div>
     </div>
   );
 }

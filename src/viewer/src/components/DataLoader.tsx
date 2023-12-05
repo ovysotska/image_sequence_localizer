@@ -1,3 +1,5 @@
+import Alert from "@mui/material/Alert";
+
 type DataLoaderProps = {
   setMatchingResultProtoFile: (file: File) => void;
   setCostMatrixProtoFile: (file: File) => void;
@@ -39,7 +41,7 @@ function DataLoader(props: DataLoaderProps): React.ReactElement {
       return file.webkitRelativePath.split("/")[1] === "query_images";
     });
     if (queryImageFiles.length === 0) {
-      console.warn("Query images was not found");
+      props.setQueryImageFiles([]);
     } else {
       props.setQueryImageFiles(queryImageFiles);
     }
@@ -49,6 +51,7 @@ function DataLoader(props: DataLoaderProps): React.ReactElement {
     });
     if (referenceImageFiles.length === 0) {
       console.warn("Reference images was not found");
+      props.setReferenceImageFiles([]);
     } else {
       props.setReferenceImageFiles(referenceImageFiles);
     }
