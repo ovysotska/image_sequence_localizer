@@ -3,7 +3,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { CostMatrix, CostMatrixElement } from "../resources/costMatrix";
 import { ZoomBlockParams } from "./ImageCostMatrix";
 
-import { useElementContext } from "../context/ElementContext";
+import { useElementContext, SelectedElement } from "../context/ElementContext";
 
 import * as d3 from "d3";
 import { MatchingResultElement } from "../resources/readers";
@@ -112,6 +112,38 @@ function InteractiveCostMatrix(
     });
   }, []);
 
+  const moveSliders = useCallback(
+    (element: SelectedElement) => {
+      const cellInZoomX =
+        (element.referenceId - props.zoomBlock.topLeftX) * cellSize +
+        cellSize / 2;
+      const cellInZoomY =
+        (element.queryId - props.zoomBlock.topLeftY) * cellSize + cellSize / 2;
+
+      d3.select(svgRef.current)
+        .select(".ySlider")
+        .transition()
+        .duration(500) // Animation duration in milliseconds
+        .attr("y1", cellInZoomY)
+        .attr("y2", cellInZoomY);
+      d3.select(svgRef.current)
+        .select(".xSlider")
+        .transition()
+        .duration(500) // Animation duration in milliseconds
+        .attr("x1", cellInZoomX)
+        .attr("x2", cellInZoomX);
+    },
+    [props.zoomBlock, cellSize]
+  );
+
+  // Move sliders when somebody changed the global selected element context
+  useEffect(() => {
+    if (globalSelectedElement == null) {
+      return;
+    }
+    moveSliders(globalSelectedElement);
+  }, [globalSelectedElement, moveSliders]);
+
   const onCellUnHover = useCallback((event: any) => {
     setTooltipVisible(false);
     event.target.setAttribute("opacity", 1.0);
@@ -119,7 +151,11 @@ function InteractiveCostMatrix(
 
   const onCellClick = useCallback(
     (event: any, cell: CostMatrixElement) => {
-      setGlobalSelectedElement(cell);
+      // moveSliders({ queryId: cell.queryId, referenceId: cell.refId });
+      setGlobalSelectedElement({
+        queryId: cell.queryId,
+        referenceId: cell.refId,
+      });
     },
     [setGlobalSelectedElement]
   );
@@ -157,6 +193,29 @@ function InteractiveCostMatrix(
     onCellUnHover,
     onCellClick,
   ]);
+
+  useEffect(() => {
+    const valuesGroup = d3.select(svgRef.current).select(".matrixEntries");
+    valuesGroup
+      .append("line")
+      .attr("class", "ySlider")
+      .attr("id", "ySlider")
+      .attr("x1", 0)
+      .attr("y1", 0)
+      .attr("x2", height)
+      .attr("y2", 0)
+      .attr("stroke", "#1e81b0")
+      .attr("stroke-width", 2);
+    valuesGroup
+      .append("line")
+      .attr("class", "xSlider")
+      .attr("x1", 0)
+      .attr("y1", 0)
+      .attr("x2", 0)
+      .attr("y2", height)
+      .attr("stroke", "#eab676")
+      .attr("stroke-width", 2);
+  }, [props.costMatrix, props.zoomBlock]);
 
   useEffect(() => {
     if (props.matches == null) {

@@ -117,7 +117,7 @@ function CostMatrixComponent(props: CostMatrixProps): React.ReactElement {
       >
         <FormControlLabel
           disabled={matchingResult ? false : true}
-          control={<Switch onChange={showMatchingResult} color="secondary" />}
+          control={<Switch onChange={showMatchingResult} color="primary" />}
           label="Matching result"
         />
         <FormControlLabel

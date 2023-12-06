@@ -1,4 +1,5 @@
 import React from "react";
+
 import { ImageCarousel } from "./ImageCarousel";
 
 import { useElementContext } from "../context/ElementContext";
@@ -14,12 +15,36 @@ function ImagePreviewComponent(
   const { globalSelectedElement, setGlobalSelectedElement } =
     useElementContext();
 
+  function updateGlobalQueryId(queryId?: number) {
+    if (queryId == null) {
+      return;
+    }
+    if (globalSelectedElement != null) {
+      setGlobalSelectedElement({
+        queryId: queryId,
+        referenceId: globalSelectedElement?.referenceId,
+      });
+    }
+  }
+
+  function updateGlobalRefId(refId?: number) {
+    if (refId == null) {
+      return;
+    }
+    if (globalSelectedElement != null) {
+      setGlobalSelectedElement({
+        queryId: globalSelectedElement.queryId,
+        referenceId: refId,
+      });
+    }
+  }
+
   return (
     <div
       className="imageLoaders"
       style={{
         margin: "0 10px 0 10px",
-        backgroundColor: "lavender",
+        backgroundColor: "#EAF1FF",
         display: "flex",
         flexDirection: "row",
         flexWrap: "wrap",
@@ -32,13 +57,15 @@ function ImagePreviewComponent(
           imageFiles={props.queryImageFiles}
           imageSource={"Query"}
           showImageId={globalSelectedElement?.queryId}
+          setSelectedImageId={updateGlobalQueryId}
         />
       </div>
       <div>
         <ImageCarousel
           imageFiles={props.referenceImageFiles}
           imageSource={"Reference"}
-          showImageId={globalSelectedElement?.refId}
+          showImageId={globalSelectedElement?.referenceId}
+          setSelectedImageId={updateGlobalRefId}
         />
       </div>
     </div>

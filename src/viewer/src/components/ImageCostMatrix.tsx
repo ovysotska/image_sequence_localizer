@@ -37,9 +37,9 @@ const ZoomTooltip = forwardRef((props: ZoomTooltipProps, pixelZoomRef: any) => {
         position: "absolute",
         top: props.coordY + "px",
         left: props.coordX + "px",
-        border: "3px solid pink",
+        boxShadow: "0px 0px 15px lavender",
         visibility: props.coordX && props.coordY ? "visible" : "hidden",
-        zIndex: 2
+        zIndex: 2,
       }}
     >
       <canvas ref={pixelZoomRef}></canvas>

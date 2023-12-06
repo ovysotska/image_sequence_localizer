@@ -36,7 +36,7 @@ function App() {
           />
           <div
             className="costMatrix"
-            style={{ margin: "0 10px 0 10px", backgroundColor: "ghostwhite" }}
+            style={{ margin: "0 10px 0 10px", backgroundColor: "alicewhite" }}
           >
             {costMatrixProtoFile && (
               <CostMatrixComponent

@@ -1,10 +1,14 @@
 import React, { createContext, useContext, ReactNode, useState } from "react";
-import { CostMatrixElement } from "../resources/costMatrix";
+
+type SelectedElement = {
+  queryId: number;
+  referenceId: number;
+};
 
 interface ElementContextProps {
-  globalSelectedElement?: CostMatrixElement;
+  globalSelectedElement?: SelectedElement;
   setGlobalSelectedElement: React.Dispatch<
-    React.SetStateAction<CostMatrixElement | undefined>
+    React.SetStateAction<SelectedElement | undefined>
   >;
 }
 
@@ -18,7 +22,7 @@ interface ElementProviderProps {
 
 function ElementProvider(props: ElementProviderProps) {
   const [globalSelectedElement, setGlobalSelectedElement] =
-    useState<CostMatrixElement>();
+    useState<SelectedElement>();
 
   return (
     <ElementContext.Provider
@@ -33,10 +37,11 @@ function useElementContext(): ElementContextProps {
   const context = useContext(ElementContext);
 
   if (!context) {
-    throw new Error("useAppContext must be used within an AppProvider");
+    throw new Error("useElementContext must be used within an ElementProvider");
   }
 
   return context;
 }
 
 export { ElementProvider, useElementContext };
+export type { SelectedElement };

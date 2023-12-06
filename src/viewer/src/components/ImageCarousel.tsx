@@ -26,6 +26,7 @@ type ImageCarouselProps = {
   imageFiles?: File[];
   imageSource: string;
   showImageId?: number;
+  setSelectedImageId?: (id?: number) => void;
 };
 
 function ImageCarousel(props: ImageCarouselProps) {
@@ -59,7 +60,7 @@ function ImageCarousel(props: ImageCarouselProps) {
             setImages(imageList);
           })
           .catch((error) => {
-            console.log("Image was not loaded", error);
+            console.warn("Image was not loaded", error);
           });
       }
     });
@@ -91,17 +92,25 @@ function ImageCarousel(props: ImageCarouselProps) {
   }
 
   function handleNextClick() {
-    if (images == null) {
+    if (images == null || currentImageId == null) {
       return;
     }
-    setCurrentImageId(Math.min(currentImageId + 1, images.length - 1));
+    const nextImageId = Math.min(currentImageId + 1, images.length - 1);
+    setCurrentImageId(nextImageId);
+    if (props.setSelectedImageId != null) {
+      props.setSelectedImageId(nextImageId);
+    }
   }
 
   function handlePrevClick() {
-    if (images == null) {
+    if (images == null || currentImageId == null) {
       return;
     }
-    setCurrentImageId(Math.max(currentImageId - 1, 0));
+    const prevImageId = Math.max(currentImageId - 1, 0);
+    setCurrentImageId(prevImageId);
+    if (props.setSelectedImageId != null) {
+      props.setSelectedImageId(prevImageId);
+    }
   }
 
   return (
@@ -119,6 +128,7 @@ function ImageCarousel(props: ImageCarouselProps) {
         </div>
       )}
       {images &&
+        currentImageId &&
         images.length > currentImageId &&
         images[currentImageId] !== undefined && (
           <div className="imageCarousel">
