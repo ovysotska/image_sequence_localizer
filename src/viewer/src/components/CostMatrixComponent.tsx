@@ -1,6 +1,6 @@
 // Created by O. Vysotska in 2023
 import { useState, useEffect } from "react";
-import { CostMatrix, CostMatrixElement } from "../resources/costMatrix";
+import { CostMatrix } from "../resources/costMatrix";
 import { ImageCostMatrix, ZoomBlockParams } from "./ImageCostMatrix";
 import InteractiveCostMatrix from "./InteractiveCostMatrix";
 
@@ -29,7 +29,6 @@ function getMatchingResultInZoomBlock(
 type CostMatrixProps = {
   costMatrixProtoFile: File;
   matchingResultProtoFile?: File;
-  setSelectedCostMatrixElement: (element: CostMatrixElement) => void;
 };
 
 function CostMatrixComponent(props: CostMatrixProps): React.ReactElement {
@@ -41,9 +40,6 @@ function CostMatrixComponent(props: CostMatrixProps): React.ReactElement {
   const [zoomedCostMatrix, setZoomedCostMatrix] = useState<CostMatrix>();
   const [matchingResultVisible, setMatchingResultVisible] =
     useState<boolean>(false);
-  const [selectedElement, setSelectedElement] = useState<CostMatrixElement>();
-
-  const { setSelectedCostMatrixElement } = props;
 
   // Read costMatrix from proto file.
   useEffect(() => {
@@ -58,13 +54,6 @@ function CostMatrixComponent(props: CostMatrixProps): React.ReactElement {
         console.log("Couldn't read file", props.costMatrixProtoFile);
       });
   }, [props.costMatrixProtoFile]);
-
-  useEffect(() => {
-    if (selectedElement == null) {
-      return;
-    }
-    setSelectedCostMatrixElement(selectedElement);
-  }, [selectedElement, setSelectedCostMatrixElement]);
 
   useEffect(() => {
     if (costMatrix != null) {
@@ -162,7 +151,6 @@ function CostMatrixComponent(props: CostMatrixProps): React.ReactElement {
             <InteractiveCostMatrix
               costMatrix={zoomedCostMatrix}
               zoomBlock={zoomParams}
-              setSelectedElement={setSelectedElement}
               showMatches={matchingResultVisible}
               matches={
                 matchingResult &&

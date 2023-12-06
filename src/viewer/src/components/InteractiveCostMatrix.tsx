@@ -3,6 +3,8 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { CostMatrix, CostMatrixElement } from "../resources/costMatrix";
 import { ZoomBlockParams } from "./ImageCostMatrix";
 
+import { useElementContext } from "../context/ElementContext";
+
 import * as d3 from "d3";
 import { MatchingResultElement } from "../resources/readers";
 
@@ -47,7 +49,6 @@ function Tooltip(props: TooltipProps): React.ReactElement {
 type InteractiveCostMatrixProps = {
   costMatrix: CostMatrix;
   zoomBlock: ZoomBlockParams;
-  setSelectedElement: (element: CostMatrixElement) => void;
   matches?: MatchingResultElement[];
   showMatches?: boolean;
 };
@@ -60,7 +61,9 @@ function InteractiveCostMatrix(
   const [tooltipProps, setTooltipProps] = useState<TooltipProps>();
 
   const [matchesVisible, setMatchesVisible] = useState<boolean>(false);
-  const [selectedPixel, setSelectedPixel] = useState<CostMatrixElement>();
+
+  const { globalSelectedElement, setGlobalSelectedElement } =
+    useElementContext();
 
   const height = 500;
   const cellSize = height / props.costMatrix.rows;
@@ -114,16 +117,12 @@ function InteractiveCostMatrix(
     event.target.setAttribute("opacity", 1.0);
   }, []);
 
-  const onCellClick = useCallback((event: any, cell: CostMatrixElement) => {
-    setSelectedPixel(cell);
-  }, []);
-
-  const { setSelectedElement } = props;
-  useEffect(() => {
-    if (selectedPixel) {
-      setSelectedElement(selectedPixel);
-    }
-  }, [selectedPixel, setSelectedElement]);
+  const onCellClick = useCallback(
+    (event: any, cell: CostMatrixElement) => {
+      setGlobalSelectedElement(cell);
+    },
+    [setGlobalSelectedElement]
+  );
 
   useEffect(() => {
     // Retrieve the group for matrix elements

@@ -1,5 +1,3 @@
-import Alert from "@mui/material/Alert";
-
 type DataLoaderProps = {
   setMatchingResultProtoFile: (file: File) => void;
   setCostMatrixProtoFile: (file: File) => void;
@@ -37,10 +35,11 @@ function DataLoader(props: DataLoaderProps): React.ReactElement {
     }
 
     const queryImageFiles = files.filter((file) => {
-      console.log(file.webkitRelativePath.split("/")[1]);
       return file.webkitRelativePath.split("/")[1] === "query_images";
     });
+    console.log("Query images", queryImageFiles);
     if (queryImageFiles.length === 0) {
+      console.warn("Query images are not found");
       props.setQueryImageFiles([]);
     } else {
       props.setQueryImageFiles(queryImageFiles);
@@ -50,7 +49,7 @@ function DataLoader(props: DataLoaderProps): React.ReactElement {
       return file.webkitRelativePath.split("/")[1] === "reference_images";
     });
     if (referenceImageFiles.length === 0) {
-      console.warn("Reference images was not found");
+      console.warn("Reference images are not found");
       props.setReferenceImageFiles([]);
     } else {
       props.setReferenceImageFiles(referenceImageFiles);
@@ -58,7 +57,14 @@ function DataLoader(props: DataLoaderProps): React.ReactElement {
   }
 
   return (
-    <div style={{ textAlign: "center" }}>
+    <div
+      style={{
+        textAlign: "center",
+        boxShadow: "0 0 15px 4px rgba(0,0,0,0.06)",
+        padding: "10px",
+        margin: "10px",
+      }}
+    >
       <label htmlFor="folderPicker">Select folder </label>
       <input
         type="file"

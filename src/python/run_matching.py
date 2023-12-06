@@ -35,6 +35,11 @@ def parseParams():
         action="store_true",
         help="Creates and writes the pair of matching images.",
     )
+    parser.add_argument(
+        "--link_images",
+        action="store_true",
+        help="Creates hard link for images in the result folder.",
+    )
     return parser.parse_args()
 
 
@@ -152,6 +157,26 @@ def runMatchingResultVisualization(config, output_dir):
     os.system(command)
 
 
+def linkImages(image_dir, output_folder):
+    if output_folder.exists():
+        print(
+            "Output {output_folder} exists. Skipping...".format(
+                output_folder=output_folder
+            )
+        )
+        return
+    output_folder.mkdir()
+    images = image_dir.glob("*")
+    for image in images:
+        image_link_name = output_folder / image.name
+        command = "ln {image} {image_link_name}".format(
+            image=image, image_link_name=image_link_name
+        )
+        print(command)
+        os.system(command)
+    print("Linked images from", image_dir)
+
+
 def main():
     args = parseParams()
 
@@ -159,6 +184,10 @@ def main():
         print("WARNING: output_dir exists. Overwritting the results")
     else:
         args.output_dir.mkdir()
+
+    if args.link_images:
+        linkImages(args.query_images, args.output_dir / "query_images")
+        linkImages(args.reference_images, args.output_dir / "reference_images")
 
     # Compute query features.
     query_features_dir = args.output_dir / "query_features"

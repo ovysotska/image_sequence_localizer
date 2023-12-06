@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import "./ImagesLoader.css";
+import "./ImageCarousel.css";
 
 import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
@@ -22,13 +22,13 @@ type ImageData = {
   base64Encoding?: string;
 };
 
-type ImagePreviewProps = {
+type ImageCarouselProps = {
   imageFiles?: File[];
   imageSource: string;
   showImageId?: number;
 };
 
-function ImagesPreview(props: ImagePreviewProps) {
+function ImageCarousel(props: ImageCarouselProps) {
   const [images, setImages] = useState<ImageData[]>();
   const [currentImageId, setCurrentImageId] = useState<number>(0);
 
@@ -147,5 +147,5 @@ function ImagesPreview(props: ImagePreviewProps) {
   );
 }
 
-export { ImagesPreview };
-export type { ImagePreviewProps };
+export { ImageCarousel };
+export type { ImageCarouselProps };
