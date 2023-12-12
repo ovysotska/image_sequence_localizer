@@ -26,11 +26,21 @@ message Feature {
   optional string type = 3;
 }
 
+// Probably only MatchingCosts should be left.
 message Patch {
   message Element {
     optional int32 row = 1;
     optional int32 col = 2;
     optional int32 similarity_value = 3;
+  }
+  repeated Element elements = 1;
+}
+
+message MatchingCosts{
+  message Element {
+    optional int32 query_id = 1;
+    optional int32 ref_id = 2;
+    optional double value = 3;
   }
   repeated Element elements = 1;
 }
