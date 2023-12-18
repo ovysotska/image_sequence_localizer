@@ -151,7 +151,6 @@ function InteractiveCostMatrix(
 
   const onCellClick = useCallback(
     (event: any, cell: CostMatrixElement) => {
-      // moveSliders({ queryId: cell.queryId, referenceId: cell.refId });
       setGlobalSelectedElement({
         queryId: cell.queryId,
         referenceId: cell.refId,
@@ -284,7 +283,7 @@ function InteractiveCostMatrix(
         <svg
           ref={svgRef}
           style={{
-            backgroundColor: "lavender",
+            backgroundColor: "lightskyblue",
             width: "400px",
             height: "400px",
             margin: "10px",

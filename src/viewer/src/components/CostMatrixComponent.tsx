@@ -132,6 +132,7 @@ function CostMatrixComponent(props: CostMatrixProps): React.ReactElement {
           flexDirection: "row",
           flexWrap: "wrap",
           justifyContent: "center",
+          backgroundColor: "ghostwhite"
         }}
       >
         <div>
