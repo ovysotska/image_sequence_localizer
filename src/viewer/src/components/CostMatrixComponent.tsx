@@ -1,11 +1,17 @@
 // Created by O. Vysotska in 2023
 import { useState, useEffect } from "react";
-import { CostMatrix, CostMatrixElement } from "./costMatrix";
+import { CostMatrix } from "../resources/costMatrix";
 import { ImageCostMatrix, ZoomBlockParams } from "./ImageCostMatrix";
-import { MatchingResultElement } from "./matchingResult";
 import InteractiveCostMatrix from "./InteractiveCostMatrix";
 
 import { FormGroup, FormControlLabel, Switch } from "@mui/material";
+
+import {
+  readMatchingResultFromProto,
+  readProtoFromFile,
+  MatchingResultElement,
+  ProtoMessageType,
+} from "../resources/readers";
 
 function getMatchingResultInZoomBlock(
   results: MatchingResultElement[],
@@ -21,12 +27,12 @@ function getMatchingResultInZoomBlock(
 }
 
 type CostMatrixProps = {
-  costMatrix: CostMatrix;
-  matchingResult?: MatchingResultElement[];
-  setSelectedCostMatrixElement: (element: CostMatrixElement) => void;
+  costMatrixProtoFile: File;
+  matchingResultProtoFile?: File;
 };
 
 function CostMatrixComponent(props: CostMatrixProps): React.ReactElement {
+  const [costMatrix, setCostMatrix] = useState<CostMatrix>();
   const [image, setImage] = useState<ImageBitmap>();
   const [matchingResult, setMatchingResult] =
     useState<MatchingResultElement[]>();
@@ -34,40 +40,58 @@ function CostMatrixComponent(props: CostMatrixProps): React.ReactElement {
   const [zoomedCostMatrix, setZoomedCostMatrix] = useState<CostMatrix>();
   const [matchingResultVisible, setMatchingResultVisible] =
     useState<boolean>(false);
-  const [selectedElement, setSelectedElement] = useState<CostMatrixElement>();
 
-  const { setSelectedCostMatrixElement } = props;
+  // Read costMatrix from proto file.
   useEffect(() => {
-    if (selectedElement == null) {
+    if (props.costMatrixProtoFile == null) {
       return;
     }
-    setSelectedCostMatrixElement(selectedElement);
-  }, [selectedElement, setSelectedCostMatrixElement]);
+    readProtoFromFile(props.costMatrixProtoFile, ProtoMessageType.CostMatrix)
+      .then((costMatrixProto) => {
+        setCostMatrix(new CostMatrix(costMatrixProto));
+      })
+      .catch((e) => {
+        console.log("Couldn't read file", props.costMatrixProtoFile);
+      });
+  }, [props.costMatrixProtoFile]);
 
   useEffect(() => {
-    if (props.costMatrix != null) {
-      props.costMatrix.createImage().then((result) => {
+    if (costMatrix != null) {
+      costMatrix.createImage().then((result) => {
         setImage(result);
       });
     }
-  }, [props.costMatrix]);
+  }, [costMatrix]);
+
+  // Read Matching result proto file
+  useEffect(() => {
+    if (props.matchingResultProtoFile == null) {
+      return;
+    }
+    readProtoFromFile(
+      props.matchingResultProtoFile,
+      ProtoMessageType.MatchingResult
+    )
+      .then((matchingResultProto) => {
+        setMatchingResult(readMatchingResultFromProto(matchingResultProto));
+      })
+      .catch((e) => {
+        console.log("Couldn't read file", props.matchingResultProtoFile);
+      });
+  }, [props.matchingResultProtoFile]);
 
   useEffect(() => {
-    setMatchingResult(props.matchingResult);
-  }, [props.matchingResult]);
-
-  useEffect(() => {
-    if (zoomParams == null || props.costMatrix == null) {
+    if (zoomParams == null || costMatrix == null) {
       return;
     }
     setZoomedCostMatrix(
-      props.costMatrix.getSubMatrix(
+      costMatrix.getSubMatrix(
         zoomParams.topLeftX,
         zoomParams.topLeftY,
         zoomParams.windowHeightPx
       )
     );
-  }, [zoomParams, props.costMatrix]);
+  }, [zoomParams, costMatrix]);
 
   function showMatchingResult(event: any) {
     if (event.target.checked) {
@@ -93,7 +117,7 @@ function CostMatrixComponent(props: CostMatrixProps): React.ReactElement {
       >
         <FormControlLabel
           disabled={matchingResult ? false : true}
-          control={<Switch onChange={showMatchingResult} color="secondary" />}
+          control={<Switch onChange={showMatchingResult} color="primary" />}
           label="Matching result"
         />
         <FormControlLabel
@@ -108,6 +132,7 @@ function CostMatrixComponent(props: CostMatrixProps): React.ReactElement {
           flexDirection: "row",
           flexWrap: "wrap",
           justifyContent: "center",
+          backgroundColor: "ghostwhite"
         }}
       >
         <div>
@@ -127,7 +152,6 @@ function CostMatrixComponent(props: CostMatrixProps): React.ReactElement {
             <InteractiveCostMatrix
               costMatrix={zoomedCostMatrix}
               zoomBlock={zoomParams}
-              setSelectedElement={setSelectedElement}
               showMatches={matchingResultVisible}
               matches={
                 matchingResult &&

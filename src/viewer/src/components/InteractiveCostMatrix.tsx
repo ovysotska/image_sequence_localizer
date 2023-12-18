@@ -1,10 +1,12 @@
 import React from "react";
 import { useState, useRef, useEffect, useCallback } from "react";
-import { CostMatrix, CostMatrixElement } from "./costMatrix";
+import { CostMatrix, CostMatrixElement } from "../resources/costMatrix";
 import { ZoomBlockParams } from "./ImageCostMatrix";
 
+import { useElementContext, SelectedElement } from "../context/ElementContext";
+
 import * as d3 from "d3";
-import { MatchingResultElement } from "./matchingResult";
+import { MatchingResultElement } from "../resources/readers";
 
 type TooltipProps = {
   opacity: number;
@@ -47,7 +49,6 @@ function Tooltip(props: TooltipProps): React.ReactElement {
 type InteractiveCostMatrixProps = {
   costMatrix: CostMatrix;
   zoomBlock: ZoomBlockParams;
-  setSelectedElement: (element: CostMatrixElement) => void;
   matches?: MatchingResultElement[];
   showMatches?: boolean;
 };
@@ -60,7 +61,9 @@ function InteractiveCostMatrix(
   const [tooltipProps, setTooltipProps] = useState<TooltipProps>();
 
   const [matchesVisible, setMatchesVisible] = useState<boolean>(false);
-  const [selectedPixel, setSelectedPixel] = useState<CostMatrixElement>();
+
+  const { globalSelectedElement, setGlobalSelectedElement } =
+    useElementContext();
 
   const height = 500;
   const cellSize = height / props.costMatrix.rows;
@@ -109,21 +112,52 @@ function InteractiveCostMatrix(
     });
   }, []);
 
+  const moveSliders = useCallback(
+    (element: SelectedElement) => {
+      const cellInZoomX =
+        (element.referenceId - props.zoomBlock.topLeftX) * cellSize +
+        cellSize / 2;
+      const cellInZoomY =
+        (element.queryId - props.zoomBlock.topLeftY) * cellSize + cellSize / 2;
+
+      d3.select(svgRef.current)
+        .select(".ySlider")
+        .transition()
+        .duration(500) // Animation duration in milliseconds
+        .attr("y1", cellInZoomY)
+        .attr("y2", cellInZoomY);
+      d3.select(svgRef.current)
+        .select(".xSlider")
+        .transition()
+        .duration(500) // Animation duration in milliseconds
+        .attr("x1", cellInZoomX)
+        .attr("x2", cellInZoomX);
+    },
+    [props.zoomBlock, cellSize]
+  );
+
+  // Move sliders when somebody changed the global selected element context
+  useEffect(() => {
+    if (globalSelectedElement == null) {
+      return;
+    }
+    moveSliders(globalSelectedElement);
+  }, [globalSelectedElement, moveSliders]);
+
   const onCellUnHover = useCallback((event: any) => {
     setTooltipVisible(false);
     event.target.setAttribute("opacity", 1.0);
   }, []);
 
-  const onCellClick = useCallback((event: any, cell: CostMatrixElement) => {
-    setSelectedPixel(cell);
-  }, []);
-
-  const { setSelectedElement } = props;
-  useEffect(() => {
-    if (selectedPixel) {
-      setSelectedElement(selectedPixel);
-    }
-  }, [selectedPixel, setSelectedElement]);
+  const onCellClick = useCallback(
+    (event: any, cell: CostMatrixElement) => {
+      setGlobalSelectedElement({
+        queryId: cell.queryId,
+        referenceId: cell.refId,
+      });
+    },
+    [setGlobalSelectedElement]
+  );
 
   useEffect(() => {
     // Retrieve the group for matrix elements
@@ -158,6 +192,29 @@ function InteractiveCostMatrix(
     onCellUnHover,
     onCellClick,
   ]);
+
+  useEffect(() => {
+    const valuesGroup = d3.select(svgRef.current).select(".matrixEntries");
+    valuesGroup
+      .append("line")
+      .attr("class", "ySlider")
+      .attr("id", "ySlider")
+      .attr("x1", 0)
+      .attr("y1", 0)
+      .attr("x2", height)
+      .attr("y2", 0)
+      .attr("stroke", "#1e81b0")
+      .attr("stroke-width", 2);
+    valuesGroup
+      .append("line")
+      .attr("class", "xSlider")
+      .attr("x1", 0)
+      .attr("y1", 0)
+      .attr("x2", 0)
+      .attr("y2", height)
+      .attr("stroke", "#eab676")
+      .attr("stroke-width", 2);
+  }, [props.costMatrix, props.zoomBlock]);
 
   useEffect(() => {
     if (props.matches == null) {
@@ -226,7 +283,7 @@ function InteractiveCostMatrix(
         <svg
           ref={svgRef}
           style={{
-            backgroundColor: "lavender",
+            backgroundColor: "lightskyblue",
             width: "400px",
             height: "400px",
             margin: "10px",

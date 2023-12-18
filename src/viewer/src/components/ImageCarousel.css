@@ -12,7 +12,7 @@
 
 .slide{
     border-radius: 0.5rem;
-    box-shadow: 0px 0px 7px #666;
+    box-shadow: 0px 0px 7px #818da1;
     width: 100%;
     height:100%;
 }
@@ -21,6 +21,9 @@
     position: absolute;
     background-color:rgba(255,255,255,.8);
     top: -1rem;
+    box-shadow: 0px 0px 7px #818da1;
+    padding: 2px 10px 2px 10px;
+    border-radius: 2px;
 }
 
 .arrow{
@@ -29,7 +32,7 @@
     height: 3rem;
     color: black;
     background-color: white;
-    box-shadow: 0px 0px 7px #666;
+    box-shadow: 0px 0px 7px #818da1;
     border-radius: 0.5rem;
 }
 .arrow:hover{
