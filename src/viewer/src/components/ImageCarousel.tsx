@@ -127,10 +127,10 @@ function ImageCarousel(props: ImageCarouselProps) {
           <input type="file" id="folder" multiple onChange={onChange} />
         </div>
       )}
-      {images &&
-        currentImageId &&
+      {images && currentImageId !== undefined &&
         images.length > currentImageId &&
-        images[currentImageId] !== undefined && (
+        images[currentImageId] !== undefined  && 
+        (
           <div className="imageCarousel">
             <img
               src={images[currentImageId].base64Encoding}
@@ -151,7 +151,7 @@ function ImageCarousel(props: ImageCarouselProps) {
               onClick={handlePrevClick}
             ></ArrowBackIosRoundedIcon>
           </div>
-        )}
+        )} 
       <div></div>
     </div>
   );
