@@ -2,10 +2,23 @@ syntax = "proto2";
 
 package image_sequence_localizer;
 
+// Assumes that all values of the matrix is known.
+// values.size() == rows*cols. No checks for this though.
 message CostMatrix {
   optional int32 rows = 20;
   optional int32 cols = 21;
   repeated double values = 1;
+}
+
+// Is used to store matching costs with associated query and reference id.
+// Does not require all elements of the cost matrix to be present.
+message MatchingCosts{
+  message Element {
+    optional int32 query_id = 1;
+    optional int32 ref_id = 2;
+    optional double value = 3;
+  }
+  repeated Element elements = 1;
 }
 
 message MatchingResult {
@@ -26,21 +39,4 @@ message Feature {
   optional string type = 3;
 }
 
-// Probably only MatchingCosts should be left.
-message Patch {
-  message Element {
-    optional int32 row = 1;
-    optional int32 col = 2;
-    optional int32 similarity_value = 3;
-  }
-  repeated Element elements = 1;
-}
 
-message MatchingCosts{
-  message Element {
-    optional int32 query_id = 1;
-    optional int32 ref_id = 2;
-    optional double value = 3;
-  }
-  repeated Element elements = 1;
-}

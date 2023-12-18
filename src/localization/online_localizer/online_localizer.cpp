@@ -92,21 +92,21 @@ Matches OnlineLocalizer::findMatchesTill(int queryId) {
 }
 
 void OnlineLocalizer::writeOutExpanded(const std::string &filename) const {
-  image_sequence_localizer::Patch patch;
+  image_sequence_localizer::MatchingCosts matchedCosts;
   for (const auto &node : expandedRecently_) {
-    image_sequence_localizer::Patch::Element *element = patch.add_elements();
+    image_sequence_localizer::MatchingCosts::Element *element = matchedCosts.add_elements();
     element->set_row(node.quId);
     element->set_col(node.refId);
     element->set_similarity_value(node.idvCost);
   }
   std::fstream out(filename,
                    std::ios::out | std::ios::trunc | std::ios::binary);
-  if (!patch.SerializeToOstream(&out)) {
+  if (!matchedCosts.SerializeToOstream(&out)) {
     LOG(ERROR) << "Couldn't open the file" << filename;
     return;
   }
   out.close();
-  LOG(INFO) << "Wrote patch " << filename;
+  LOG(INFO) << "Wrote matched costs to: " << filename;
 }
 
 // frontier picking up routine

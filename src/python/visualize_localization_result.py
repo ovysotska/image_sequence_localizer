@@ -6,7 +6,6 @@ import protos_io
 
 
 def create_combined_image(matching_result, cost_matrix, expanded_mask=None):
-
     rgb_costs = np.zeros((cost_matrix.shape[0], cost_matrix.shape[1], 3))
     rgb_costs[:, :, 0] = cost_matrix
     rgb_costs[:, :, 1] = cost_matrix
@@ -48,7 +47,7 @@ def main():
         "--expanded_patches_dir",
         required=False,
         type=Path,
-        help="Path to directory with expanded nodes files of type .Patch.pb",
+        help="Path to directory with expanded nodes files of type .MatchingCosts.pb",
     )
     parser.add_argument(
         "--image_name",
