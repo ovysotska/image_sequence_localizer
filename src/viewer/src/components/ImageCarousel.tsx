@@ -127,7 +127,7 @@ function ImageCarousel(props: ImageCarouselProps) {
           <input type="file" id="folder" multiple onChange={onChange} />
         </div>
       )}
-      {images && currentImageId !== undefined &&
+      {images && currentImageId !== null &&
         images.length > currentImageId &&
         images[currentImageId] !== undefined  && 
         (

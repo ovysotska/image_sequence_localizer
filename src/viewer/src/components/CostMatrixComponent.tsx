@@ -29,6 +29,7 @@ function getMatchingResultInZoomBlock(
 type CostMatrixProps = {
   costMatrixProtoFile: File;
   matchingResultProtoFile?: File;
+  matchingCostsProtoFile?: File;
 };
 
 function CostMatrixComponent(props: CostMatrixProps): React.ReactElement {
@@ -36,6 +37,9 @@ function CostMatrixComponent(props: CostMatrixProps): React.ReactElement {
   const [image, setImage] = useState<ImageBitmap>();
   const [matchingResult, setMatchingResult] =
     useState<MatchingResultElement[]>();
+  // This should be some useful data structure to propagate the expanded costs.
+  // For now just checking that this coud be loaded.
+  const [matchingCostsProto,  setMatchingCostsProto] = useState<any>();
   const [zoomParams, setZoomParams] = useState<ZoomBlockParams>();
   const [zoomedCostMatrix, setZoomedCostMatrix] = useState<CostMatrix>();
   const [matchingResultVisible, setMatchingResultVisible] =
@@ -79,6 +83,24 @@ function CostMatrixComponent(props: CostMatrixProps): React.ReactElement {
         console.log("Couldn't read file", props.matchingResultProtoFile);
       });
   }, [props.matchingResultProtoFile]);
+
+
+  // Read matching costs -> for expanded costs proto file
+  useEffect(() => {
+    if (props.matchingCostsProtoFile == null) {
+      return;
+    }
+    readProtoFromFile(
+      props.matchingCostsProtoFile,
+      ProtoMessageType.MatchingCosts
+    )
+      .then((matchingCostsProto) => {
+        setMatchingCostsProto(matchingCostsProto);
+      })
+      .catch((e) => {
+        console.log("Couldn't read file", props.matchingCostsProtoFile);
+      });
+  }, [props.matchingCostsProtoFile]);
 
   useEffect(() => {
     if (zoomParams == null || costMatrix == null) {
