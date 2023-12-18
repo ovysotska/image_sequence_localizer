@@ -95,9 +95,9 @@ void OnlineLocalizer::writeOutExpanded(const std::string &filename) const {
   image_sequence_localizer::MatchingCosts matchedCosts;
   for (const auto &node : expandedRecently_) {
     image_sequence_localizer::MatchingCosts::Element *element = matchedCosts.add_elements();
-    element->set_row(node.quId);
-    element->set_col(node.refId);
-    element->set_similarity_value(node.idvCost);
+    element->set_query_id(node.quId);
+    element->set_ref_id(node.refId);
+    element->set_value(node.idvCost);
   }
   std::fstream out(filename,
                    std::ios::out | std::ios::trunc | std::ios::binary);

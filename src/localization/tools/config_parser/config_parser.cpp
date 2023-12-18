@@ -108,9 +108,9 @@ bool ConfigParser::parse(const std::string &iniFile) {
                 ss >> costMatrix;
                 continue;
             }
-            if (header == "costOutputName") {
+            if (header == "costsOutputName") {
                 ss >> header;  // reads "="
-                ss >> costOutputName;
+                ss >> costsOutputName;
                 continue;
             }
             if (header == "simPlaces") {
@@ -139,7 +139,7 @@ void ConfigParser::print() const {
     printf("== Buffer size: %d\n", bufferSize);
 
     printf("== CostMatrix: %s\n", costMatrix.c_str());
-    printf("== costOutputName: %s\n", costOutputName.c_str());
+    printf("== costsOutputName: %s\n", costsOutputName.c_str());
     printf("== matchingResult: %s\n", matchingResult.c_str());
     printf("== simPlaces: %s\n", simPlaces.c_str());
 }
@@ -187,8 +187,8 @@ bool ConfigParser::parseYaml(const std::string &yamlFile) {
     if (config["costMatrix"]) {
         costMatrix = config["costMatrix"].as<std::string>();
     }
-    if (config["costOutputName"]) {
-        costOutputName = config["costOutputName"].as<std::string>();
+    if (config["costsOutputName"]) {
+        costsOutputName = config["costsOutputName"].as<std::string>();
     }
     if (config["simPlaces"]) {
         simPlaces = config["simPlaces"].as<std::string>();

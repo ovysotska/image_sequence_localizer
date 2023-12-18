@@ -11,7 +11,7 @@ message CostMatrix {
 }
 
 // Is used to store matching costs with associated query and reference id.
-// Does not require all elements of the cost matrix to be present.
+// Does not require all elements of the cost matrix to be present
 message MatchingCosts{
   message Element {
     optional int32 query_id = 1;
@@ -38,5 +38,3 @@ message Feature {
   optional int32 size = 2;
   optional string type = 3;
 }
-
-

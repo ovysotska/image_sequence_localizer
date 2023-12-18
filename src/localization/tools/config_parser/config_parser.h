@@ -42,7 +42,7 @@ public:
   std::string path2refImg = "";
   std::string imgExt = "";
   std::string costMatrix = "";
-  std::string costOutputName = "costs.MatchingCosts.pb";
+  std::string costsOutputName = "costs.MatchingCosts.pb";
   std::string simPlaces = "";
   std::string hashTable = "";
   std::string matchingResult = "matches.MatchingResult.pb";
@@ -73,7 +73,7 @@ public:
 /*! \var std::string ConfigParser::costMatrix
     \brief stores path to precomputed cost/similarity matrix.
 */
-/*! \var std::string ConfigParser::costOutputName
+/*! \var std::string ConfigParser::costsOutputName
     \brief stores the name of the produced result for the cost_matrix_based
    matching.
 */

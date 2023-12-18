@@ -1,9 +1,22 @@
 type DataLoaderProps = {
   setMatchingResultProtoFile: (file: File) => void;
+  setMatchingCostsProtoFile: (file: File) => void;
   setCostMatrixProtoFile: (file: File) => void;
   setQueryImageFiles: (files: File[]) => void;
   setReferenceImageFiles: (file: File[]) => void;
 };
+
+function findAndSetFileByType(files: File[], type: string, setter: (file: File)=> void){
+  const protoFile = files.find((file) => {
+    return file.webkitRelativePath.split("/")[1].endsWith(type);
+  });
+  if (protoFile == null) {
+    console.warn("File of type", type, "was not found");
+  } else {
+    console.log("Found file", protoFile)
+    setter(protoFile);
+  }
+}
 
 function DataLoader(props: DataLoaderProps): React.ReactElement {
   async function onChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -13,26 +26,9 @@ function DataLoader(props: DataLoaderProps): React.ReactElement {
     }
     const files = Array.from(fileList);
 
-    const costMatrixProtoFile = files.find((file) => {
-      return file.webkitRelativePath.split("/")[1].endsWith(".CostMatrix.pb");
-    });
-    if (costMatrixProtoFile == null) {
-      console.warn("CostMatrix proto file was not found");
-    } else {
-      props.setCostMatrixProtoFile(costMatrixProtoFile);
-    }
-
-    const matchingResultProtoFile = files.find((file) => {
-      return file.webkitRelativePath
-        .split("/")[1]
-        .endsWith(".MatchingResult.pb");
-    });
-
-    if (matchingResultProtoFile == null) {
-      console.warn("MatchingResult proto file was not found");
-    } else {
-      props.setMatchingResultProtoFile(matchingResultProtoFile);
-    }
+    findAndSetFileByType(files, ".CostMatrix.pb", props.setCostMatrixProtoFile);
+    findAndSetFileByType(files, ".MatchingResult.pb", props.setMatchingResultProtoFile);
+    findAndSetFileByType(files, ".MatchingCosts.pb", props.setMatchingCostsProtoFile);
 
     const queryImageFiles = files.filter((file) => {
       return file.webkitRelativePath.split("/")[1] === "query_images";

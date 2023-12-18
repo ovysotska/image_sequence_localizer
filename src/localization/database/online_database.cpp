@@ -128,6 +128,6 @@ void storeCostsAsProto(
     return;
   }
   out.close();
-  LOG(INFO) << "Wrote matching costs to" << protoFilename;
+  LOG(INFO) << "Wrote matching costs to: " << protoFilename;
 }
 } // namespace localization::database
