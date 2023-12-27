@@ -94,13 +94,13 @@ std::vector<int> LshCvHashing::getCandidates(int quId) {
   Timer timer;
   timer.start();
 
-  std::vector<int> candidates;
-  candidates = hashFeature(feature);
+  std::vector<int> candidates = hashFeature(feature);
 
   timer.stop();
   LOG(INFO) << "Hash retrieval time";
   timer.print_elapsed_time(TimeExt::MSec);
   LOG(INFO) << "Candidates size: " << candidates.size();
+
   return candidates;
 }
 } // namespace localization::relocalizers

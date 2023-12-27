@@ -91,27 +91,9 @@ Matches OnlineLocalizer::findMatchesTill(int queryId) {
   return getCurrentPath();
 }
 
-void OnlineLocalizer::writeOutExpanded(const std::string &filename) const {
-  image_sequence_localizer::Patch patch;
-  for (const auto &node : expandedRecently_) {
-    image_sequence_localizer::Patch::Element *element = patch.add_elements();
-    element->set_row(node.quId);
-    element->set_col(node.refId);
-    element->set_similarity_value(node.idvCost);
-  }
-  std::fstream out(filename,
-                   std::ios::out | std::ios::trunc | std::ios::binary);
-  if (!patch.SerializeToOstream(&out)) {
-    LOG(ERROR) << "Couldn't open the file" << filename;
-    return;
-  }
-  out.close();
-  LOG(INFO) << "Wrote patch " << filename;
-}
-
 // frontier picking up routine
 void OnlineLocalizer::matchImage(int quId) {
-  expandedRecently_.clear();
+  // expandedRecently_.clear();
 
   std::unordered_set<Node> children;
   if (needReloc_) {
@@ -152,7 +134,7 @@ void OnlineLocalizer::matchImage(int quId) {
     }
   }
   for (const Node &n : children) {
-    expandedRecently_.insert(n);
+    expandedNodes_.insert(n);
   }
 }
 
@@ -379,7 +361,7 @@ void OnlineLocalizer::visualize() const {
     return;
   }
   // _vis->drawFrontier(frontier_);
-  _vis->drawExpansion(expandedRecently_);
+  _vis->drawExpansion(expandedNodes_);
   std::vector<PathElement> path = getCurrentPath();
   std::reverse(path.begin(), path.end());
   _vis->drawPath(path);

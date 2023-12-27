@@ -26,6 +26,16 @@ message Feature {
   optional string type = 3;
 }
 
+message ScanContext{
+  message Grid{
+    repeated double values = 1;
+    optional int32 cols = 2;
+    optional int32 rows = 3;
+
+  }
+  repeated Grid grids = 1; 
+}
+
 message Patch {
   message Element {
     optional int32 row = 1;

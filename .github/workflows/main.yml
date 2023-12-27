@@ -28,7 +28,7 @@ jobs:
       run: sudo apt update
 
     - name: Install dependencies
-      run: sudo apt install -y libopencv-dev libyaml-cpp-dev libprotobuf-dev libprotoc-dev protobuf-compiler
+      run: sudo apt install -y libopencv-dev libyaml-cpp-dev libprotobuf-dev libprotoc-dev protobuf-compiler libeigen3-dev
 
     - name: Build
       run: |

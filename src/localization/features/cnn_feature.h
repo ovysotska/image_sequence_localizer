@@ -50,7 +50,7 @@ public:
    */
   double score2cost(double score) const override;
 
-  using iFeature::bits;
+  // using iFeature::bits;
   using iFeature::dimensions;
 
 protected:

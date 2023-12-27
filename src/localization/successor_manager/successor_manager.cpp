@@ -30,7 +30,6 @@
 
 #include <algorithm>
 #include <fstream>
-#include <iostream>
 using std::vector;
 
 namespace localization::successor_manager {
@@ -166,7 +165,7 @@ SuccessorManager::getSuccessorsIfLost(const Node &node) {
       double succ_cost = database_->getCost(succ_qu_id, candId);
       succ.set(succ_qu_id, candId, succ_cost);
       _successors.insert(succ);
-      succ.print();
+      // succ.print();
     }
   }
   return _successors;

@@ -35,6 +35,8 @@ namespace localization::features {
 /**
  * @brief      Interface class for features.
  */
+// TODO(olga): Make this easier, the feature comparison should returncost
+// directly. Don't care about the similarity.
 class iFeature {
 public:
   /**
@@ -48,6 +50,7 @@ public:
   virtual double computeSimilarityScore(const iFeature &rhs) const = 0;
   /**
    * @brief      Transforms similarity into the weights/cost for the graph.
+   The bigger the similarity the smaller the cost should be.
 
    * @param[in]  score  The score
    *

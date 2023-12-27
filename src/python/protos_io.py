@@ -50,15 +50,10 @@ def read_matching_result(filename):
     return result_proto
 
 
-def read_expanded_mask(expanded_patches_dir):
-    patch_files = list(expanded_patches_dir.glob("*.Patch.pb"))
-    patch_files.sort()
+def read_expanded_mask(expanded_patches_file):
 
-    mask = []
-    for patch_file in patch_files:
-        f = open(patch_file, "rb")
-        patch_proto = loc_protos.Patch()
-        patch_proto.ParseFromString(f.read())
-        f.close()
-        mask.extend(patch_proto.elements)
-    return mask
+    f = open(expanded_patches_file, "rb")
+    patch_proto = loc_protos.Patch()
+    patch_proto.ParseFromString(f.read())
+    f.close()
+    return patch_proto

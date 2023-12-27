@@ -35,6 +35,7 @@
 #include <memory>
 #include <string>
 
+#include <iostream>
 namespace localization::database {
 
 namespace {
@@ -54,7 +55,7 @@ addFeatureIfNeeded(features::FeatureBuffer &featureBuffer,
 OnlineDatabase::OnlineDatabase(const std::string &queryFeaturesDir,
                                const std::string &refFeaturesDir,
                                features::FeatureType type, int bufferSize,
-                               const std::string &costMatrixFile)
+                               const std::string &costMatrixFile, bool invert)
     : quFeaturesNames_{listProtoDir(queryFeaturesDir, ".Feature")},
       refFeaturesNames_{listProtoDir(refFeaturesDir, ".Feature")},
       featureType_{type}, refBuffer_{std::make_unique<features::FeatureBuffer>(
@@ -64,6 +65,7 @@ OnlineDatabase::OnlineDatabase(const std::string &queryFeaturesDir,
   LOG_IF(FATAL, refFeaturesNames_.empty()) << "Reference features are not set.";
   if (!costMatrixFile.empty()) {
     precomputedCosts_ = CostMatrix(costMatrixFile);
+    precomputedCosts_->inverseCosts(invert);
   }
 }
 
@@ -83,7 +85,7 @@ double OnlineDatabase::computeMatchingCost(int quId, int refId) {
 
 double OnlineDatabase::getCost(int quId, int refId) {
   if (precomputedCosts_) {
-    return precomputedCosts_->getInverseCost(quId, refId);
+    return precomputedCosts_->at(quId, refId);
   }
   // Check if the cost was computed before.
   auto rowIter = costs_.find(quId);

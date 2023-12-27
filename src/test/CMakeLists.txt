@@ -8,6 +8,17 @@ set(TESTNAME test_${PROJECT_NAME})
 #     cxx_flags
 # )
 
+add_executable(${TESTNAME}_scan_context
+    scan_context_test.cpp
+)
+target_link_libraries(${TESTNAME}_scan_context
+    scan_context
+    protos
+    gtest 
+    gtest_main
+    cxx_flags
+)
+
 add_executable(${TESTNAME} 
     cost_matrix_test.cpp
     database_test.cpp
@@ -42,3 +53,4 @@ target_link_libraries(${TESTNAME}_successor_manager
 
 gtest_discover_tests(${TESTNAME})
 gtest_discover_tests(${TESTNAME}_successor_manager)
+gtest_discover_tests(${TESTNAME}_scan_context)

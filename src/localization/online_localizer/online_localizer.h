@@ -50,6 +50,7 @@ public:
   ~OnlineLocalizer() {}
 
   Matches findMatchesTill(int queryId);
+  const NodeSet &showExpandedNodes() const { return expandedNodes_; }
   void writeOutExpanded(const std::string &filename) const;
 
 protected:
@@ -85,7 +86,7 @@ private:
   successor_manager::SuccessorManager *successorManager_ = nullptr;
   iLocVisualizer::Ptr _vis = nullptr;
 
-  NodeSet expandedRecently_;
+  NodeSet expandedNodes_;
 };
 } // namespace localization::online_localizer
 
