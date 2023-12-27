@@ -23,7 +23,7 @@ public:
   void loadFromTxt(const std::string &filename, int rows, int cols);
 
   // TODO(olga): This should be removed once ifeature doesn't have explicit
-  // simlarity score requirement.
+  // similarity score requirement.
   void inverseCosts(bool inverse = true) { inverseCosts_ = inverse; }
 
   void loadFromProto(const std::string &filename);

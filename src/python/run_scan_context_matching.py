@@ -77,7 +77,7 @@ def runResultVisualization(config):
         image_name=config["matchingResultImage"]
     )
 
-    params += "--expanded_patches_file {file} ".format(file=config["expandedNodesFile"])
+    # params += "--expanded_patches_file {file} ".format(file=config["expandedNodesFile"])
     command = "python visualize_localization_result.py " + params
     print("Calling:", command)
     os.system(command)

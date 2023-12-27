@@ -25,8 +25,6 @@ double computeDistanceBetweenGrids(const Eigen::MatrixXd &lhs,
   CHECK(lhs.cols() == rhs.cols()) << "The number of columns is not the same.";
   CHECK(lhs.rows() == rhs.rows()) << "The number of rows is not the same.";
 
-  std::cout << "Rows " << lhs.rows() << " " << rhs.rows() << std::endl;
-
   Eigen::VectorXd columnErrors(lhs.cols());
   for (int c = 0; c < lhs.cols(); ++c) {
     columnErrors[c] = cosine_distance(lhs.col(c), rhs.col(c));

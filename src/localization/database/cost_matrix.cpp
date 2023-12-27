@@ -41,7 +41,7 @@ CostMatrix::CostMatrix(const std::string &queryFeaturesDir,
       const auto refFeature = createFeature(type, refFile);
       row.push_back(queryFeature->computeSimilarityScore(*refFeature));
     }
-    LOG(INFO) << "Created row for query image " << fileIdx;
+    LOG(INFO) << "Computed row values for query image " << fileIdx;
     costs_.push_back(row);
   }
   rows_ = costs_.size();
@@ -89,9 +89,11 @@ double CostMatrix::getInverseCost(int row, int col) const {
   if (std::abs(value) < kEpsilon) {
     return std::numeric_limits<double>::max();
   }
-  if (value < 0){
-    LOG(WARNING) << "The cost value for row:" << row  << " and col:" << col <<" is < 0: " << value<< ". This should not be like this. I will make a positive value of it for now. But please check your values";
-
+  if (value < 0) {
+    LOG(WARNING) << "The cost value for row:" << row << " and col:" << col
+                 << " is < 0: " << value
+                 << ". This should not be like this. I will make a positive "
+                    "value of it for now. But please check your values";
   }
   return 1. / std::abs(value);
 }
