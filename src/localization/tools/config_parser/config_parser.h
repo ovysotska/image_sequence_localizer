@@ -30,28 +30,28 @@
  * @brief      Class for storing the configuration parameters.
  */
 class ConfigParser {
-   public:
-    ConfigParser() {}
-    bool parse(const std::string &iniFile);
-    bool parseYaml(const std::string &yamlFile);
-    void print() const;
+public:
+  ConfigParser() {}
+  bool parse(const std::string &iniFile);
+  bool parseYaml(const std::string &yamlFile);
+  void print() const;
 
-    std::string path2qu = "";
-    std::string path2ref = "";
-    std::string path2quImg = "";
-    std::string path2refImg = "";
-    std::string imgExt = "";
-    std::string costMatrix = "";
-    std::string costOutputName = "";
-    std::string simPlaces = "";
-    std::string hashTable = "";
-    std::string matchingResult = "matches.MatchingResult.pb";
+  std::string path2qu = "";
+  std::string path2ref = "";
+  std::string path2quImg = "";
+  std::string path2refImg = "";
+  std::string imgExt = "";
+  std::string costMatrix = "";
+  std::string costsOutputName = "costs.MatchingCosts.pb";
+  std::string simPlaces = "";
+  std::string hashTable = "";
+  std::string matchingResult = "matches.MatchingResult.pb";
 
-    int querySize = -1;
-    int fanOut = -1;
-    int bufferSize = -1;
-    double nonMatchCost = -1.0;
-    double expansionRate = -1.0;
+  int querySize = -1;
+  int fanOut = -1;
+  int bufferSize = -1;
+  double nonMatchCost = -1.0;
+  double expansionRate = -1.0;
 };
 
 /*! \var std::string ConfigParser::path2qu
@@ -73,7 +73,7 @@ class ConfigParser {
 /*! \var std::string ConfigParser::costMatrix
     \brief stores path to precomputed cost/similarity matrix.
 */
-/*! \var std::string ConfigParser::costOutputName
+/*! \var std::string ConfigParser::costsOutputName
     \brief stores the name of the produced result for the cost_matrix_based
    matching.
 */
@@ -111,4 +111,4 @@ class ConfigParser {
    typically be selected from 0.5 - 0.7.
 */
 
-#endif  // SRC_TOOLS_CONFIG_PARSER_CONFIG_PARSER_H_
+#endif // SRC_TOOLS_CONFIG_PARSER_CONFIG_PARSER_H_

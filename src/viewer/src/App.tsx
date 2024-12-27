@@ -10,6 +10,7 @@ import { ElementProvider } from "./context/ElementContext";
 
 function App() {
   const [costMatrixProtoFile, setCostMatrixProtoFile] = useState<File>();
+  const [matchingCostsProtoFile, setMatchingCostsProtoFile] = useState<File>();
   const [matchingResultProtoFile, setMatchingResultProtoFile] =
     useState<File>();
   const [queryImageFiles, setQueryImageFiles] = useState<File[]>();
@@ -31,6 +32,7 @@ function App() {
           <DataLoader
             setCostMatrixProtoFile={setCostMatrixProtoFile}
             setMatchingResultProtoFile={setMatchingResultProtoFile}
+            setMatchingCostsProtoFile={setMatchingCostsProtoFile}
             setQueryImageFiles={setQueryImageFiles}
             setReferenceImageFiles={setReferenceImageFiles}
           />
@@ -42,6 +44,7 @@ function App() {
               <CostMatrixComponent
                 costMatrixProtoFile={costMatrixProtoFile}
                 matchingResultProtoFile={matchingResultProtoFile}
+                matchingCostsProtoFile={matchingCostsProtoFile}
               />
             )}
           </div>
