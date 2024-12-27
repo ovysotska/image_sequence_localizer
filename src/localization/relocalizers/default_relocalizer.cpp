@@ -14,7 +14,7 @@ DefaultRelocalizer::DefaultRelocalizer(int fanOut, int refSize)
 std::vector<int> DefaultRelocalizer::getCandidates(int quId) {
   std::vector<int> candidateIds;
   for (int i = std::max(0, quId - fanOut_);
-       i <= std::min(refSize_, quId + fanOut_); i++) {
+       i < std::min(refSize_, quId + fanOut_); i++) {
     candidateIds.push_back(i);
   }
   return candidateIds;
