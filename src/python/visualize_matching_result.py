@@ -20,6 +20,16 @@ def createHiddenMatchImage(width, height):
     return image
 
 
+def resize_image_by_height(image, target_height):
+    original_height, original_width = image.shape[:2]
+    aspect_ratio = original_width / original_height
+    new_width = int(target_height * aspect_ratio)
+    resized_image = cv2.resize(
+        image, (new_width, target_height), interpolation=cv2.INTER_AREA
+    )
+    return resized_image
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -66,7 +76,7 @@ def main():
     reference_images.extend(args.reference_images.glob(".jpg"))
     reference_images = sorted(reference_images)
 
-    for match in matching_result.matches:
+    for idx, match in enumerate(reversed(matching_result.matches)):
         query_image = cv2.imread(str(query_images[match.query_id]))
         if not match.real:
             reference_image = createHiddenMatchImage(
@@ -74,11 +84,15 @@ def main():
             )
         else:
             reference_image = cv2.imread(str(reference_images[match.ref_id]))
+            reference_image = resize_image_by_height(
+                reference_image, query_image.shape[0]
+            )
 
         stacked = cv2.hconcat([query_image, reference_image])
-        img_name = args.output_dir / "query:{qu_id}_ref:{ref_id}.jpg".format(
-            qu_id=match.query_id, ref_id=match.ref_id
-        )
+        img_name = args.output_dir / f"match_{idx:05d}.jpg"
+        # img_name = args.output_dir / "query:{qu_id}_ref:{ref_id}.jpg".format(
+        # qu_id=match.query_id, ref_id=match.ref_id
+        # )
         cv2.imwrite(str(img_name), stacked)
         print("Saved image", img_name)
 
