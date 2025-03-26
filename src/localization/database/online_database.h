@@ -46,7 +46,8 @@ class OnlineDatabase : public iDatabase {
 public:
   OnlineDatabase(const std::string &queryFeaturesDir,
                  const std::string &refFeaturesDir, features::FeatureType type,
-                 int bufferSize, const std::string &costMatrixFile = "");
+                 int bufferSize, const std::string &costMatrixFile = "",
+                 bool invert = true);
 
   inline int refSize() override { return refFeaturesNames_.size(); }
   double getCost(int quId, int refId) override;

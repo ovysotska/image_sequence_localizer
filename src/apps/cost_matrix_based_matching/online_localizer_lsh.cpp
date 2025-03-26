@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
 
   if (argc < 2) {
     printf("[ERROR] Not enough input parameters.\n");
-    printf("Proper usage: ./cost_matrix_based_matching_lsh config_file.yaml\n");
+    printf("Proper usage: ./online_localizer_lsh config_file.yaml\n");
     exit(0);
   }
 
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
       /*refFeaturesDir=*/parser.path2ref,
       /*type=*/loc::features::FeatureType::Cnn_Feature,
       /*bufferSize=*/parser.bufferSize,
-      /*costMatrixFile=*/parser.costMatrix);
+      /*costMatrixFile=*/parser.costMatrix, /*invert=*/true);
 
   auto relocalizer = std::make_unique<loc::relocalizers::LshCvHashing>(
       /*onlineDatabase=*/database.get(),

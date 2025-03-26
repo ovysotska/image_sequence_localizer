@@ -28,18 +28,20 @@ CostMatrix::CostMatrix(const std::string &queryFeaturesDir,
   const std::vector<std::string> refFeaturesFiles =
       listProtoDir(refFeaturesDir, ".Feature");
 
-  std::cerr << "Query features" << queryFeaturesFiles.size() << std::endl;
-  std::cerr << "ref features" << refFeaturesFiles.size() << std::endl;
+  LOG(INFO) << "Query features size " << queryFeaturesFiles.size();
+  LOG(INFO) << "Reference features size " << refFeaturesDir.size();
+  LOG(INFO) << "Computing cost matrix. This make take some time...";
 
   costs_.reserve(queryFeaturesFiles.size());
-  for (const auto &queryFile : queryFeaturesFiles) {
-    auto queryFeature = createFeature(type, queryFile);
+  for (int fileIdx = 0; fileIdx < queryFeaturesFiles.size(); ++fileIdx) {
+    auto queryFeature = createFeature(type, queryFeaturesFiles[fileIdx]);
     std::vector<double> row;
     row.reserve(refFeaturesFiles.size());
     for (const auto &refFile : refFeaturesFiles) {
       const auto refFeature = createFeature(type, refFile);
       row.push_back(queryFeature->computeSimilarityScore(*refFeature));
     }
+    LOG(INFO) << "Computed row values for query image " << fileIdx;
     costs_.push_back(row);
   }
   rows_ = costs_.size();
@@ -76,17 +78,22 @@ void CostMatrix::loadFromTxt(const std::string &filename, int rows, int cols) {
 double CostMatrix::at(int row, int col) const {
   CHECK(row >= 0 && row < rows_) << "Row outside range " << row;
   CHECK(col >= 0 && col < cols_) << "Col outside range " << col;
+  if (inverseCosts_) {
+    return getInverseCost(row, col);
+  }
   return costs_[row][col];
 }
 
 double CostMatrix::getInverseCost(int row, int col) const {
-  const double value = this->at(row, col);
+  const double value = costs_[row][col];
   if (std::abs(value) < kEpsilon) {
     return std::numeric_limits<double>::max();
   }
-  if (value < 0){
-    LOG(WARNING) << "The cost value for row:" << row  << " and col:" << col <<" is < 0: " << value<< ". This should not be like this. I will make a positive value of it for now. But please check your values";
-
+  if (value < 0) {
+    LOG(WARNING) << "The cost value for row:" << row << " and col:" << col
+                 << " is < 0: " << value
+                 << ". This should not be like this. I will make a positive "
+                    "value of it for now. But please check your values";
   }
   return 1. / std::abs(value);
 }
@@ -111,5 +118,26 @@ void CostMatrix::loadFromProto(const std::string &filename) {
   rows_ = cost_matrix_proto.rows();
   LOG(INFO) << "Read cost matrix with " << rows_ << " rows and " << cols_
             << " cols.";
+}
+
+void CostMatrix::storeToProto(const std::string &protoFilename) const {
+  image_sequence_localizer::CostMatrix costMatrixProto;
+  costMatrixProto.set_cols(cols_);
+  costMatrixProto.set_rows(rows_);
+  for (int r = 0; r < rows_; ++r) {
+    for (int c = 0; c < cols_; ++c) {
+      costMatrixProto.add_values(costs_[r][c]);
+    }
+  }
+
+  std::fstream out(protoFilename,
+                   std::ios::out | std::ios::trunc | std::ios::binary);
+  if (!costMatrixProto.SerializeToOstream(&out)) {
+    LOG(ERROR) << "Couldn't open the file " << protoFilename;
+    LOG(ERROR) << "The path is NOT saved.";
+    return;
+  }
+  out.close();
+  LOG(INFO) << "The cost matrix was written to " << protoFilename;
 }
 } // namespace localization::database

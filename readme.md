@@ -13,7 +13,7 @@ The assumption is then that the input is a sequence of images. The program outpu
 
 Prerequisites:
 ```
-sudo apt-get install -y build-essential libopencv-dev libyaml-cpp-dev libprotobuf-dev libprotoc-dev protobuf-compiler
+sudo apt-get install -y libopencv-dev libyaml-cpp-dev libprotobuf-dev libprotoc-dev protobuf-compiler libeigen3-dev
 ```
 Tested on Ubuntu 20.04.
 
@@ -55,6 +55,17 @@ For more details about the parameters, please use `python run_matching.py --help
 For more details about the underlying method and the interpretation of the results, please have a look at [paper](http://www.ipb.uni-bonn.de/pdfs/vysotska16ral-icra.pdf).
 Here is a sketch of what roughly is happening for those who don't like to read much ![](doc/cost_matrix_view.png)
 
+
+## LIDAR place recognition
+
+The code allows to match also the ScanContext sequences.
+To do place recognition in this case, you need for now 3 steps:
+1. Convert numpy arrays into protobuf, use `python/convert_numpy_to_scan_context.py`
+2. Compute scan context cost matrix, use `./src/apps/cost_matrix_based_matching/compute_scan_context_cost_matrix queryFeaturesDir referenceFeaturesDir outputFilename` from `build` folder
+3. Run online place recognition with pre computed cost matrix, use `python/run_scan_context_matching.py`
+
+
+More general support will come later.
 
 ## Parent project
 

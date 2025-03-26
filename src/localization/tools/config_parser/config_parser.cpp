@@ -31,175 +31,178 @@
 using std::string;
 
 bool ConfigParser::parse(const std::string &iniFile) {
-    std::ifstream in(iniFile.c_str());
-    if (!in) {
-        printf("[ERROR][ConfigParser] The file \"%s\" cannot be opened.\n",
-               iniFile.c_str());
-        return false;
+  std::ifstream in(iniFile.c_str());
+  if (!in) {
+    printf("[ERROR][ConfigParser] The file \"%s\" cannot be opened.\n",
+           iniFile.c_str());
+    return false;
+  }
+  while (!in.eof()) {
+    string line;
+    std::getline(in, line);
+    if (line.empty() || line[0] == '#') {
+      // it should be a comment
+      continue;
     }
-    while (!in.eof()) {
-        string line;
-        std::getline(in, line);
-        if (line.empty() || line[0] == '#') {
-            // it should be a comment
-            continue;
-        }
-        std::stringstream ss(line);
-        while (!ss.eof()) {
-            string header;
-            ss >> header;
-            if (header == "path2qu") {
-                ss >> header;  // reads "="
-                ss >> path2qu;
-                continue;
-            }
+    std::stringstream ss(line);
+    while (!ss.eof()) {
+      string header;
+      ss >> header;
+      if (header == "path2qu") {
+        ss >> header; // reads "="
+        ss >> path2qu;
+        continue;
+      }
 
-            if (header == "path2ref") {
-                ss >> header;  // reads "="
-                ss >> path2ref;
-                continue;
-            }
+      if (header == "path2ref") {
+        ss >> header; // reads "="
+        ss >> path2ref;
+        continue;
+      }
 
-            if (header == "querySize") {
-                ss >> header;  // reads "="
-                ss >> querySize;
-            }
+      if (header == "querySize") {
+        ss >> header; // reads "="
+        ss >> querySize;
+      }
 
-            if (header == "nonMatchCost") {
-                ss >> header;  // reads "="
-                ss >> nonMatchCost;
-                continue;
-            }
+      if (header == "nonMatchCost") {
+        ss >> header; // reads "="
+        ss >> nonMatchCost;
+        continue;
+      }
 
-            if (header == "expansionRate") {
-                ss >> header;  // reads "="
-                ss >> expansionRate;
-                continue;
-            }
-            if (header == "fanOut") {
-                ss >> header;  // reads "="
-                ss >> fanOut;
-                continue;
-            }
-            if (header == "bufferSize") {
-                ss >> header;  // reads "="
-                ss >> bufferSize;
-                continue;
-            }
+      if (header == "expansionRate") {
+        ss >> header; // reads "="
+        ss >> expansionRate;
+        continue;
+      }
+      if (header == "fanOut") {
+        ss >> header; // reads "="
+        ss >> fanOut;
+        continue;
+      }
+      if (header == "bufferSize") {
+        ss >> header; // reads "="
+        ss >> bufferSize;
+        continue;
+      }
 
-            if (header == "path2quImg") {
-                ss >> header;  // reads "="
-                ss >> path2quImg;
-                continue;
-            }
+      if (header == "path2quImg") {
+        ss >> header; // reads "="
+        ss >> path2quImg;
+        continue;
+      }
 
-            if (header == "path2refImg") {
-                ss >> header;  // reads "="
-                ss >> path2refImg;
-                continue;
-            }
-            if (header == "imgExt") {
-                ss >> header;  // reads "="
-                ss >> imgExt;
-                continue;
-            }
-            if (header == "costMatrix") {
-                ss >> header;  // reads "="
-                ss >> costMatrix;
-                continue;
-            }
-            if (header == "costOutputName") {
-                ss >> header;  // reads "="
-                ss >> costOutputName;
-                continue;
-            }
-            if (header == "simPlaces") {
-                ss >> header;  // reads "="
-                ss >> simPlaces;
-                continue;
-            }
-        }  // end of line parsing
-    }      // end of file
-    return true;
+      if (header == "path2refImg") {
+        ss >> header; // reads "="
+        ss >> path2refImg;
+        continue;
+      }
+      if (header == "imgExt") {
+        ss >> header; // reads "="
+        ss >> imgExt;
+        continue;
+      }
+      if (header == "costMatrix") {
+        ss >> header; // reads "="
+        ss >> costMatrix;
+        continue;
+      }
+      if (header == "costOutputName") {
+        ss >> header; // reads "="
+        ss >> costOutputName;
+        continue;
+      }
+      if (header == "simPlaces") {
+        ss >> header; // reads "="
+        ss >> simPlaces;
+        continue;
+      }
+    } // end of line parsing
+  }   // end of file
+  return true;
 }
 
 void ConfigParser::print() const {
-    printf("== Read parameters ==\n");
-    printf("== Path2query: %s\n", path2qu.c_str());
-    printf("== Path2ref: %s\n", path2ref.c_str());
+  printf("== Read parameters ==\n");
+  printf("== Path2query: %s\n", path2qu.c_str());
+  printf("== Path2ref: %s\n", path2ref.c_str());
 
-    printf("== Query size: %d\n", querySize);
-    printf("== NonMatchCost: %3.4f\n", nonMatchCost);
-    printf("== Expansion Rate: %3.4f\n", expansionRate);
-    printf("== FanOut: %d\n", fanOut);
+  printf("== Query size: %d\n", querySize);
+  printf("== NonMatchCost: %3.4f\n", nonMatchCost);
+  printf("== Expansion Rate: %3.4f\n", expansionRate);
+  printf("== FanOut: %d\n", fanOut);
 
-    printf("== Path2query images: %s\n", path2quImg.c_str());
-    printf("== Path2reference images: %s\n", path2refImg.c_str());
-    printf("== Image extension: %s\n", imgExt.c_str());
-    printf("== Buffer size: %d\n", bufferSize);
+  printf("== Path2query images: %s\n", path2quImg.c_str());
+  printf("== Path2reference images: %s\n", path2refImg.c_str());
+  printf("== Image extension: %s\n", imgExt.c_str());
+  printf("== Buffer size: %d\n", bufferSize);
 
-    printf("== CostMatrix: %s\n", costMatrix.c_str());
-    printf("== costOutputName: %s\n", costOutputName.c_str());
-    printf("== matchingResult: %s\n", matchingResult.c_str());
-    printf("== simPlaces: %s\n", simPlaces.c_str());
+  printf("== CostMatrix: %s\n", costMatrix.c_str());
+  printf("== costOutputName: %s\n", costOutputName.c_str());
+  printf("== matchingResult: %s\n", matchingResult.c_str());
+  printf("== simPlaces: %s\n", simPlaces.c_str());
 }
 
 bool ConfigParser::parseYaml(const std::string &yamlFile) {
-    YAML::Node config;
-    try {
-        config = YAML::LoadFile(yamlFile.c_str());
-    } catch (...) {
-        printf("[ERROR][ConfigParser] File %s cannot be opened\n",
-               yamlFile.c_str());
-        return false;
-    }
-    if (config["path2ref"]) {
-        path2ref = config["path2ref"].as<std::string>();
-    }
-    if (config["path2qu"]) {
-        path2qu = config["path2qu"].as<std::string>();
-    }
-    if (config["querySize"]) {
-        querySize = config["querySize"].as<int>();
-    }
-    if (config["fanOut"]) {
-        fanOut = config["fanOut"].as<int>();
-    }
-    if (config["nonMatchCost"]) {
-        nonMatchCost = config["nonMatchCost"].as<double>();
-    }
-    if (config["expansionRate"]) {
-        expansionRate = config["expansionRate"].as<double>();
-    }
-    if (config["path2quImg"]) {
-        path2quImg = config["path2quImg"].as<std::string>();
-    }
+  YAML::Node config;
+  try {
+    config = YAML::LoadFile(yamlFile.c_str());
+  } catch (...) {
+    printf("[ERROR][ConfigParser] File %s cannot be opened\n",
+           yamlFile.c_str());
+    return false;
+  }
+  if (config["path2ref"]) {
+    path2ref = config["path2ref"].as<std::string>();
+  }
+  if (config["path2qu"]) {
+    path2qu = config["path2qu"].as<std::string>();
+  }
+  if (config["querySize"]) {
+    querySize = config["querySize"].as<int>();
+  }
+  if (config["fanOut"]) {
+    fanOut = config["fanOut"].as<int>();
+  }
+  if (config["nonMatchCost"]) {
+    nonMatchCost = config["nonMatchCost"].as<double>();
+  }
+  if (config["expansionRate"]) {
+    expansionRate = config["expansionRate"].as<double>();
+  }
+  if (config["path2quImg"]) {
+    path2quImg = config["path2quImg"].as<std::string>();
+  }
 
-    if (config["path2refImg"]) {
-        path2refImg = config["path2refImg"].as<std::string>();
-    }
-    if (config["imgExt"]) {
-        imgExt = config["imgExt"].as<std::string>();
-    }
-    if (config["bufferSize"]) {
-        bufferSize = config["bufferSize"].as<int>();
-    }
-    if (config["costMatrix"]) {
-        costMatrix = config["costMatrix"].as<std::string>();
-    }
-    if (config["costOutputName"]) {
-        costOutputName = config["costOutputName"].as<std::string>();
-    }
-    if (config["simPlaces"]) {
-        simPlaces = config["simPlaces"].as<std::string>();
-    }
+  if (config["path2refImg"]) {
+    path2refImg = config["path2refImg"].as<std::string>();
+  }
+  if (config["imgExt"]) {
+    imgExt = config["imgExt"].as<std::string>();
+  }
+  if (config["bufferSize"]) {
+    bufferSize = config["bufferSize"].as<int>();
+  }
+  if (config["costMatrix"]) {
+    costMatrix = config["costMatrix"].as<std::string>();
+  }
+  if (config["costOutputName"]) {
+    costOutputName = config["costOutputName"].as<std::string>();
+  }
+  if (config["simPlaces"]) {
+    simPlaces = config["simPlaces"].as<std::string>();
+  }
 
-    if (config["hashTable"]) {
-        hashTable = config["hashTable"].as<std::string>();
-    }
-    if (config["matchingResult"]) {
-        matchingResult = config["matchingResult"].as<std::string>();
-    }
+  if (config["hashTable"]) {
+    hashTable = config["hashTable"].as<std::string>();
+  }
+  if (config["matchingResult"]) {
+    matchingResult = config["matchingResult"].as<std::string>();
+  }
+  if (config["expandedNodesFile"]) {
+    expandedNodesFile = config["expandedNodesFile"].as<std::string>();
+  }
 
-    return true;
+  return true;
 }

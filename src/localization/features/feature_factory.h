@@ -28,9 +28,7 @@
 
 namespace localization::features {
 
-enum FeatureType {
-  Cnn_Feature,
-};
+enum FeatureType { Cnn_Feature, Scan_Context };
 
 std::unique_ptr<iFeature> createFeature(FeatureType type,
                                         const std::string &featureFilename);

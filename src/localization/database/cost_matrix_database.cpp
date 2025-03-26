@@ -37,7 +37,7 @@ CostMatrixDatabase::CostMatrixDatabase(const std::string &costMatrixFile)
     : costMatrix_(CostMatrix(costMatrixFile)) {}
 
 double CostMatrixDatabase::getCost(int quId, int refId) {
-  return costMatrix_.getInverseCost(quId, refId);
+  return costMatrix_.at(quId, refId);
 }
 
 } // namespace localization::database

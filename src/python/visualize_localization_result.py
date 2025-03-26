@@ -14,7 +14,7 @@ def create_combined_image(matching_result, cost_matrix, expanded_mask=None):
 
     # Add expanded nodes.
     if expanded_mask:
-        for element in expanded_mask:
+        for element in expanded_mask.elements:
             rgb_costs[element.row, element.col] = [0, 1, 0]
 
     # Add path with color. Red - real nodes, Blue - hidden nodes.
@@ -45,10 +45,10 @@ def main():
         help="Path to the matching result .MatchingResult.pb file",
     )
     parser.add_argument(
-        "--expanded_patches_dir",
+        "--expanded_patches_file",
         required=False,
         type=Path,
-        help="Path to directory with expanded nodes files of type .Patch.pb",
+        help="A file with expanded nodes files of type .Patch.pb",
     )
     parser.add_argument(
         "--image_name",
@@ -76,8 +76,8 @@ def main():
 
     matching_result = protos_io.read_matching_result(args.matching_result)
 
-    if args.expanded_patches_dir:
-        expanded_mask = protos_io.read_expanded_mask(args.expanded_patches_dir)
+    if args.expanded_patches_file:
+        expanded_mask = protos_io.read_expanded_mask(args.expanded_patches_file)
     else:
         expanded_mask = None
 
