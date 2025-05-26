@@ -1,5 +1,8 @@
 # Image Sequence Localizer
 
+
+![Build Status](https://github.com/ovysotska/image_sequence_localizer/actions/workflows/main.yml/badge.svg)
+
 This project proposes a framework for outdoor **visual place recognition**.
 
 It can recognize visually similar places in GPS-denied environments. 
