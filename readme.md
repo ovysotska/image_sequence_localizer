@@ -2,7 +2,7 @@
 
 ![Build Status](https://github.com/ovysotska/image_sequence_localizer/actions/workflows/main.yml/badge.svg)
 ![Tested on Linux](https://img.shields.io/badge/Linux-FCC624?logo=linux&logoColor=black)
-[![License: MIT](https://img.shields.io/badge/Licence-MIT-green.svg)](LICENSE.txt)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.txt)
 
 This project proposes a framework for outdoor **visual place recognition**.
 
