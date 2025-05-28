@@ -27,6 +27,7 @@
 #include "database/list_dir.h"
 #include "features/feature_buffer.h"
 #include "features/ifeature.h"
+#include "localization_protos.pb.h"
 
 #include <glog/logging.h>
 
@@ -101,5 +102,32 @@ double OnlineDatabase::getCost(int quId, int refId) {
 const features::iFeature &OnlineDatabase::getQueryFeature(int quId) {
   return addFeatureIfNeeded(*queryBuffer_, quFeaturesNames_, featureType_,
                             quId);
+}
+
+void storeCostsAsProto(
+    const localization::database::OnlineDatabase::MatchingCosts &costs,
+    const std::string &protoFilename) {
+  if (costs.empty()) {
+    LOG(WARNING) << "Matching costs are empty. Nothing to store.";
+    return;
+  }
+  image_sequence_localizer::MatchingCosts costsProto;
+  for (const auto &[queryId, refValueMap] : costs) {
+    for (const auto &[refId, value] : refValueMap) {
+      image_sequence_localizer::MatchingCosts::Element *element =
+          costsProto.add_elements();
+      element->set_query_id(queryId);
+      element->set_ref_id(refId);
+      element->set_value(value);
+    }
+  }
+  std::fstream out(protoFilename,
+                   std::ios::out | std::ios::trunc | std::ios::binary);
+  if (!costsProto.SerializeToOstream(&out)) {
+    LOG(ERROR) << "Couldn't open the file" << protoFilename;
+    return;
+  }
+  out.close();
+  LOG(INFO) << "Wrote matching costs to: " << protoFilename;
 }
 } // namespace localization::database

@@ -23,6 +23,7 @@ function readImageAsync(file: Blob) {
 enum ProtoMessageType {
   CostMatrix = "CostMatrix",
   MatchingResult = "MatchingResult",
+  MatchingCosts = "MatchingCosts",
 }
 
 function readProtoFromBuffer(buffer: Uint8Array, protoMessageType: string) {
@@ -34,11 +35,11 @@ function readProtoFromBuffer(buffer: Uint8Array, protoMessageType: string) {
         // Get the message type from the root object
         const message = root.lookupType(protoMessageType);
         const decodedMessage = message.decode(buffer);
-        console.log("Message", decodedMessage);
         resolve(decodedMessage);
       })
       .catch((error: any) => {
         console.log("ERROR, proto couldn't be loaded", error);
+        console.log("For type", protoMessageType);
         reject();
       });
   });

@@ -18,7 +18,6 @@ def write_feature(filename, proto):
 
 
 def write_cost_matrix(cost_matrix, cost_matrix_file):
-
     cost_matrix_proto = loc_protos.CostMatrix()
     cost_matrix_proto.rows = cost_matrix.shape[0]
     cost_matrix_proto.cols = cost_matrix.shape[1]
@@ -51,14 +50,14 @@ def read_matching_result(filename):
 
 
 def read_expanded_mask(expanded_patches_dir):
-    patch_files = list(expanded_patches_dir.glob("*.Patch.pb"))
-    patch_files.sort()
+    matching_costs_files = list(expanded_patches_dir.glob("*.MatchingCosts.pb"))
+    matching_costs_files.sort()
 
     mask = []
-    for patch_file in patch_files:
-        f = open(patch_file, "rb")
-        patch_proto = loc_protos.Patch()
-        patch_proto.ParseFromString(f.read())
+    for matching_costs_file in matching_costs_files:
+        f = open(matching_costs_file, "rb")
+        matching_costs_proto = loc_protos.MatchingCosts()
+        matching_costs_proto.ParseFromString(f.read())
         f.close()
-        mask.extend(patch_proto.elements)
+        mask.extend(matching_costs_proto.elements)
     return mask

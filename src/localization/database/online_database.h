@@ -38,12 +38,15 @@
 #include <vector>
 
 namespace localization::database {
+
 /**
  * @brief      Database for loading and matching features. Caches the computed
  * matching costs.
  */
 class OnlineDatabase : public iDatabase {
 public:
+  using MatchingCosts =
+      std::unordered_map<int, std::unordered_map<int, double>>;
   OnlineDatabase(const std::string &queryFeaturesDir,
                  const std::string &refFeaturesDir, features::FeatureType type,
                  int bufferSize, const std::string &costMatrixFile = "");
@@ -54,6 +57,7 @@ public:
   double computeMatchingCost(int quId, int refId);
 
   const features::iFeature &getQueryFeature(int quId);
+  const MatchingCosts &getEstimatedCosts() const { return costs_; }
 
 protected:
   std::vector<std::string> quFeaturesNames_;
@@ -64,10 +68,14 @@ protected:
 private:
   std::unique_ptr<features::FeatureBuffer> refBuffer_{};
   std::unique_ptr<features::FeatureBuffer> queryBuffer_{};
-  std::unordered_map<int, std::unordered_map<int, double>> costs_;
+  MatchingCosts costs_;
 
   std::optional<CostMatrix> precomputedCosts_ = {};
 };
+
+void storeCostsAsProto(
+    const localization::database::OnlineDatabase::MatchingCosts &matches,
+    const std::string &protoFilename);
 } // namespace localization::database
 
 #endif // SRC_DATABASE_ONLINE_DATABASE_H_
