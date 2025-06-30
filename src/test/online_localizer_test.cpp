@@ -27,12 +27,12 @@ public:
   void SetUp() {
     tmp_dir = test::createFeatures();
     std::filesystem::path featureDir = tmp_dir;
-    image_sequence_localizer::CostMatrix cost_matrix =
-        test::computeCostMatrixProto(featureDir, featureDir);
-    std::string costMatrixFile = tmp_dir / "test.CostMatrix.pb";
+    image_sequence_localizer::SimilarityMatrix similarity_matrix =
+        test::computeSimilarityMatrixProto(featureDir, featureDir);
+    std::string costMatrixFile = tmp_dir / "test.SimilarityMatrix.pb";
     std::fstream out(costMatrixFile,
                      std::ios::out | std::ios::trunc | std::ios::binary);
-    cost_matrix.SerializeToOstream(&out);
+    similarity_matrix.SerializeToOstream(&out);
     out.close();
 
     database = std::make_unique<loc::database::OnlineDatabase>(

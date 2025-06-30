@@ -15,23 +15,23 @@ public:
 
     tmp_dir = std::filesystem::temp_directory_path() / "SimilarityMatrixTest";
     std::filesystem::create_directories(tmp_dir);
-    image_sequence_localizer::CostMatrix costMatrixProto;
+    image_sequence_localizer::SimilarityMatrix similarityMatrixProto;
     for (int r = 0; r < 2; ++r) {
       for (int c = 0; c < 3; ++c) {
-        costMatrixProto.add_values(similarityMatrixValues[r][c]);
+        similarityMatrixProto.add_values(similarityMatrixValues[r][c]);
       }
     }
 
-    costMatrixProto.set_cols(3);
-    costMatrixProto.set_rows(2);
+    similarityMatrixProto.set_cols(3);
+    similarityMatrixProto.set_rows(2);
     std::string testName =
         ::testing::UnitTest::GetInstance()->current_test_info()->name();
 
-    similarityMatrixFile = tmp_dir / (testName + "_test.CostMatrix.pb");
+    similarityMatrixFile = tmp_dir / (testName + "_test.SimilarityMatrix.pb");
     std::cout << "Saving to" << similarityMatrixFile;
     std::fstream out(similarityMatrixFile,
                      std::ios::out | std::ios::trunc | std::ios::binary);
-    costMatrixProto.SerializeToOstream(&out);
+    similarityMatrixProto.SerializeToOstream(&out);
     out.close();
   }
 

@@ -60,17 +60,14 @@ def setRunParameters(args):
     run_parameters.path2ref_images = args.reference_images.as_posix()
     run_parameters.path2qu = (args.output_dir / "query_features").as_posix()
     run_parameters.path2ref = (args.output_dir / "reference_features").as_posix()
-    run_parameters.costMatrix = (
-        args.output_dir / (args.dataset_name + ".CostMatrix.pb")
+    run_parameters.similarityMatrix = (
+        args.output_dir / (args.dataset_name + ".SimilarityMatrix.pb")
     ).as_posix()
     run_parameters.matchingResult = (
         args.output_dir / (args.dataset_name + ".MatchingResult.pb")
     ).as_posix()
     run_parameters.matchingResultImage = (
         args.output_dir / (args.dataset_name + "_result.png")
-    ).as_posix()
-    run_parameters.debugProto = (
-        args.output_dir / (args.dataset_name + ".OnlineLocalizerDebug.png")
     ).as_posix()
 
     queriesNum = len(list(Path(run_parameters.path2qu).glob("*Feature.pb")))
@@ -113,7 +110,7 @@ def main():
     with open(yaml_config_file, "w") as file:
         yaml.dump(params_as_dict, file)
 
-    matching.computeCostMatrix(run_params)
+    matching.computeSimilarityMatrix(run_params)
     matching.runMatching(yaml_config_file)
     matching.runLocalizationResultVisualization(run_params)
     if args.write_image_matches:

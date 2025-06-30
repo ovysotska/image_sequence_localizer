@@ -41,8 +41,8 @@ def setRunParameters(args):
     run_parameters = matching.RunParameters()
     run_parameters.path2qu = args.query_features.as_posix()
     run_parameters.path2ref = args.reference_features.as_posix()
-    run_parameters.costMatrix = (
-        args.output_dir / (args.dataset_name + ".CostMatrix.pb")
+    run_parameters.similarityMatrix = (
+        args.output_dir / (args.dataset_name + ".SimilarityMatrix.pb")
     ).as_posix()
     run_parameters.matchingResult = (
         args.output_dir / (args.dataset_name + ".MatchingResult.pb")
@@ -75,7 +75,7 @@ def main():
     with open(yaml_config_file, "w") as file:
         yaml.dump(param_as_dict, file)
 
-    matching.computeCostMatrix(run_params)
+    matching.computeSimilarityMatrix(run_params)
     matching.runMatching(yaml_config_file)
     matching.runLocalizationResultVisualization(run_params)
 

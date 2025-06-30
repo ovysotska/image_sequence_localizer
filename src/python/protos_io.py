@@ -17,29 +17,29 @@ def write_feature(filename, proto):
     f.close()
 
 
-def write_cost_matrix(cost_matrix, cost_matrix_file):
+def write_similarity_matrix(simlarity_matrix, similarity_matrix_file):
 
-    cost_matrix_proto = loc_protos.CostMatrix()
-    cost_matrix_proto.rows = cost_matrix.shape[0]
-    cost_matrix_proto.cols = cost_matrix.shape[1]
-    for row in cost_matrix:
-        cost_matrix_proto.values.extend(row.tolist())
+    similarity_matrix_proto = loc_protos.SimilarityMatrix()
+    similarity_matrix_proto.rows = simlarity_matrix.shape[0]
+    similarity_matrix_proto.cols = simlarity_matrix.shape[1]
+    for row in simlarity_matrix:
+        similarity_matrix_proto.values.extend(row.tolist())
 
-    f = open(cost_matrix_file, "wb")
-    f.write(cost_matrix_proto.SerializeToString())
+    f = open(similarity_matrix_file, "wb")
+    f.write(similarity_matrix_proto.SerializeToString())
     f.close()
 
 
-def read_cost_matrix(cost_matrix_file):
-    f = open(cost_matrix_file, "rb")
-    cost_matrix_proto = loc_protos.CostMatrix()
-    cost_matrix_proto.ParseFromString(f.read())
+def read_similarity_matrix(similarity_matrix_file):
+    f = open(similarity_matrix_file, "rb")
+    similarity_matrix_proto = loc_protos.CostMatrix()
+    similarity_matrix_proto.ParseFromString(f.read())
     f.close()
-    cost_matrix = np.array(cost_matrix_proto.values)
-    cost_matrix = np.reshape(
-        cost_matrix, (cost_matrix_proto.rows, cost_matrix_proto.cols)
+    similarity_matrix = np.array(similarity_matrix_proto.values)
+    similarity_matrix = np.reshape(
+        similarity_matrix, (similarity_matrix_proto.rows, similarity_matrix_proto.cols)
     )
-    return cost_matrix
+    return similarity_matrix
 
 
 def read_matching_result(filename):

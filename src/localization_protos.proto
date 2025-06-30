@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package image_sequence_localizer;
 
-message CostMatrix {
+message SimilarityMatrix {
   optional int32 rows = 20;
   optional int32 cols = 21;
   repeated double values = 1;

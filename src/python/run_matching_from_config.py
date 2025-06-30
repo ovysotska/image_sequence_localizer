@@ -28,7 +28,7 @@ def main():
     run_params = matching.RunParameters()
     run_params = matching.initializeFromDict(run_params, config)
 
-    matching.computeCostMatrix(run_params)
+    matching.computeSimilarityMatrix(run_params)
     matching.runMatching(args.yaml_config_file)
     matching.runLocalizationResultVisualization(run_params)
 

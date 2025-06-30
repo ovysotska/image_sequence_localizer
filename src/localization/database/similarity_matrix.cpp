@@ -93,22 +93,22 @@ double SimilarityMatrix::getCost(int row, int col) const {
 
 void SimilarityMatrix::loadFromProto(const std::string &filename) {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
-  image_sequence_localizer::CostMatrix cost_matrix_proto;
+  image_sequence_localizer::SimilarityMatrix similarity_matrix_proto;
   std::fstream input(filename, std::ios::in | std::ios::binary);
 
-  if (!cost_matrix_proto.ParseFromIstream(&input)) {
+  if (!similarity_matrix_proto.ParseFromIstream(&input)) {
     LOG(FATAL) << "Failed to parse cost_matrix file: " << filename;
   }
   std::vector<double> row;
-  for (int idx = 0; idx < cost_matrix_proto.values_size(); ++idx) {
-    row.push_back(cost_matrix_proto.values(idx));
-    if (row.size() == cost_matrix_proto.cols()) {
+  for (int idx = 0; idx < similarity_matrix_proto.values_size(); ++idx) {
+    row.push_back(similarity_matrix_proto.values(idx));
+    if (row.size() == similarity_matrix_proto.cols()) {
       scores_.push_back(row);
       row.clear();
     }
   }
-  cols_ = cost_matrix_proto.cols();
-  rows_ = cost_matrix_proto.rows();
+  cols_ = similarity_matrix_proto.cols();
+  rows_ = similarity_matrix_proto.rows();
   LOG(INFO) << "Read cost matrix with " << rows_ << " rows and " << cols_
             << " cols.";
 }
