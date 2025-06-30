@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
       std::make_unique<loc::successor_manager::SuccessorManager>(
           database.get(), relocalizer.get(), parser.fanOut);
   loc::online_localizer::OnlineLocalizer localizer{
-      successorManager.get(), parser.expansionRate, parser.nonMatchCost};
+      successorManager.get(), parser.expansionRate, parser.matchingThreshold};
   const loc::online_localizer::Matches imageMatches =
       localizer.findMatchesTill(parser.querySize);
   loc::online_localizer::storeMatchesAsProto(imageMatches,

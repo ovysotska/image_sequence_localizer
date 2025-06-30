@@ -50,7 +50,7 @@ class ConfigParser {
     int querySize = -1;
     int fanOut = -1;
     int bufferSize = -1;
-    double nonMatchCost = -1.0;
+    double matchingThreshold = -1.0;
     double expansionRate = -1.0;
 };
 
@@ -96,9 +96,9 @@ class ConfigParser {
     \brief number of image features to be cached. Speeds up the computation for
    feature_based matching. Irrelevant for cost_matrix_based matching.
 */
-/*! \var double ConfigParser::nonMatchCost
+/*! \var double ConfigParser::matchingThreshold
     \brief maximum boundary for the matching cost to still be considered as a
-   match. For example, if `nonMatchCost = 5.0` then every smaller cost should
+   match. For example, if `matchingThreshold = 5.0` then every smaller cost should
    represent the fact that 2 images match and every higher cost represents the
    fact that 2 image descriptors do not represent the same place. (sensitive
    parameter, depends on the matched trajectories).

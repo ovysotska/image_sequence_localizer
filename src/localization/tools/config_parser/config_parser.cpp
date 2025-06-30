@@ -65,9 +65,9 @@ bool ConfigParser::parse(const std::string &iniFile) {
                 ss >> querySize;
             }
 
-            if (header == "nonMatchCost") {
+            if (header == "matchingThreshold") {
                 ss >> header;  // reads "="
-                ss >> nonMatchCost;
+                ss >> matchingThreshold;
                 continue;
             }
 
@@ -129,7 +129,7 @@ void ConfigParser::print() const {
     printf("== Path2ref: %s\n", path2ref.c_str());
 
     printf("== Query size: %d\n", querySize);
-    printf("== NonMatchCost: %3.4f\n", nonMatchCost);
+    printf("== matchingThreshold: %3.4f\n", matchingThreshold);
     printf("== Expansion Rate: %3.4f\n", expansionRate);
     printf("== FanOut: %d\n", fanOut);
 
@@ -165,8 +165,8 @@ bool ConfigParser::parseYaml(const std::string &yamlFile) {
     if (config["fanOut"]) {
         fanOut = config["fanOut"].as<int>();
     }
-    if (config["nonMatchCost"]) {
-        nonMatchCost = config["nonMatchCost"].as<double>();
+    if (config["matchingThreshold"]) {
+        matchingThreshold = config["matchingThreshold"].as<double>();
     }
     if (config["expansionRate"]) {
         expansionRate = config["expansionRate"].as<double>();
