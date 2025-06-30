@@ -14,7 +14,7 @@ class RunParameters:
     matchingResultImage: str = None
     expansionRate: float = 0.3
     fanOut: int = 5
-    nonMatchCost: float = 3.7
+    matchingThreshold: float = 3.7
     querySize: int = None
     bufferSize: int = 100
 

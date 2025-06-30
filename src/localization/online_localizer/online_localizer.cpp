@@ -48,17 +48,17 @@ const float kMaxLostNodesRatio = 0.8; // 80%
 
 OnlineLocalizer::OnlineLocalizer(
     successor_manager::SuccessorManager *successorManager, double expansionRate,
-    double nonMatchingCost) {
+    double matchingThreshold) {
 
   CHECK(successorManager) << "Successor manager is not set.";
   CHECK(expansionRate > 0 && expansionRate <= 1)
       << "Graph expansion rate should be in [0,1]. Obtained: " << expansionRate;
-  CHECK(nonMatchingCost > 0)
-      << "Non matching cost should be > 0. Obtained: " << nonMatchingCost;
+  CHECK(matchingThreshold > 0)
+      << "Matching threshold should be > 0. Obtained: " << matchingThreshold;
 
   successorManager_ = successorManager;
   expansionRate_ = expansionRate;
-  nonMatchingCost_ = nonMatchingCost;
+  matchingThreshold_ = matchingThreshold;
 
   pred_[kSourceNode.quId][kSourceNode.refId] = kSourceNode;
   Node source = kSourceNode;
@@ -315,7 +315,7 @@ std::vector<PathElement> OnlineLocalizer::getCurrentPath() const {
       source_reached = true;
       continue;
     }
-    NodeState state = pred.idvCost > nonMatchingCost_ ? HIDDEN : REAL;
+    NodeState state = pred.idvCost > matchingThreshold_ ? HIDDEN : REAL;
     PathElement pathEl(pred.quId, pred.refId, state);
     path.push_back(pathEl);
     pred = pred_.at(pred.quId).at(pred.refId);
@@ -362,7 +362,7 @@ std::vector<PathElement> OnlineLocalizer::getLastNmatches(int N) const {
       source_reached = true;
       continue;
     }
-    NodeState state = pred.idvCost > nonMatchingCost_ ? HIDDEN : REAL;
+    NodeState state = pred.idvCost > matchingThreshold_ ? HIDDEN : REAL;
     PathElement pathEl(pred.quId, pred.refId, state);
     path.push_back(pathEl);
     pred = pred_.at(pred.quId).at(pred.refId);

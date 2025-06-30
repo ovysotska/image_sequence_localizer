@@ -46,7 +46,7 @@ public:
   using AccCostsMap = std::unordered_map<int, std::unordered_map<int, double>>;
 
   OnlineLocalizer(successor_manager::SuccessorManager *successorManager,
-                  double expansionRate, double nonMatchingCost);
+                  double expansionRate, double matchingThreshold);
   ~OnlineLocalizer() {}
 
   Matches findMatchesTill(int queryId);
@@ -73,7 +73,7 @@ private:
   int kSlidingWindowSize_ = 5; // frames
   bool needReloc_ = false;
   double expansionRate_ = -1.0;
-  double nonMatchingCost_ = -1.0;
+  double matchingThreshold_ = -1.0;
 
   std::priority_queue<Node> frontier_;
   // stores parent for each node
