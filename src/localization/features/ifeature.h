@@ -67,12 +67,9 @@ public:
   std::vector<double> dimensions;
 };
 /**
-  \fn iFeature::score2weight
+  \fn iFeature::score2cost
    * Intuitively, the bigger the similarity between the feature the smaller
-   * should be the weight on the corresponding edges in the graph.
-   * If you already have an "inverted similarity" score, this function should
-  just return the same value it takes as an input.
-
+   * should be the cost on the corresponding edges in the graph.
 */
 } // namespace localization::features
 

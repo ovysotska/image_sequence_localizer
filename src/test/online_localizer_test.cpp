@@ -1,5 +1,4 @@
 
-#include "database/cost_matrix_database.h"
 #include "database/online_database.h"
 #include "features/ifeature.h"
 #include "localization_protos.pb.h"

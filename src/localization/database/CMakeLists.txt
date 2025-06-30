@@ -4,8 +4,8 @@ target_link_libraries(list_dir
     glog::glog
 )
 
-add_library(cost_matrix cost_matrix.cpp)
-target_link_libraries(cost_matrix
+add_library(similarity_matrix similarity_matrix.cpp)
+target_link_libraries(similarity_matrix
     feature_factory
     list_dir
     protos
@@ -19,16 +19,16 @@ target_link_libraries(online_database
     feature_buffer
     feature_factory
     glog::glog
-    cost_matrix
+    similarity_matrix
 )
 
-add_library(cost_matrix_database cost_matrix_database.cpp)
-target_link_libraries(cost_matrix_database
+add_library(similarity_matrix_database similarity_matrix_database.cpp)
+target_link_libraries(similarity_matrix_database
     timer 
     list_dir
     feature_buffer
     feature_factory
     glog::glog
-    cost_matrix
+    similarity_matrix
 )
 

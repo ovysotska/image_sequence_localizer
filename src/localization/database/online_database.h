@@ -26,7 +26,7 @@
 #ifndef SRC_DATABASE_ONLINE_DATABASE_H_
 #define SRC_DATABASE_ONLINE_DATABASE_H_
 
-#include "database/cost_matrix.h"
+#include "database/similarity_matrix.h"
 #include "database/idatabase.h"
 #include "features/feature_buffer.h"
 #include "features/feature_factory.h"
@@ -46,7 +46,7 @@ class OnlineDatabase : public iDatabase {
 public:
   OnlineDatabase(const std::string &queryFeaturesDir,
                  const std::string &refFeaturesDir, features::FeatureType type,
-                 int bufferSize, const std::string &costMatrixFile = "");
+                 int bufferSize, const std::string &similarityMatrixFile = "");
 
   inline int refSize() override { return refFeaturesNames_.size(); }
   double getCost(int quId, int refId) override;
@@ -66,7 +66,7 @@ private:
   std::unique_ptr<features::FeatureBuffer> queryBuffer_{};
   std::unordered_map<int, std::unordered_map<int, double>> costs_;
 
-  std::optional<CostMatrix> precomputedCosts_ = {};
+  std::optional<SimilarityMatrix> precomputedScores_ = {};
 };
 } // namespace localization::database
 

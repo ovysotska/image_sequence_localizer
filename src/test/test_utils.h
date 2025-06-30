@@ -62,7 +62,7 @@ inline void clearDataUnderPath(const std::filesystem::path &path) {
   std::filesystem::remove_all(path);
 }
 
-const std::vector<std::vector<double>> kCostMatrix = {
+const std::vector<std::vector<double>> kSimilarityMatrix = {
     {1, 0.922225, 0.285714, 0.99449},
     {0.922225, 1, 0.634029, 0.922876},
     {0.285714, 0.634029, 1, 0.298347},

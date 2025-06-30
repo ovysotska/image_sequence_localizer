@@ -103,14 +103,9 @@ bool ConfigParser::parse(const std::string &iniFile) {
                 ss >> imgExt;
                 continue;
             }
-            if (header == "costMatrix") {
+            if (header == "similarityMatrix") {
                 ss >> header;  // reads "="
-                ss >> costMatrix;
-                continue;
-            }
-            if (header == "costOutputName") {
-                ss >> header;  // reads "="
-                ss >> costOutputName;
+                ss >> similarityMatrix;
                 continue;
             }
             if (header == "simPlaces") {
@@ -138,8 +133,7 @@ void ConfigParser::print() const {
     printf("== Image extension: %s\n", imgExt.c_str());
     printf("== Buffer size: %d\n", bufferSize);
 
-    printf("== CostMatrix: %s\n", costMatrix.c_str());
-    printf("== costOutputName: %s\n", costOutputName.c_str());
+    printf("== similarityMatrix: %s\n", similarityMatrix.c_str());
     printf("== matchingResult: %s\n", matchingResult.c_str());
     printf("== simPlaces: %s\n", simPlaces.c_str());
 }
@@ -184,11 +178,8 @@ bool ConfigParser::parseYaml(const std::string &yamlFile) {
     if (config["bufferSize"]) {
         bufferSize = config["bufferSize"].as<int>();
     }
-    if (config["costMatrix"]) {
-        costMatrix = config["costMatrix"].as<std::string>();
-    }
-    if (config["costOutputName"]) {
-        costOutputName = config["costOutputName"].as<std::string>();
+    if (config["similarityMatrix"]) {
+        similarityMatrix = config["similarityMatrix"].as<std::string>();
     }
     if (config["simPlaces"]) {
         simPlaces = config["simPlaces"].as<std::string>();

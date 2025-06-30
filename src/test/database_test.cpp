@@ -23,7 +23,7 @@
 
 /* Updated by O. Vysotska in 2022 */
 
-#include "database/cost_matrix_database.h"
+#include "database/similarity_matrix_database.h"
 #include "database/online_database.h"
 #include "localization_protos.pb.h"
 #include "test_utils.h"

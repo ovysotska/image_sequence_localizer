@@ -1,6 +1,6 @@
 /* By O. Vysotska in 2023 */
 
-#include "database/cost_matrix_database.h"
+#include "database/similarity_matrix_database.h"
 #include "database/idatabase.h"
 #include "online_localizer/online_localizer.h"
 #include "online_localizer/path_element.h"
@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
   parser.print();
 
   const auto database =
-      std::make_unique<loc::database::CostMatrixDatabase>(parser.costMatrix);
+      std::make_unique<loc::database::SimilarityMatrixDatabase>(parser.similarityMatrix);
 
   const auto relocalizer =
       std::make_unique<loc::relocalizers::DefaultRelocalizer>(

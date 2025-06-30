@@ -1,6 +1,6 @@
 /* By O. Vysotska in 2023 */
 
-#include "cost_matrix.h"
+#include "similarity_matrix.h"
 #include "database/list_dir.h"
 #include "features/feature_factory.h"
 #include "localization_protos.pb.h"
@@ -15,12 +15,12 @@ namespace {
 constexpr auto kEpsilon = 1e-09;
 } // namespace
 
-CostMatrix::CostMatrix(const std::string &costMatrixFile) {
-  CHECK(!costMatrixFile.empty()) << "Cost matrix file is not set";
-  loadFromProto(costMatrixFile);
+SimilarityMatrix::SimilarityMatrix(const std::string &similarityMatrixFile) {
+  CHECK(!similarityMatrixFile.empty()) << "Cost matrix file is not set";
+  loadFromProto(similarityMatrixFile);
 }
 
-CostMatrix::CostMatrix(const std::string &queryFeaturesDir,
+SimilarityMatrix::SimilarityMatrix(const std::string &queryFeaturesDir,
                        const std::string &refFeaturesDir,
                        const features::FeatureType &type) {
   const std::vector<std::string> queryFeaturesFiles =
@@ -31,7 +31,7 @@ CostMatrix::CostMatrix(const std::string &queryFeaturesDir,
   std::cerr << "Query features" << queryFeaturesFiles.size() << std::endl;
   std::cerr << "ref features" << refFeaturesFiles.size() << std::endl;
 
-  costs_.reserve(queryFeaturesFiles.size());
+  scores_.reserve(queryFeaturesFiles.size());
   for (const auto &queryFile : queryFeaturesFiles) {
     auto queryFeature = createFeature(type, queryFile);
     std::vector<double> row;
@@ -40,21 +40,21 @@ CostMatrix::CostMatrix(const std::string &queryFeaturesDir,
       const auto refFeature = createFeature(type, refFile);
       row.push_back(queryFeature->computeSimilarityScore(*refFeature));
     }
-    costs_.push_back(row);
+    scores_.push_back(row);
   }
-  rows_ = costs_.size();
-  if (costs_.size() > 0) {
-    cols_ = costs_[0].size();
+  rows_ = scores_.size();
+  if (scores_.size() > 0) {
+    cols_ = scores_[0].size();
   }
 }
 
-CostMatrix::CostMatrix(const Matrix &costs) {
-  costs_ = costs;
-  rows_ = costs.size();
-  cols_ = rows_ > 0 ? costs[0].size() : 0;
+SimilarityMatrix::SimilarityMatrix(const Matrix &scores) {
+  scores_ = scores;
+  rows_ = scores.size();
+  cols_ = rows_ > 0 ? scores[0].size() : 0;
 }
 
-void CostMatrix::loadFromTxt(const std::string &filename, int rows, int cols) {
+void SimilarityMatrix::loadFromTxt(const std::string &filename, int rows, int cols) {
   std::ifstream in(filename);
   LOG_IF(FATAL, !in) << "The file cannot be opened " << filename;
 
@@ -65,7 +65,7 @@ void CostMatrix::loadFromTxt(const std::string &filename, int rows, int cols) {
       float value;
       in >> row[c];
     }
-    costs_.push_back(row);
+    scores_.push_back(row);
   }
   LOG(INFO) << "Matrix was read";
   in.close();
@@ -73,25 +73,25 @@ void CostMatrix::loadFromTxt(const std::string &filename, int rows, int cols) {
   cols_ = cols;
 }
 
-double CostMatrix::at(int row, int col) const {
+double SimilarityMatrix::at(int row, int col) const {
   CHECK(row >= 0 && row < rows_) << "Row outside range " << row;
   CHECK(col >= 0 && col < cols_) << "Col outside range " << col;
-  return costs_[row][col];
+  return scores_[row][col];
 }
 
-double CostMatrix::getInverseCost(int row, int col) const {
+double SimilarityMatrix::getCost(int row, int col) const {
   const double value = this->at(row, col);
   if (std::abs(value) < kEpsilon) {
     return std::numeric_limits<double>::max();
   }
   if (value < 0){
-    LOG(WARNING) << "The cost value for row:" << row  << " and col:" << col <<" is < 0: " << value<< ". This should not be like this. I will make a positive value of it for now. But please check your values";
+    LOG(WARNING) << "The score value for row:" << row  << " and col:" << col <<" is < 0: " << value<< ". This should not be like this. I will make a positive value of it for now. But please check your values";
 
   }
   return 1. / std::abs(value);
 }
 
-void CostMatrix::loadFromProto(const std::string &filename) {
+void SimilarityMatrix::loadFromProto(const std::string &filename) {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
   image_sequence_localizer::CostMatrix cost_matrix_proto;
   std::fstream input(filename, std::ios::in | std::ios::binary);
@@ -103,7 +103,7 @@ void CostMatrix::loadFromProto(const std::string &filename) {
   for (int idx = 0; idx < cost_matrix_proto.values_size(); ++idx) {
     row.push_back(cost_matrix_proto.values(idx));
     if (row.size() == cost_matrix_proto.cols()) {
-      costs_.push_back(row);
+      scores_.push_back(row);
       row.clear();
     }
   }
