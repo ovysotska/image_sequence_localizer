@@ -41,11 +41,11 @@ Requires `Python 3.8+`.
 
 ## Usage
 
-The code is under continuous development but at any point in time you should be able to run the matching procedure through:
+If you have images sequences, start matching procedure by calling:
 
 ```bash
 cd src/python
-python run_matching.py \
+python run_matching_from_images.py \
     --query_images <path_to_images> \
     --reference_images <path_to_images> \
     --dataset_name <dataset_name> \
@@ -53,11 +53,23 @@ python run_matching.py \
     --write_image_matches
 ```
 
+If you have pre-computed features already:
+
+```bash
+python run_matching_from_features.py \
+    --query_features <path_to_features> \
+    --reference_features <path_to_features> \
+    --dataset_name <dataset_name> \
+    --output_dir <path_to_folder>
+```
+
+\*\* Make sure the features are stored as a correct proto message `.Feature.pb`, check [localization_protos.proto](src/localization_protos.proto) for format details.
+
 The framework assumes that there is a _query_ image sequence, for every image of which the user wants to find the corresponding image in the _reference_ image sequence.
 
-The `run_matching.py` script stores all the results in the user-provided `output_dir`. The user also needs to specify the name of the dataset, for example, "my_awesome_dataset".
+The scripts store all the results in the user-provided `output_dir`. The user also needs to specify the name of the dataset, for example, "my_awesome_dataset".
 
-For more details about the parameters, please use `python run_matching.py --help`.
+For more details about the parameters, please use `python run_matching_from_*.py --help`.
 
 For more details about the underlying method and the interpretation of the results, please have a look at [paper](http://www.ipb.uni-bonn.de/pdfs/vysotska16ral-icra.pdf).
 Here is a sketch of what roughly is happening for those who don't like to read much ![](doc/cost_matrix_view.png)
