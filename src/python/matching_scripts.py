@@ -112,14 +112,14 @@ def computeSimilarityMatrix(run_params):
 
 
 def runMatching(config_yaml_file):
-    binary = "../../build/src/apps/cost_matrix_based_matching/online_localizer_lsh"
+    binary = "../../build/src/apps/similarity_matrix_based_matching/online_localizer_lsh"
     command = binary + " " + str(config_yaml_file)
     print("Calling:", command)
     os.system(command)
 
 
 def runLocalizationResultVisualization(run_params):
-    params = "--similarity_matrix {similarity_matrix} ".format(cost_matrix=run_params.similarityMatrix)
+    params = "--similarity_matrix {similarity_matrix} ".format(similarity_matrix=run_params.similarityMatrix)
     params += "--matching_result {matching_result} ".format(
         matching_result=run_params.matchingResult
     )

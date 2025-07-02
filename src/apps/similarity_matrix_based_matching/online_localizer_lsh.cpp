@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
 
   if (argc < 2) {
     printf("[ERROR] Not enough input parameters.\n");
-    printf("Proper usage: ./cost_matrix_based_matching_lsh config_file.yaml\n");
+    printf("Proper usage: ./online_localizer_lsh config_file.yaml\n");
     exit(0);
   }
 

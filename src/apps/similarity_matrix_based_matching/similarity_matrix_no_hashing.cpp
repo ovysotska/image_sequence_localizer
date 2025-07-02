@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
 
   if (argc < 2) {
     LOG(ERROR) << "Not enough input parameters.";
-    LOG(INFO) << "Proper usage: ./cost_matrix_based_matching_no_hashing "
+    LOG(INFO) << "Proper usage: ./similarity_matrix_based_matching_no_hashing "
                  "config_file.yaml";
     exit(0);
   }

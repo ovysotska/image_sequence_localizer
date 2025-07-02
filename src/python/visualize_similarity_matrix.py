@@ -22,7 +22,7 @@ def main():
     )
     args = parser.parse_args()
 
-    similarity_matrix = protos_io.read_cost_matrix(args.similarity_matrix)
+    similarity_matrix = protos_io.read_similarity_matrix(args.similarity_matrix)
 
     max_value = np.max(np.max(similarity_matrix))
     min_value = np.min(np.min(similarity_matrix))

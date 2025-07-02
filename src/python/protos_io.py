@@ -32,7 +32,7 @@ def write_similarity_matrix(simlarity_matrix, similarity_matrix_file):
 
 def read_similarity_matrix(similarity_matrix_file):
     f = open(similarity_matrix_file, "rb")
-    similarity_matrix_proto = loc_protos.CostMatrix()
+    similarity_matrix_proto = loc_protos.SimilarityMatrix()
     similarity_matrix_proto.ParseFromString(f.read())
     f.close()
     similarity_matrix = np.array(similarity_matrix_proto.values)
