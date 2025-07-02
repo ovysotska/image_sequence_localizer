@@ -16,7 +16,7 @@ constexpr auto kEpsilon = 1e-09;
 } // namespace
 
 SimilarityMatrix::SimilarityMatrix(const std::string &similarityMatrixFile) {
-  CHECK(!similarityMatrixFile.empty()) << "Cost matrix file is not set";
+  CHECK(!similarityMatrixFile.empty()) << "Similarity matrix file is not set";
   loadFromProto(similarityMatrixFile);
 }
 
