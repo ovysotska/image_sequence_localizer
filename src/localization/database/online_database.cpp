@@ -27,6 +27,7 @@
 #include "database/list_dir.h"
 #include "features/feature_buffer.h"
 #include "features/ifeature.h"
+#include "similarity_matrix.h"
 
 #include <glog/logging.h>
 
@@ -54,7 +55,7 @@ addFeatureIfNeeded(features::FeatureBuffer &featureBuffer,
 OnlineDatabase::OnlineDatabase(const std::string &queryFeaturesDir,
                                const std::string &refFeaturesDir,
                                features::FeatureType type, int bufferSize,
-                               const std::string &costMatrixFile)
+                               const std::string &similarityMatrixFile)
     : quFeaturesNames_{listProtoDir(queryFeaturesDir, ".Feature")},
       refFeaturesNames_{listProtoDir(refFeaturesDir, ".Feature")},
       featureType_{type}, refBuffer_{std::make_unique<features::FeatureBuffer>(
@@ -62,8 +63,8 @@ OnlineDatabase::OnlineDatabase(const std::string &queryFeaturesDir,
       queryBuffer_{std::make_unique<features::FeatureBuffer>(bufferSize)} {
   LOG_IF(FATAL, quFeaturesNames_.empty()) << "Query features are not set.";
   LOG_IF(FATAL, refFeaturesNames_.empty()) << "Reference features are not set.";
-  if (!costMatrixFile.empty()) {
-    precomputedCosts_ = CostMatrix(costMatrixFile);
+  if (!similarityMatrixFile.empty()) {
+    precomputedScores_ = SimilarityMatrix(similarityMatrixFile);
   }
 }
 
@@ -82,8 +83,8 @@ double OnlineDatabase::computeMatchingCost(int quId, int refId) {
 }
 
 double OnlineDatabase::getCost(int quId, int refId) {
-  if (precomputedCosts_) {
-    return precomputedCosts_->getInverseCost(quId, refId);
+  if (precomputedScores_) {
+    return precomputedScores_->getCost(quId, refId);
   }
   // Check if the cost was computed before.
   auto rowIter = costs_.find(quId);

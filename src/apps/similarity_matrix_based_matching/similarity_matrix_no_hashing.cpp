@@ -1,6 +1,6 @@
 /* By O. Vysotska in 2023 */
 
-#include "database/cost_matrix_database.h"
+#include "database/similarity_matrix_database.h"
 #include "database/idatabase.h"
 #include "online_localizer/online_localizer.h"
 #include "online_localizer/path_element.h"
@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
 
   if (argc < 2) {
     LOG(ERROR) << "Not enough input parameters.";
-    LOG(INFO) << "Proper usage: ./cost_matrix_based_matching_no_hashing "
+    LOG(INFO) << "Proper usage: ./similarity_matrix_based_matching_no_hashing "
                  "config_file.yaml";
     exit(0);
   }
@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
   parser.print();
 
   const auto database =
-      std::make_unique<loc::database::CostMatrixDatabase>(parser.costMatrix);
+      std::make_unique<loc::database::SimilarityMatrixDatabase>(parser.similarityMatrix);
 
   const auto relocalizer =
       std::make_unique<loc::relocalizers::DefaultRelocalizer>(

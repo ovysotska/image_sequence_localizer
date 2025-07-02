@@ -10,17 +10,17 @@ def cosine_similarity(qu, db):
     return dist
 
 
-def compute_cost_matrix(qu_features, db_features):
-    cost_matrix = np.zeros((len(qu_features), len(db_features)))
+def compute_similarity_matrix(qu_features, db_features):
+    similarity_matrix = np.zeros((len(qu_features), len(db_features)))
 
-    print("Computing cost matrix...")
+    print("Computing similarity matrix...")
     for q, query_feature in enumerate(qu_features):
         for d, db_feature in enumerate(db_features):
             # Compute cosine distance
-            cost_matrix[q, d] = cosine_similarity(query_feature, db_feature)
+            similarity_matrix[q, d] = cosine_similarity(query_feature, db_feature)
 
     print("Finished.")
-    return cost_matrix
+    return similarity_matrix
 
 
 def main():
@@ -32,17 +32,17 @@ def main():
         "--db_features", required=True, type=Path, help="Path to db directory."
     )
     parser.add_argument(
-        "--cost_matrix_file",
+        "--similarity_matrix_file",
         required=False,
-        default="cost_matrix.CostMatrix.pb",
+        default="similarity_matrix.SimilarityMatrix.pb",
         type=Path,
-        help="File name for cost matrix output with extension CostMatrix.pb",
+        help="File name for similarity matrix output with extension SimilarityMatrix.pb",
     )
     args = parser.parse_args()
 
     query_files = list(args.query_features.glob("*.Feature.pb"))
     db_files = list(args.db_features.glob("*.Feature.pb"))
-    cost_matrix_file = args.cost_matrix_file
+    similarity_matrix_file = args.similarity_matrix_file
 
     if len(query_files) == 0:
         print("WARNING: no query features were read")
@@ -62,11 +62,11 @@ def main():
     for db_file in db_files:
         db_features.append(protos_io.read_feature(db_file))
 
-    cost_matrix = compute_cost_matrix(query_features, db_features)
+    similarity_matrix = compute_similarity_matrix(query_features, db_features)
 
-    print("Matrix size", cost_matrix.shape)
-    protos_io.write_cost_matrix(cost_matrix, cost_matrix_file)
-    print("The cost matrix was save to", cost_matrix_file)
+    print("Matrix size", similarity_matrix.shape)
+    protos_io.write_similarity_matrix(similarity_matrix, similarity_matrix_file)
+    print("The similarity matrix was save to", similarity_matrix_file)
 
 
 if __name__ == "__main__":

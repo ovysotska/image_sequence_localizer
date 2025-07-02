@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
       /*refFeaturesDir=*/parser.path2ref,
       /*type=*/loc::features::FeatureType::Cnn_Feature,
       /*bufferSize=*/parser.bufferSize,
-      /*costMatrixFile=*/parser.costMatrix);
+      /*similarityMatrixFile=*/parser.similarityMatrix);
 
   auto relocalizer = std::make_unique<loc::relocalizers::LshCvHashing>(
       /*onlineDatabase=*/database.get(),

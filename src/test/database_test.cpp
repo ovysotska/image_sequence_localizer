@@ -23,7 +23,7 @@
 
 /* Updated by O. Vysotska in 2022 */
 
-#include "database/cost_matrix_database.h"
+#include "database/similarity_matrix_database.h"
 #include "database/online_database.h"
 #include "localization_protos.pb.h"
 #include "test_utils.h"
@@ -44,20 +44,20 @@ using FeatureType = localization::features::FeatureType;
 
 class OnlineDatabaseTest : public ::testing::Test {
 protected:
-  std::string createCostMatrixProto(const std::filesystem::path &dir) {
-    image_sequence_localizer::CostMatrix cost_matrix;
+  std::string createSimilarityMatrixProto(const std::filesystem::path &dir) {
+    image_sequence_localizer::SimilarityMatrix similarity_matrix;
     for (double value : {1, 2, 3, 4, 5, 6}) {
-      cost_matrix.add_values(value);
+      similarity_matrix.add_values(value);
     }
-    cost_matrix.set_cols(3);
-    cost_matrix.set_rows(2);
+    similarity_matrix.set_cols(3);
+    similarity_matrix.set_rows(2);
 
     std::string cost_matrix_name =
-        (dir / "test_cost_matrix.CostMatrix.pb").string();
+        (dir / "test_similarity_matrix.SimilarityMatrix.pb").string();
 
     std::fstream out(cost_matrix_name,
                      std::ios::out | std::ios::trunc | std::ios::binary);
-    cost_matrix.SerializeToOstream(&out);
+    similarity_matrix.SerializeToOstream(&out);
     out.close();
     return cost_matrix_name;
   }
@@ -108,7 +108,7 @@ TEST_F(OnlineDatabaseTest, NoCostMatrixFile) {
 }
 
 TEST_F(OnlineDatabaseTest, CostMatrixDatabaseConstructor) {
-  std::string cost_matrix_name = createCostMatrixProto(tmp_dir);
+  std::string cost_matrix_name = createSimilarityMatrixProto(tmp_dir);
   loc_database::OnlineDatabase database(/*queryFeaturesDir=*/tmp_dir,
                                         /*refFeaturesDir=*/tmp_dir,
                                         /*type=*/FeatureType::Cnn_Feature,
@@ -120,7 +120,7 @@ TEST_F(OnlineDatabaseTest, CostMatrixDatabaseConstructor) {
 }
 
 TEST_F(OnlineDatabaseTest, CostMatrixDatabaseGetCost) {
-  std::string cost_matrix_name = createCostMatrixProto(tmp_dir);
+  std::string cost_matrix_name = createSimilarityMatrixProto(tmp_dir);
   loc_database::OnlineDatabase database(/*queryFeaturesDir=*/tmp_dir,
                                         /*refFeaturesDir=*/tmp_dir,
                                         /*type=*/FeatureType::Cnn_Feature,

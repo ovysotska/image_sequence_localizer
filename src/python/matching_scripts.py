@@ -9,7 +9,7 @@ class RunParameters:
     path2ref_images: str = None
     path2qu: str = None
     path2ref: str = None
-    costMatrix: str = None
+    similarityMatrix: str = None
     matchingResult: str = None
     matchingResultImage: str = None
     expansionRate: float = 0.3
@@ -96,30 +96,30 @@ def computeFeatures(image_dir, output_folder, dataset_name, feature_type):
     )
 
 
-def computeCostMatrix(run_params):
+def computeSimilarityMatrix(run_params):
     params = "--query_features {query_features} ".format(
         query_features=run_params.path2qu
     )
     params += "--db_features {reference_features} ".format(
         reference_features=run_params.path2ref
     )
-    params += "--cost_matrix_file {cost_matrix_file} ".format(
-        cost_matrix_file=run_params.costMatrix
+    params += "--similarity_matrix_file {cost_matrix_file} ".format(
+        cost_matrix_file=run_params.similarityMatrix
     )
-    command = "python compute_cost_matrix.py " + params
+    command = "python compute_similarity_matrix.py " + params
     print("Calling:", command)
     os.system(command)
 
 
 def runMatching(config_yaml_file):
-    binary = "../../build/src/apps/cost_matrix_based_matching/online_localizer_lsh"
+    binary = "../../build/src/apps/similarity_matrix_based_matching/online_localizer_lsh"
     command = binary + " " + str(config_yaml_file)
     print("Calling:", command)
     os.system(command)
 
 
 def runLocalizationResultVisualization(run_params):
-    params = "--cost_matrix {cost_matrix} ".format(cost_matrix=run_params.costMatrix)
+    params = "--similarity_matrix {similarity_matrix} ".format(similarity_matrix=run_params.similarityMatrix)
     params += "--matching_result {matching_result} ".format(
         matching_result=run_params.matchingResult
     )

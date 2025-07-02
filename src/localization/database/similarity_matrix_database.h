@@ -23,21 +23,28 @@
 
 /* Updated by O. Vysotska in 2022 */
 
-#include "database/cost_matrix_database.h"
-#include "database/cost_matrix.h"
+#ifndef SRC_DATABASE_SIMILARITY_MATRIX_DATABASE_H_
+#define SRC_DATABASE_SIMILARITY_MATRIX_DATABASE_H_
 
-#include <fstream>
-#include <limits>
+#include "database/idatabase.h"
+#include "database/similarity_matrix.h"
 
-#include <glog/logging.h>
+#include <memory>
+#include <string>
 
 namespace localization::database {
 
-CostMatrixDatabase::CostMatrixDatabase(const std::string &costMatrixFile)
-    : costMatrix_(CostMatrix(costMatrixFile)) {}
+class SimilarityMatrixDatabase : public iDatabase {
+public:
+  explicit SimilarityMatrixDatabase(const std::string &costMatrixFile);
 
-double CostMatrixDatabase::getCost(int quId, int refId) {
-  return costMatrix_.getInverseCost(quId, refId);
-}
+  int refSize() override { return similarityMatrix_.cols(); }
+  double getCost(int quId, int refId) override;
+
+private:
+  SimilarityMatrix similarityMatrix_;
+};
 
 } // namespace localization::database
+
+#endif // SRC_DATABASE_SIMILARITY_MATRIX_DATABASE_H_

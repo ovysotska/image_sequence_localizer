@@ -1,1 +1,1 @@
-add_subdirectory(cost_matrix_based_matching)
+add_subdirectory(similarity_matrix_based_matching)

@@ -41,8 +41,7 @@ class ConfigParser {
     std::string path2quImg = "";
     std::string path2refImg = "";
     std::string imgExt = "";
-    std::string costMatrix = "";
-    std::string costOutputName = "";
+    std::string similarityMatrix = "";
     std::string simPlaces = "";
     std::string hashTable = "";
     std::string matchingResult = "matches.MatchingResult.pb";
@@ -70,14 +69,9 @@ class ConfigParser {
 /*! \var std::string ConfigParser::imgExt
     \brief stores the extension of the provided images (".jpg", ".png", etc).
 */
-/*! \var std::string ConfigParser::costMatrix
-    \brief stores path to precomputed cost/similarity matrix.
+/*! \var std::string ConfigParser::similarityMatrix
+    \brief stores path to precomputed similarity matrix.
 */
-/*! \var std::string ConfigParser::costOutputName
-    \brief stores the name of the produced result for the cost_matrix_based
-   matching.
-*/
-
 /*! \var std::string ConfigParser::hashTable
     \brief stores the name of the file to read hash table from.
    matching.

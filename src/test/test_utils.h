@@ -62,32 +62,32 @@ inline void clearDataUnderPath(const std::filesystem::path &path) {
   std::filesystem::remove_all(path);
 }
 
-const std::vector<std::vector<double>> kCostMatrix = {
+const std::vector<std::vector<double>> kSimilarityMatrix = {
     {1, 0.922225, 0.285714, 0.99449},
     {0.922225, 1, 0.634029, 0.922876},
     {0.285714, 0.634029, 1, 0.298347},
     {0.99449, 0.922876, 0.298347, 1}};
 
-inline image_sequence_localizer::CostMatrix
-computeCostMatrixProto(const fs::path &queryDir, const fs::path &refDir) {
+inline image_sequence_localizer::SimilarityMatrix
+computeSimilarityMatrixProto(const fs::path &queryDir, const fs::path &refDir) {
 
   const std::vector<std::string> queryFiles =
       localization::database::listProtoDir(queryDir, ".Feature");
   const std::vector<std::string> refFiles =
       localization::database::listProtoDir(refDir, ".Feature");
-  image_sequence_localizer::CostMatrix cost_matrix;
+  image_sequence_localizer::SimilarityMatrix similarity_matrix;
 
   for (const auto &query : queryFiles) {
     const auto queryFeature = localization::features::CnnFeature(query);
     for (const auto &ref : refFiles) {
-      cost_matrix.add_values(queryFeature.computeSimilarityScore(
+      similarity_matrix.add_values(queryFeature.computeSimilarityScore(
           localization::features::CnnFeature(ref)));
     }
   }
 
-  cost_matrix.set_cols(refFiles.size());
-  cost_matrix.set_rows(queryFiles.size());
-  return cost_matrix;
+  similarity_matrix.set_cols(refFiles.size());
+  similarity_matrix.set_rows(queryFiles.size());
+  return similarity_matrix;
 }
 
 } // namespace test
