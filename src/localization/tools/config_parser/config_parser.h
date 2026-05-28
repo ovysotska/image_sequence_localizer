@@ -45,12 +45,14 @@ class ConfigParser {
     std::string simPlaces = "";
     std::string hashTable = "";
     std::string matchingResult = "matches.MatchingResult.pb";
+    std::string debugProto = "";
 
     int querySize = -1;
     int fanOut = -1;
     int bufferSize = -1;
     double matchingThreshold = -1.0;
     double expansionRate = -1.0;
+    bool adaptThreshold = false;
 };
 
 /*! \var std::string ConfigParser::path2qu

@@ -1,7 +1,4 @@
-/** vpr_relocalization: a library for visual place recognition in changing
-** environments with efficient relocalization step.
-** Copyright (c) 2017 O. Vysotska, C. Stachniss, University of Bonn
-**
+/** Copyright (c) 2026 Olga Vysotska, RSL, ETH Zurich 
 ** Permission is hereby granted, free of charge, to any person obtaining a copy
 ** of this software and associated documentation files (the "Software"), to deal
 ** in the Software without restriction, including without limitation the rights
@@ -20,30 +17,28 @@
 ** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ** SOFTWARE.
 **/
+#ifndef SRC_ONLINE_LOCALIZER_MATH_TOOLS_H_
+#define SRC_ONLINE_LOCALIZER_MATH_TOOLS_H_
 
-/* Updated by O. Vysotska in 2022 */
+#include <vector>
 
-#include "database/similarity_matrix_database.h"
-#include "database/similarity_matrix.h"
-#include "similarity_matrix.h"
+namespace localization::online_localizer {
 
-#include <glog/logging.h>
+double getNormalPdfValueAtX(double x, double mu, double sigma);
+std::vector<double> computeCumulativeSum(const std::vector<double> &array);
+double interpolate1D(const std::vector<double> &x, const std::vector<double> &y,
+                     double t);
 
-namespace localization::database {
+double estimateMean(const std::vector<double> &values);
+double estimateVariance(const std::vector<double> &values);
 
-SimilarityMatrixDatabase::SimilarityMatrixDatabase(const std::string &similarityMatrixFile)
-    : similarityMatrix_(SimilarityMatrix(similarityMatrixFile)) {}
+struct ValueEstimate {
+  double value;
+  double uncertainty;
+};
+ValueEstimate kalmanFilterUpdate(ValueEstimate previousEstimate,
+                                 ValueEstimate measurement);
 
-double SimilarityMatrixDatabase::getCost(int quId, int refId) {
-  return similarityMatrix_.getCost(quId, refId);
-}
+} // namespace localization::online_localizer
 
-std::optional<double> SimilarityMatrixDatabase::getCostIfComputed(int quId,
-                                                            int refId) const {
-  if (refId >= refSize()) {
-    return {};
-  }
-  return similarityMatrix_.at(quId, refId);
-}
-
-} // namespace localization::database
+#endif

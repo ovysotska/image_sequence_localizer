@@ -99,6 +99,24 @@ double OnlineDatabase::getCost(int quId, int refId) {
   return cost;
 }
 
+std::optional<double> OnlineDatabase::getCostIfComputed(int quId,
+                                                        int refId) const {
+  if (precomputedScores_) {
+    if (refId >= refSize()) {
+      return {};
+    }
+    return precomputedScores_->at(quId, refId);
+  }
+  auto rowIter = costs_.find(quId);
+  if (rowIter != costs_.end()) {
+    auto elementIter = rowIter->second.find(refId);
+    if (elementIter != rowIter->second.end()) {
+      return 1. / elementIter->second;
+    }
+  }
+  return {};
+}
+
 const features::iFeature &OnlineDatabase::getQueryFeature(int quId) {
   return addFeatureIfNeeded(*queryBuffer_, quFeaturesNames_, featureType_,
                             quId);

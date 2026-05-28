@@ -171,4 +171,25 @@ SuccessorManager::getSuccessorsIfLost(const Node &node) {
   }
   return _successors;
 }
+
+std::vector<Node> SuccessorManager::getPatchCosts(int quId, int refId,
+                                                  int patchWidth) const {
+  CHECK_GE(patchWidth, 1);
+  std::vector<Node> patchCosts;
+  int halfPatchWidth = (patchWidth > 1) ? patchWidth / 2 : patchWidth;
+  int topLeftRow = std::max(quId - (patchWidth - 1), 0);
+  int topLeftCol = std::max(refId - (patchWidth - 1), 0);
+  for (int patchQueryId = topLeftRow; patchQueryId <= quId; patchQueryId++) {
+    for (int patchRefId = topLeftCol; patchRefId <= refId; patchRefId++) {
+      // Return directly similarity matching costs [0,1].
+      auto cost = database_->getCostIfComputed(patchQueryId, patchRefId);
+      if (cost) {
+        patchCosts.push_back(
+            Node(patchQueryId, patchRefId, std::abs(cost.value())));
+      }
+    }
+  }
+  return patchCosts;
+}
+
 } // namespace localization::successor_manager

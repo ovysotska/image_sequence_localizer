@@ -25,6 +25,8 @@
 
 #include "online_localizer/online_localizer.h"
 #include "localization_protos.pb.h"
+#include "online_localizer/math_tools/gmm.h"
+#include "online_localizer/math_tools/statistical_test.h"
 #include "online_localizer/path_element.h"
 #include "tools/timer/timer.h"
 
@@ -44,11 +46,37 @@ namespace localization::online_localizer {
 using std::string;
 using std::vector;
 
+namespace {
+
 const float kMaxLostNodesRatio = 0.8; // 80%
+
+const int kPatchWidth = 20;
+const int kMinPatchSize = 2;
+
+} // namespace
+
+void writePatchToProto(const std::vector<Node> patch,
+                       image_sequence_localizer::Patch *patchProto) {
+  for (const auto &node : patch) {
+    image_sequence_localizer::Patch::Element *element =
+        patchProto->add_elements();
+    element->set_row(node.quId);
+    element->set_col(node.refId);
+    element->set_similarity_value(node.idvCost);
+  }
+}
+
+void writeGmmStatsToProto(const GaussianMixtureModels &models,
+                          image_sequence_localizer::PatchInfo::GMM *gmmProto) {
+  gmmProto->set_mu_class_0(models.nonMatchingModel().mu());
+  gmmProto->set_mu_class_1(models.matchingModel().mu());
+  gmmProto->set_sigma_class_0(models.nonMatchingModel().sigma());
+  gmmProto->set_sigma_class_1(models.matchingModel().sigma());
+}
 
 OnlineLocalizer::OnlineLocalizer(
     successor_manager::SuccessorManager *successorManager, double expansionRate,
-    double matchingThreshold) {
+    double matchingThreshold, bool adaptThreshold) {
 
   CHECK(successorManager) << "Successor manager is not set.";
   CHECK(expansionRate > 0 && expansionRate <= 1)
@@ -58,7 +86,13 @@ OnlineLocalizer::OnlineLocalizer(
 
   successorManager_ = successorManager;
   expansionRate_ = expansionRate;
-  matchingThreshold_ = matchingThreshold;
+  matchingThreshold_.value = matchingThreshold;
+  adaptThreshold_ = adaptThreshold;
+  LOG(INFO) << "Adapting matching threshold: " << (adaptThreshold_ ? "yes": "no");
+
+  debug_.set_start_matching_threshold(matchingThreshold_.value);
+  debug_.set_stats_patch_width(kPatchWidth);
+  debug_.set_sliding_window_size(kSlidingWindowSize_);
 
   pred_[kSourceNode.quId][kSourceNode.refId] = kSourceNode;
   Node source = kSourceNode;
@@ -68,15 +102,19 @@ OnlineLocalizer::OnlineLocalizer(
   currentBestHyp_ = source;
 }
 
-Matches OnlineLocalizer::findMatchesTill(int queryId) {
+Matches OnlineLocalizer::findMatchesTill(int queryId,
+                                         const std::string &debugFilename) {
   CHECK(queryId >= 0) << "Number of queries is <= 0: " << queryId;
   Timer timer;
   // For the first image consider lost
   // for every image in the query set
   for (int qu = 0; qu < queryId; ++qu) {
+    // Setting up debug message
+    image_sequence_localizer::OnlineLocalizerDebugPerStep *debugPerStep =
+        debug_.add_debug_per_step();
     // while the graph is not expanded till row 'qu'
     timer.start();
-    processImage(qu);
+    processImage(qu, debugPerStep);
     timer.stop();
 
     LOG(INFO) << "Matched image " << qu;
@@ -85,6 +123,18 @@ Matches OnlineLocalizer::findMatchesTill(int queryId) {
     visualize();
   }
   LOG(INFO) << "Finished matching.";
+
+  if (!debugFilename.empty()) {
+    std::fstream out(debugFilename,
+                     std::ios::out | std::ios::trunc | std::ios::binary);
+    if (!debug_.SerializeToOstream(&out)) {
+      LOG(ERROR) << "Couldn't open the file: " << debugFilename;
+    }
+    out.close();
+
+    LOG(INFO) << "Debug is written to: " << debugFilename;
+  }
+
   if (_vis) {
     _vis->processFinished();
   }
@@ -107,6 +157,54 @@ void OnlineLocalizer::writeOutExpanded(const std::string &filename) const {
   }
   out.close();
   LOG(INFO) << "Wrote patch " << filename;
+}
+
+std::optional<double> OnlineLocalizer::estimateMatchingThreshold(
+    image_sequence_localizer::PatchInfo *patchInfoProto) const {
+
+  std::vector<Node> patch = successorManager_->getPatchCosts(
+      currentBestHyp_.quId, currentBestHyp_.refId, kPatchWidth);
+  patchInfoProto->set_best_row(currentBestHyp_.quId);
+  patchInfoProto->set_best_col(currentBestHyp_.refId);
+
+  if (patch.size() < kMinPatchSize) {
+    LOG(WARNING) << "Patch is too small to make decisions: " << patch.size();
+    return {};
+  }
+
+  writePatchToProto(patch, patchInfoProto->mutable_patch());
+
+  std::vector<double> patchValues;
+  patchValues.reserve(patch.size());
+  for (const auto &node : patch) {
+    patchValues.push_back(node.idvCost);
+  }
+
+  const auto &[pathInsidePatch, pvalue, location] =
+      patchContainsPath(patchValues);
+  patchInfoProto->set_path_exists(pathInsidePatch);
+  patchInfoProto->set_pvalue(pvalue);
+  patchInfoProto->set_pvalue_location(location);
+
+  if (!pathInsidePatch) {
+    LOG(INFO) << "No path inside the patch";
+    return {};
+  }
+
+  auto matchThresholdResult = estimateSeparationThreshold(patchValues);
+
+  if (!matchThresholdResult) {
+    return {};
+  }
+  const auto &[matchThreshold, gaussianModels] = matchThresholdResult.value();
+  writeGmmStatsToProto(gaussianModels, patchInfoProto->mutable_gmm_stats());
+
+  if (std::abs(matchThreshold) < 1e-08) {
+    LOG(WARNING) << "Match threshold is too close to 0";
+    return {};
+  }
+  patchInfoProto->set_threshold(matchThreshold);
+  return 1.0 / matchThreshold;
 }
 
 // frontier picking up routine
@@ -156,12 +254,15 @@ void OnlineLocalizer::matchImage(int quId) {
   }
 }
 
-void OnlineLocalizer::processImage(int quId) {
+void OnlineLocalizer::processImage(
+    int quId,
+    image_sequence_localizer::OnlineLocalizerDebugPerStep *debugProto) {
   LOG(INFO) << "Checking image " << quId;
   if (quId == 0) {
     needReloc_ = true;
   }
   matchImage(quId);
+  queryIdToThreshMap_[quId] = matchingThreshold_.value;
 
   CHECK(!frontier_.empty()) << "Frontier is empty! Something bad happened.";
 
@@ -171,6 +272,40 @@ void OnlineLocalizer::processImage(int quId) {
     LOG(INFO) << "LOST";
   } else {
     needReloc_ = false;
+  }
+
+  if (!adaptThreshold_){
+    return;
+  }
+
+  // Perform threshold adaptation 
+
+  image_sequence_localizer::PatchInfo *ksDebugInfo =
+      debugProto->add_ks_patches();
+  debugProto->set_matching_threshold(matchingThreshold_.value);
+  debugProto->set_row(quId);
+  // TODO(olga). Not sure this is the safest way to code this.
+  writePatchToProto({expandedRecently_.begin(), expandedRecently_.end()},
+                    debugProto->mutable_expanded_nodes());
+
+  debugProto->set_lost(needReloc_);
+  convertMatchesToProto(getCurrentPath(), debugProto->mutable_path());
+
+  // Threshold is estimated only if path exists and GMM was able to find a
+  // separation threshold + only if in Localization mode (NOT LOST)
+  // or LOST but first path is not found yet
+  if (!needReloc_ || (needReloc_ && !thresholdFoundFirstTime_)) {
+    std::optional<double> estimatedThreshold =
+        estimateMatchingThreshold(ksDebugInfo);
+    if (estimatedThreshold) {
+      ValueEstimate estimate;
+      estimate.value = estimatedThreshold.value();
+      estimate.uncertainty = 20.0;
+
+      matchingThreshold_ = kalmanFilterUpdate(matchingThreshold_, estimate);
+      thresholdFoundFirstTime_ = true;
+      debugProto->set_estimated_matching_threshold(matchingThreshold_.value);
+    }
   }
 }
 
@@ -315,7 +450,8 @@ std::vector<PathElement> OnlineLocalizer::getCurrentPath() const {
       source_reached = true;
       continue;
     }
-    NodeState state = pred.idvCost > matchingThreshold_ ? HIDDEN : REAL;
+    NodeState state =
+        pred.idvCost > queryIdToThreshMap_.at(pred.quId) ? HIDDEN : REAL;
     PathElement pathEl(pred.quId, pred.refId, state);
     path.push_back(pathEl);
     pred = pred_.at(pred.quId).at(pred.refId);
@@ -362,7 +498,8 @@ std::vector<PathElement> OnlineLocalizer::getLastNmatches(int N) const {
       source_reached = true;
       continue;
     }
-    NodeState state = pred.idvCost > matchingThreshold_ ? HIDDEN : REAL;
+    NodeState state =
+        pred.idvCost > queryIdToThreshMap_.at(pred.quId) ? HIDDEN : REAL;
     PathElement pathEl(pred.quId, pred.refId, state);
     path.push_back(pathEl);
     pred = pred_.at(pred.quId).at(pred.refId);

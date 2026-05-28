@@ -60,7 +60,7 @@ public:
 };
 
 TEST_F(OnlineLocalizerTest, Get) {
-  loc::online_localizer::Matches matches = localizer->findMatchesTill(4);
+  loc::online_localizer::Matches matches = localizer->findMatchesTill(4, "");
 
   // Expecting diagonal elements as path in reverse.
   for (int i = 0; i < matches.size(); ++i) {

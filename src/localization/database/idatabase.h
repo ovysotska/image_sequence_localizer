@@ -24,6 +24,8 @@
 #ifndef SRC_DATABASE_IDATABASE_H_
 #define SRC_DATABASE_IDATABASE_H_
 
+#include <optional>
+
 namespace localization::database {
 
 /**
@@ -31,7 +33,7 @@ namespace localization::database {
  */
 class iDatabase {
 public:
-  virtual int refSize() = 0;
+  virtual int refSize() const = 0;
   /**
    * @brief      Gets the cost. This cost goes directly in the graph structure.
    * Smaller costs correspond to bigger similarities.
@@ -42,6 +44,8 @@ public:
    * @return     The cost.
    */
   virtual double getCost(int quId, int refId) = 0;
+  virtual std::optional<double> getCostIfComputed(int quId,
+                                                  int refId) const = 0;
 
   iDatabase() = default;
   iDatabase(const iDatabase &) = delete;

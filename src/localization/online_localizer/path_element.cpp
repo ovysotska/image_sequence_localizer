@@ -31,6 +31,18 @@
 
 namespace localization::online_localizer {
 
+void convertMatchesToProto(
+    const Matches &matches,
+    image_sequence_localizer::MatchingResult *matching_result_proto) {
+  for (const auto &match : matches) {
+    image_sequence_localizer::MatchingResult::Match *match_proto =
+        matching_result_proto->add_matches();
+    match_proto->set_query_id(match.quId);
+    match_proto->set_ref_id(match.refId);
+    match_proto->set_real(match.state == NodeState::HIDDEN ? 0 : 1);
+  }
+}
+
 void storeMatchesAsProto(const Matches &matches,
                          const std::string &protoFilename) {
   image_sequence_localizer::MatchingResult matching_result_proto;
