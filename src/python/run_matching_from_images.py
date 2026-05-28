@@ -47,6 +47,11 @@ def parseParams():
         help="Creates and writes the pair of matching images.",
     )
     parser.add_argument(
+        "--adaptThreshold",
+        action="store_true",
+        help="Adapts the matching threshold based on the similarity values.",
+    )
+    parser.add_argument(
         "--link_images",
         action="store_true",
         help="Creates hard link for images in the result folder.",
@@ -104,6 +109,10 @@ def main():
     )
 
     run_params = setRunParameters(args)
+    if args.adaptThreshold:
+        run_params.adaptThreshold = True
+        # equals to 1. / (0.5 for similarity values between [0, 1]
+        run_params.matchingThreshold = 2.0
     params_as_dict = matching.convertToDictWithoutNoneEntries(run_params)
 
     yaml_config_file = args.output_dir / (args.dataset_name + "_config.yml")

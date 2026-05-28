@@ -24,8 +24,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <iostream>
-#include <random>
 #include <vector>
 
 namespace localization::online_localizer {
@@ -139,7 +137,7 @@ patchContainsPath(const std::vector<double> &values) {
   // This function checks if the patch contains the path using
   // the Kolmogorov-Smirnov statistical test.
   // https://en.wikipedia.org/wiki/Kolmogorov%E2%80%93Smirnov_test
-  // We consider that the patch contains NO path is the values form a unimodal
+  // We consider that the patch contains NO path if the values form a unimodal
   // distribution. If the observed distribution diverges from the unimodal
   // Gaussian distribution, then there exists a path in the patch.
   // The null hypothesis in the ks-test is: The patch is unimodal.

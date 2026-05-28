@@ -74,13 +74,25 @@ For more details about the parameters, please use `python run_matching_from_*.py
 For more details about the underlying method and the interpretation of the results, please have a look at [paper](http://www.ipb.uni-bonn.de/pdfs/vysotska16ral-icra.pdf).
 Here is a sketch of what roughly is happening for those who don't like to read much ![](doc/cost_matrix_view.png)
 
+### Adaptive thresholding
+
+This algorithm requires user to provide a value for matching threshold, a value that defines starting with which similarity two images are no longer showing the same place. Selecting a correct value for this is not straightforward and depends on the degree of challenge two image sequences exhibit. For example, when matching summer sequence with respect to winter sequence one threshold value would be fitting, however, the same value may not be good when matching day and night sequences. Moreover, the environment can be gradually changing within one image sequence, for example, it becomes gradually darker when the sun goes down.
+
+Here we provide an option to dynamically adapt the initial threshold. The code will check the current similarity values and adapt the matching threshold accordingly.
+To use **adaptive thresholding** add `--adaptThreshold` parameter in the matching call, as shown here:
+
+```bash
+python run_matching_from_images.py \
+    --query_images <path_to_images> \
+    --reference_images <path_to_images> \
+    --dataset_name <dataset_name> \
+    --output_dir <path_to_folder>
+    --write_image_matches
+    --adaptThreshold
+```
+
+For more details, please refer to the [paper](https://www.research-collection.ethz.ch/server/api/core/bitstreams/39b0396e-4743-4bf1-97c6-4cbcf97b0270/content).
+
 ## Parent project
 
 This repository is a continuation of my previous works [vpr_relocalization](https://github.com/PRBonn/vpr_relocalization) and [online_place_recognition](https://github.com/PRBonn/online_place_recognition).
-
-The plan is to gradually modernize and improve the code by preserving the essential capabilities of the system.
-
-**Essential capabilities**:
-
-1. Given two sequences of images compute the matching image pairs.
-2. Scripts to visualize the results.

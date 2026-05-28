@@ -34,11 +34,17 @@ def parseParams():
         required=True,
         help="Path to output directory to store results.",
     )
+    parser.add_argument(
+        "--adaptThreshold",
+        action="store_true",
+        help="Adapts the matching threshold based on the similarity values.",
+    )
     return parser.parse_args()
 
 
 def setRunParameters(args):
     run_parameters = matching.RunParameters()
+    print(run_parameters)
     run_parameters.path2qu = args.query_features.as_posix()
     run_parameters.path2ref = args.reference_features.as_posix()
     run_parameters.similarityMatrix = (
@@ -69,6 +75,10 @@ def main():
         args.output_dir.mkdir()
 
     run_params = setRunParameters(args)
+    if args.adaptThreshold:
+        run_params.adaptThreshold = True
+        # equals to 1. / (0.5 for similarity values between [0, 1]
+        run_params.matchingThreshold = 2.0
     param_as_dict = matching.convertToDictWithoutNoneEntries(run_params)
 
     yaml_config_file = args.output_dir / (args.dataset_name + "_config.yml")

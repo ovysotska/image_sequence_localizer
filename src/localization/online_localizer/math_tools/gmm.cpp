@@ -1,4 +1,4 @@
-/** Copyright (c) 2026 Olga Vysotska, RSL, ETH Zurich 
+/** Copyright (c) 2026 Olga Vysotska, RSL, ETH Zurich
 ** Permission is hereby granted, free of charge, to any person obtaining a copy
 ** of this software and associated documentation files (the "Software"), to deal
 ** in the Software without restriction, including without limitation the rights
@@ -22,7 +22,6 @@
 
 #include "glog/logging.h"
 
-#include <array>
 #include <cmath>
 #include <numeric>
 #include <vector>

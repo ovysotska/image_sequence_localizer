@@ -15,6 +15,7 @@ class RunParameters:
     expansionRate: float = 0.3
     fanOut: int = 5
     matchingThreshold: float = 3.7
+    adaptThreshold: bool = False
     querySize: int = None
     bufferSize: int = 100
 
@@ -112,14 +113,18 @@ def computeSimilarityMatrix(run_params):
 
 
 def runMatching(config_yaml_file):
-    binary = "../../build/src/apps/similarity_matrix_based_matching/online_localizer_lsh"
+    binary = (
+        "../../build/src/apps/similarity_matrix_based_matching/online_localizer_lsh"
+    )
     command = binary + " " + str(config_yaml_file)
     print("Calling:", command)
     os.system(command)
 
 
 def runLocalizationResultVisualization(run_params):
-    params = "--similarity_matrix {similarity_matrix} ".format(similarity_matrix=run_params.similarityMatrix)
+    params = "--similarity_matrix {similarity_matrix} ".format(
+        similarity_matrix=run_params.similarityMatrix
+    )
     params += "--matching_result {matching_result} ".format(
         matching_result=run_params.matchingResult
     )

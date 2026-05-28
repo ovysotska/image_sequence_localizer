@@ -20,8 +20,6 @@
 #ifndef SRC_ONLINE_LOCALIZER_MATH_TOOLS_STATISTICAL_TEST_H_
 #define SRC_ONLINE_LOCALIZER_MATH_TOOLS_STATISTICAL_TEST_H_
 
-#include <array>
-#include <optional>
 #include <vector>
 
 namespace localization::online_localizer {
