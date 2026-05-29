@@ -18,6 +18,7 @@ class RunParameters:
     adaptThreshold: bool = False
     querySize: int = None
     bufferSize: int = 100
+    debugProto: str = None
 
 
 def initializeFromDict(params, params_as_dict):
