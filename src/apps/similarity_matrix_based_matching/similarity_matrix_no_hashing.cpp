@@ -1,7 +1,7 @@
 /* By O. Vysotska in 2023 */
 
-#include "database/similarity_matrix_database.h"
 #include "database/idatabase.h"
+#include "database/similarity_matrix_database.h"
 #include "online_localizer/online_localizer.h"
 #include "online_localizer/path_element.h"
 #include "relocalizers/default_relocalizer.h"
@@ -31,7 +31,8 @@ int main(int argc, char *argv[]) {
   parser.print();
 
   const auto database =
-      std::make_unique<loc::database::SimilarityMatrixDatabase>(parser.similarityMatrix);
+      std::make_unique<loc::database::SimilarityMatrixDatabase>(
+          parser.similarityMatrix);
 
   const auto relocalizer =
       std::make_unique<loc::relocalizers::DefaultRelocalizer>(
@@ -41,9 +42,10 @@ int main(int argc, char *argv[]) {
       std::make_unique<loc::successor_manager::SuccessorManager>(
           database.get(), relocalizer.get(), parser.fanOut);
   loc::online_localizer::OnlineLocalizer localizer{
-      successorManager.get(), parser.expansionRate, parser.matchingThreshold};
+      successorManager.get(), parser.expansionRate, parser.matchingThreshold,
+      parser.adaptThreshold};
   const loc::online_localizer::Matches imageMatches =
-      localizer.findMatchesTill(parser.querySize);
+      localizer.findMatchesTill(parser.querySize, parser.debugProto);
   loc::online_localizer::storeMatchesAsProto(imageMatches,
                                              parser.matchingResult);
 

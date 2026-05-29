@@ -24,6 +24,8 @@
 #ifndef SRC_ONLINE_LOCALIZER_PATH_ELEMENT_H_
 #define SRC_ONLINE_LOCALIZER_PATH_ELEMENT_H_
 
+#include "localization_protos.pb.h"
+
 #include <string>
 #include <vector>
 
@@ -51,6 +53,10 @@ public:
 using Matches = std::vector<PathElement>;
 void storeMatchesAsProto(const Matches &matches,
                          const std::string &protoFilename);
+
+void convertMatchesToProto(
+    const Matches &matches,
+    image_sequence_localizer::MatchingResult *matching_result_proto);
 }; // namespace localization::online_localizer
 
 #endif // SRC_ONLINE_LOCALIZER_PATH_ELEMENT_H_

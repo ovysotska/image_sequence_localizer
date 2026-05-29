@@ -34,3 +34,41 @@ message Patch {
   }
   repeated Element elements = 1;
 }
+
+message PatchInfo{
+  message GMM { 
+    optional double mu_class_0 = 1;
+    optional double mu_class_1 = 2;
+    optional double sigma_class_0 = 3;
+    optional double sigma_class_1 = 4;
+  }
+  optional Patch patch = 1;
+  optional double pvalue = 2;
+  optional double pvalue_location = 3;
+  optional bool path_exists = 4;
+  optional double threshold = 5;
+  optional int32 best_row = 6;
+  optional int32 best_col = 7;
+  // GMM result
+  optional GMM gmm_stats = 10;
+
+}
+
+message OnlineLocalizerDebugPerStep{
+  optional double matching_threshold = 1;
+  optional double estimated_matching_threshold = 2;
+  optional int32 row = 3;
+  repeated PatchInfo ks_patches = 4;
+  optional Patch expanded_nodes = 5;
+  optional MatchingResult path = 6;
+  optional bool lost = 7;
+
+}
+
+message OnlineLocalizerDebug {
+  optional double start_matching_threshold = 1;
+  optional int32 stats_patch_width = 2;
+  optional int32 sliding_window_size = 3;
+  optional double significance_value = 4;
+  repeated OnlineLocalizerDebugPerStep debug_per_step = 10;
+}

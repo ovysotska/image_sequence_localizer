@@ -62,6 +62,8 @@ public:
   void getSuccessorFanOut(int quId, int refId);
   void getSuccessorsSimPlaces(int quId, int refId);
 
+  std::vector<Node> getPatchCosts(int quId, int refId, int patchWidth) const;
+
 protected:
   database::iDatabase *database_ = nullptr;
   int fanOut_ = 0;

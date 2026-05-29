@@ -38,8 +38,9 @@ class SimilarityMatrixDatabase : public iDatabase {
 public:
   explicit SimilarityMatrixDatabase(const std::string &costMatrixFile);
 
-  int refSize() override { return similarityMatrix_.cols(); }
+  int refSize() const override { return similarityMatrix_.cols(); }
   double getCost(int quId, int refId) override;
+  std::optional<double> getCostIfComputed(int quId, int refId) const override;
 
 private:
   SimilarityMatrix similarityMatrix_;

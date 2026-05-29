@@ -26,8 +26,8 @@
 #ifndef SRC_DATABASE_ONLINE_DATABASE_H_
 #define SRC_DATABASE_ONLINE_DATABASE_H_
 
-#include "database/similarity_matrix.h"
 #include "database/idatabase.h"
+#include "database/similarity_matrix.h"
 #include "features/feature_buffer.h"
 #include "features/feature_factory.h"
 
@@ -48,8 +48,9 @@ public:
                  const std::string &refFeaturesDir, features::FeatureType type,
                  int bufferSize, const std::string &similarityMatrixFile = "");
 
-  inline int refSize() override { return refFeaturesNames_.size(); }
+  inline int refSize() const override { return refFeaturesNames_.size(); }
   double getCost(int quId, int refId) override;
+  std::optional<double> getCostIfComputed(int quId, int refId) const override;
 
   double computeMatchingCost(int quId, int refId);
 

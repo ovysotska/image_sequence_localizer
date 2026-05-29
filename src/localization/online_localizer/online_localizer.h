@@ -24,15 +24,17 @@
 #ifndef SRC_ONLINE_LOCALIZER_ONLINE_LOCALIZER_H_
 #define SRC_ONLINE_LOCALIZER_ONLINE_LOCALIZER_H_
 
+#include <map>
 #include <memory>
 #include <queue>
-#include <set>
 #include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
+#include "localization_protos.pb.h"
 #include "online_localizer/ilocvisualizer.h"
+#include "online_localizer/math_tools/math_tools.h"
 #include "online_localizer/path_element.h"
 #include "successor_manager/node.h"
 #include "successor_manager/successor_manager.h"
@@ -46,14 +48,17 @@ public:
   using AccCostsMap = std::unordered_map<int, std::unordered_map<int, double>>;
 
   OnlineLocalizer(successor_manager::SuccessorManager *successorManager,
-                  double expansionRate, double matchingThreshold);
+                  double expansionRate, double matchingThreshold,
+                  bool adaptThreshold = false);
   ~OnlineLocalizer() {}
 
-  Matches findMatchesTill(int queryId);
+  Matches findMatchesTill(int queryId, const std::string &debugFilename);
   void writeOutExpanded(const std::string &filename) const;
 
 protected:
-  void processImage(int quId);
+  void processImage(
+      int quId,
+      image_sequence_localizer::OnlineLocalizerDebugPerStep *debugProto);
   void matchImage(int quId);
   std::vector<PathElement> getCurrentPath() const;
 
@@ -66,6 +71,8 @@ protected:
   double computeAveragePathCost() const;
 
   bool isLost(int N, double perc) const;
+  std::optional<double> estimateMatchingThreshold(
+      image_sequence_localizer::PatchInfo *patchInfoProto) const;
 
   void visualize() const;
 
@@ -73,19 +80,24 @@ private:
   int kSlidingWindowSize_ = 5; // frames
   bool needReloc_ = false;
   double expansionRate_ = -1.0;
-  double matchingThreshold_ = -1.0;
+
+  ValueEstimate matchingThreshold_ = {-1.0, 100};
+  bool thresholdFoundFirstTime_ = false;
+  bool adaptThreshold_ = false;
 
   std::priority_queue<Node> frontier_;
   // stores parent for each node
   PredMap pred_;
-  // stores the accumulative  cost for each node
+  // stores the accumulative cost for each node
   AccCostsMap accCosts_;
   Node currentBestHyp_;
 
   successor_manager::SuccessorManager *successorManager_ = nullptr;
   iLocVisualizer::Ptr _vis = nullptr;
+  std::map<int, double> queryIdToThreshMap_;
 
   NodeSet expandedRecently_;
+  image_sequence_localizer::OnlineLocalizerDebug debug_;
 };
 } // namespace localization::online_localizer
 
