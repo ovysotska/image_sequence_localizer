@@ -21,7 +21,7 @@ function readImageAsync(file: Blob) {
 }
 
 enum ProtoMessageType {
-  CostMatrix = "CostMatrix",
+  CostMatrix = "SimilarityMatrix",
   MatchingResult = "MatchingResult",
 }
 
@@ -52,7 +52,7 @@ async function readProtoFromFile(file: File, messageType: ProtoMessageType) {
     }
     let protoMessage = await readProtoFromBuffer(
       new Uint8Array(contentBuffer),
-      "image_sequence_localizer." + messageType.toString()
+      "image_sequence_localizer." + messageType.toString(),
     );
     console.log("Read proto message", protoMessage);
     return protoMessage;
@@ -68,7 +68,7 @@ type MatchingResultElement = {
 };
 
 function readMatchingResultFromProto(
-  matchingResultProto?: any
+  matchingResultProto?: any,
 ): MatchingResultElement[] | undefined {
   if (matchingResultProto == null) {
     return undefined;

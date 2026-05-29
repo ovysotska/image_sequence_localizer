@@ -15,14 +15,14 @@ import {
 
 function getMatchingResultInZoomBlock(
   results: MatchingResultElement[],
-  zoomParams: ZoomBlockParams
+  zoomParams: ZoomBlockParams,
 ) {
   return results.filter(
     (result) =>
       result.queryId >= zoomParams.topLeftY &&
       result.queryId < zoomParams.topLeftY + zoomParams.windowHeightPx &&
       result.refId >= zoomParams.topLeftX &&
-      result.refId < zoomParams.topLeftX + zoomParams.windowWidthPx
+      result.refId < zoomParams.topLeftX + zoomParams.windowWidthPx,
   );
 }
 
@@ -70,7 +70,7 @@ function CostMatrixComponent(props: CostMatrixProps): React.ReactElement {
     }
     readProtoFromFile(
       props.matchingResultProtoFile,
-      ProtoMessageType.MatchingResult
+      ProtoMessageType.MatchingResult,
     )
       .then((matchingResultProto) => {
         setMatchingResult(readMatchingResultFromProto(matchingResultProto));
@@ -88,8 +88,8 @@ function CostMatrixComponent(props: CostMatrixProps): React.ReactElement {
       costMatrix.getSubMatrix(
         zoomParams.topLeftX,
         zoomParams.topLeftY,
-        zoomParams.windowHeightPx
-      )
+        zoomParams.windowHeightPx,
+      ),
     );
   }, [zoomParams, costMatrix]);
 
@@ -132,7 +132,7 @@ function CostMatrixComponent(props: CostMatrixProps): React.ReactElement {
           flexDirection: "row",
           flexWrap: "wrap",
           justifyContent: "center",
-          backgroundColor: "ghostwhite"
+          backgroundColor: "ghostwhite",
         }}
       >
         <div>
