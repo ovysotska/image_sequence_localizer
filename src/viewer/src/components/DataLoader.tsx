@@ -14,7 +14,9 @@ function DataLoader(props: DataLoaderProps): React.ReactElement {
     const files = Array.from(fileList);
 
     const costMatrixProtoFile = files.find((file) => {
-      return file.webkitRelativePath.split("/")[1].endsWith(".CostMatrix.pb");
+      return file.webkitRelativePath
+        .split("/")[1]
+        .endsWith(".SimilarityMatrix.pb");
     });
     if (costMatrixProtoFile == null) {
       console.warn("CostMatrix proto file was not found");
